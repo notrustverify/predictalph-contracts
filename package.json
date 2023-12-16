@@ -1,0 +1,41 @@
+{
+  "name": "prediction-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "testnetcompile": "cli compile -n testnet",
+    "devcompile": "cli compile -n devnet",
+    "mainnetcompile": "cli compile -n mainnet",
+    "test": "cli test",
+    "devdeploy": "cli deploy --network devnet",
+    "testnetdeploy": "cli deploy --network testnet",
+    "mainnetdeploy": "cli deploy --network mainnet",
+    "build": "tsc --build .",
+    "withdraw": "tsc --build . && node dist/src/withdraw.js",
+    "destroy": "tsc --build . && node dist/src/destroy.js",
+    "draw": "tsc --build . && node dist/src/draw.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@alephium/cli": "^0.27.0",
+    "@alephium/web3": "^0.27.0",
+    "@alephium/web3-wallet": "^0.27.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@alephium/web3-test": "^0.27.2",
+    "@types/jest": "^29.5.11",
+    "jest": "^29.4.2",
+    "ts-jest": "^29.1.1",
+    "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": ">=14.0.0 <17.0.0",
+    "npm": ">=7.0.0"
+  }
+}

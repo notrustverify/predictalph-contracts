@@ -1,0 +1,3 @@
+TxScript Bid(predictalph: Predictalph, amount: U256, up: Bool) {
+    predictalph.bid{callerAddress!() -> ALPH : amount}(amount, up)
+}

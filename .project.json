@@ -1,0 +1,55 @@
+{
+  "fullNodeVersion": "v2.5.7",
+  "compilerOptionsUsed": {
+    "ignoreUnusedConstantsWarnings": false,
+    "ignoreUnusedVariablesWarnings": false,
+    "ignoreUnusedFieldsWarnings": false,
+    "ignoreUnusedPrivateFunctionsWarnings": false,
+    "ignoreUpdateFieldsCheckWarnings": false,
+    "ignoreCheckExternalCallerWarnings": false
+  },
+  "infos": {
+    "Bid": {
+      "sourceFile": "bid.ral",
+      "sourceCodeHash": "371e702f097195f771e3149b9072a9b95afcc049a3afcddd3e8905999af67988",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "End": {
+      "sourceFile": "roundState.ral",
+      "sourceCodeHash": "06e29ab2d60c68662691db7d4f4f8f62dae75776b677168c608bca20d3ea646b",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "Predictalph": {
+      "sourceFile": "predict.ral",
+      "sourceCodeHash": "b6b509eb83df10a809d6fbeb395235644f3d00fbf9042faff9cc59aa9edc6baf",
+      "bytecodeDebugPatch": "=8-2=1-5=1-1=1-3+0f0=2-1+3=4-1+7=1-3+22=1-3+423442444254=67-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=27-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=838",
+      "codeHashDebug": "5d942030e0b8e5b1c53bc1acecdd7fb89b705e9f10b81a8fa40dae2123dc9196",
+      "warnings": []
+    },
+    "Punter": {
+      "sourceFile": "punter.ral",
+      "sourceCodeHash": "cc69b77f1f7a6479099786d6e171138c602306f63bcfa0f914cc71cbc343003c",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "9811fbd668a4aeaaa372907ddc875ac188f4404ec8be88cf7ae7989e6e482e2a",
+      "warnings": []
+    },
+    "Round": {
+      "sourceFile": "round.ral",
+      "sourceCodeHash": "4d1b66f56372e1b6c92b5da2b7ce8ed02a5b8b20434dbf93a9ea87336ee33c52",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "9fcbe39918570a6173bd02e7bf360ee49a125966197073456788f0c4c312ed48",
+      "warnings": []
+    },
+    "Start": {
+      "sourceFile": "roundState.ral",
+      "sourceCodeHash": "06e29ab2d60c68662691db7d4f4f8f62dae75776b677168c608bca20d3ea646b",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    }
+  }
+}
