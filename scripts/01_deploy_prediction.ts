@@ -26,8 +26,8 @@ const deployAuction: DeployFunction<Settings> = async (
 
   })
 
-  console.log(`Auction contract id: ${auction.contractInstance.contractId}`)
-  console.log(`Auction contract address: ${auction.contractInstance.address}`)
+  console.log(`Prediction contract id: ${auction.contractInstance.contractId}`)
+  console.log(`Prediction contract address: ${auction.contractInstance.address}`)
 }
 
 export default deployAuction

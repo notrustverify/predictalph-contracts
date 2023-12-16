@@ -1,7 +1,7 @@
 {
   "version": "v2.5.7",
   "name": "Bid",
-  "bytecodeTemplate": "01010300000009b4{1}a2{1}{2}0e0c{0}0104",
+  "bytecodeTemplate": "01010300000009b4{1}a2{1}{2}0e0c{0}0106",
   "fieldsSig": {
     "names": [
       "predictalph",

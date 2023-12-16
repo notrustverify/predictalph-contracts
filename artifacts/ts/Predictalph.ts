@@ -109,6 +109,22 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getRound", params);
     },
+    getRoundByEpoch: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { epochToGet: bigint }
+      >
+    ): Promise<TestContractResult<HexString>> => {
+      return testMethod(this, "getRoundByEpoch", params);
+    },
+    getBetInfoByEpoch: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { from: Address; epochToGet: bigint }
+      >
+    ): Promise<TestContractResult<HexString>> => {
+      return testMethod(this, "getBetInfoByEpoch", params);
+    },
     startRound: async (
       params: TestContractParams<PredictalphTypes.Fields, { price: bigint }>
     ): Promise<TestContractResult<null>> => {
@@ -131,9 +147,113 @@ class Factory extends ContractFactory<
       return testMethod(this, "bid", params);
     },
     withdraw: async (
-      params: Omit<
-        TestContractParams<PredictalphTypes.Fields, never>,
-        "testArgs"
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        {
+          arrayEpochIn: [
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint,
+            bigint
+          ];
+          numberParticipation: bigint;
+        }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdraw", params);
@@ -166,8 +286,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=8-2=1-5=1-1=1-3+0f0=2-1+3=4-1+7=1-3+22=1-3+423442444254=67-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=27-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=838",
-    "5d942030e0b8e5b1c53bc1acecdd7fb89b705e9f10b81a8fa40dae2123dc9196"
+    "=8-2+4d=2-1+7=3-5+9=3-2+3d=2-2+7b=3-1+9=2+8e4=1-1+9e=2-2+ae=2-1=1+e=67-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=83-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=896",
+    "eccf81ebf59ed93128d65ac015831aa73756f4db3f8e9608ee1143375c079fb3"
   )
 );
 

@@ -38,6 +38,22 @@ enum ErrorCodes {
         return Round(epochContractId)
     }
 
+    fn getRoundByEpoch(epochToGet: U256) -> (Round) {
+        let epochContractId = subContractId!(#00 ++ toByteVec!(epochToGet))
+        emit Debug(`Round contract id ${epochContractId}`)
+        assert!(contractExists!(epochContractId), ErrorCodes.RoundNotExists)
+
+        return Round(epochContractId)
+    }
+
+    fn getBetInfoByEpoch(from: Address, epochToGet: U256) -> Punter {
+        let bidderContractId = subContractId!(#01 ++ toByteVec!(from) ++ toByteVec!(epochToGet))
+        assert!(contractExists!(bidderContractId), ErrorCodes.PunterNotExists)
+    
+        return Punter(bidderContractId)
+    }
+
+
     @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
     pub fn startRound(price: U256) -> (){
         let caller = callerAddress!()
@@ -110,21 +126,24 @@ enum ErrorCodes {
         
     }
 
-    pub fn withdraw() -> () {
+    @using(checkExternalCaller = false)
+    pub fn withdraw(arrayEpochIn: [U256;100], numberParticipation: U256) -> () {
         let caller = callerAddress!()
 
-        let betInfoCaller = getBetInfo(caller)
-        let addressPunter = betInfoCaller.getAddress()
-        checkCaller!(caller == addressPunter, ErrorCodes.InvalidCaller)
+        for (let mut index = 0; index < numberParticipation ; index = index + 1) {
+            let betInfoCaller = getBetInfoByEpoch(caller,arrayEpochIn[index])
+            let addressPunter = betInfoCaller.getAddress()
+            checkCaller!(caller == addressPunter, ErrorCodes.InvalidCaller)
 
-        let amountPunter = betInfoCaller.getAmountBid()
-        let upBid = betInfoCaller.getBid()
+            let amountPunter = betInfoCaller.getAmountBid()
+            let upBid = betInfoCaller.getBid()
 
-        let round = getRound()
-        round.userClaimRewards(addressPunter, amountPunter, upBid)
-        betInfoCaller.destroy()
+            let round = getRoundByEpoch(arrayEpochIn[index])
+            round.userClaimRewards(addressPunter, amountPunter, upBid)
+            betInfoCaller.destroy()
 
-        emit Claimed(addressPunter, amountPunter, epoch)
+            emit Claimed(addressPunter, amountPunter, epoch)
+        }
     }
 
     @using(updateFields = true, checkExternalCaller = false)
