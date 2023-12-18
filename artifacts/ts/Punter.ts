@@ -76,9 +76,7 @@ class Factory extends ContractFactory<PunterInstance, PunterTypes.Fields> {
     return this.contract.getInitialFieldsWithDefaultValues() as PunterTypes.Fields;
   }
 
-  consts = {
-    ErrorCodes: { InvalidCaller: BigInt(0), AlreadyPlayed: BigInt(1) },
-  };
+  consts = { ErrorCodes: { InvalidCaller: BigInt(200) } };
 
   at(address: string): PunterInstance {
     return new PunterInstance(address);
@@ -105,14 +103,6 @@ class Factory extends ContractFactory<PunterInstance, PunterTypes.Fields> {
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
-    bid: async (
-      params: TestContractParams<
-        PunterTypes.Fields,
-        { amount: bigint; up: boolean }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "bid", params);
-    },
     destroy: async (
       params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
     ): Promise<TestContractResult<null>> => {
@@ -126,7 +116,7 @@ export const Punter = new Factory(
   Contract.fromJson(
     PunterContractJson,
     "",
-    "9811fbd668a4aeaaa372907ddc875ac188f4404ec8be88cf7ae7989e6e482e2a"
+    "54f576b733065f21808717607e5639c57be247ee1b6baf5b529639e26d81eba9"
   )
 );
 

@@ -14,6 +14,7 @@ import {
 import { default as BidScriptJson } from "../Bid.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
+import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
 
 export const Bid = new ExecutableScript<{
   predictalph: HexString;
@@ -28,3 +29,6 @@ export const Start = new ExecutableScript<{
   predictalph: HexString;
   price: bigint;
 }>(Script.fromJson(StartScriptJson));
+export const Withdraw = new ExecutableScript<{ predictalph: HexString }>(
+  Script.fromJson(WithdrawScriptJson)
+);

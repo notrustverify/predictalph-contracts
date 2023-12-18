@@ -2,13 +2,12 @@ Contract Punter(
     prediction: Predictalph,
     punterAddress: Address,
     epoch: U256,
-    mut upBid: Bool,
-    mut amountBid: U256
+    upBid: Bool,
+    amountBid: U256
 ) {
 
     enum ErrorCodes {
-        InvalidCaller = 0
-        AlreadyPlayed = 1
+        InvalidCaller = 200
       }
 
 
@@ -26,15 +25,6 @@ Contract Punter(
 
     pub fn getRoundEpoch() -> (U256){
         return epoch
-    }
-
-    @using(updateFields = true)
-    pub fn bid(amount: U256, up: Bool) -> (){
-        checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-        assert!(amount < 0, ErrorCodes.AlreadyPlayed)
-        
-        amountBid = amount
-        upBid = up
     }
 
     pub fn destroy() -> (){

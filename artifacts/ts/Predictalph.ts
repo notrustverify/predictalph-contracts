@@ -88,6 +88,8 @@ class Factory extends ContractFactory<
       RoundAlreadyRunning: BigInt(5),
       RoundDidntEnd: BigInt(6),
       RoundNotExists: BigInt(7),
+      AlreadyPlayed: BigInt(8),
+      NotEnoughAlph: BigInt(9),
     },
   };
 
@@ -96,11 +98,6 @@ class Factory extends ContractFactory<
   }
 
   tests = {
-    getBetInfo: async (
-      params: TestContractParams<PredictalphTypes.Fields, { from: Address }>
-    ): Promise<TestContractResult<HexString>> => {
-      return testMethod(this, "getBetInfo", params);
-    },
     getRound: async (
       params: Omit<
         TestContractParams<PredictalphTypes.Fields, never>,
@@ -112,7 +109,7 @@ class Factory extends ContractFactory<
     getRoundByEpoch: async (
       params: TestContractParams<
         PredictalphTypes.Fields,
-        { epochToGet: bigint }
+        { epochToGet: HexString }
       >
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getRoundByEpoch", params);
@@ -120,7 +117,7 @@ class Factory extends ContractFactory<
     getBetInfoByEpoch: async (
       params: TestContractParams<
         PredictalphTypes.Fields,
-        { from: Address; epochToGet: bigint }
+        { from: Address; epochToGet: HexString }
       >
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getBetInfoByEpoch", params);
@@ -147,113 +144,9 @@ class Factory extends ContractFactory<
       return testMethod(this, "bid", params);
     },
     withdraw: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
-        {
-          arrayEpochIn: [
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint,
-            bigint
-          ];
-          numberParticipation: bigint;
-        }
+      params: Omit<
+        TestContractParams<PredictalphTypes.Fields, never>,
+        "testArgs"
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdraw", params);
@@ -286,8 +179,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=8-2+4d=2-1+7=3-5+9=3-2+3d=2-2+7b=3-1+9=2+8e4=1-1+9e=2-2+ae=2-1=1+e=67-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=83-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=896",
-    "eccf81ebf59ed93128d65ac015831aa73756f4db3f8e9608ee1143375c079fb3"
+    "=4-2=6-2+61=2-1+7=2-4=1-3=1-1=3-2+57=1+20=1-2+425242624272=2-2+82=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=836",
+    "d5cea33d4338c24cf56efc9af6fd8ea3926195a41bf65a0333301abfef218b0e"
   )
 );
 

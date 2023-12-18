@@ -1,8 +1,8 @@
 {
   "version": "v2.5.7",
   "name": "Punter",
-  "bytecode": "050609121b4024403e404d010000000102ce0102010000000102a00002010000000102a00102010000000102ce020201000202000eb3ce00410c7b16000c310d7b1600a1011601a100010000000007b3ce00410c7bce01b0",
-  "codeHash": "9811fbd668a4aeaaa372907ddc875ac188f4404ec8be88cf7ae7989e6e482e2a",
+  "bytecode": "050509121b40244035010000000102ce0102010000000102ce0302010000000102ce0402010000000102ce0202010000000007b3ce00411340c87bce01b0",
+  "codeHash": "54f576b733065f21808717607e5639c57be247ee1b6baf5b529639e26d81eba9",
   "fieldsSig": {
     "names": [
       "prediction",
@@ -22,8 +22,8 @@
       false,
       false,
       false,
-      true,
-      true
+      false,
+      false
     ]
   },
   "eventsSig": [],
@@ -77,25 +77,6 @@
       ]
     },
     {
-      "name": "bid",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
-      "paramNames": [
-        "amount",
-        "up"
-      ],
-      "paramTypes": [
-        "U256",
-        "Bool"
-      ],
-      "paramIsMutable": [
-        false,
-        false
-      ],
-      "returnTypes": []
-    },
-    {
       "name": "destroy",
       "usePreapprovedAssets": false,
       "useAssetsInContract": false,
@@ -115,14 +96,7 @@
           "name": "InvalidCaller",
           "value": {
             "type": "U256",
-            "value": "0"
-          }
-        },
-        {
-          "name": "AlreadyPlayed",
-          "value": {
-            "type": "U256",
-            "value": "1"
+            "value": "200"
           }
         }
       ]

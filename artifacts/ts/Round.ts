@@ -86,11 +86,11 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
 
   consts = {
     ErrorCodes: {
-      InvalidCaller: BigInt(0),
-      NotAllPlayerClaimed: BigInt(1),
-      HouseWon: BigInt(2),
-      RewardsAlreadyComputed: BigInt(3),
-      BidTimestampNotReached: BigInt(4),
+      InvalidCaller: BigInt(100),
+      NotAllPlayerClaimed: BigInt(101),
+      HouseWon: BigInt(102),
+      RewardsAlreadyComputed: BigInt(103),
+      BidTimestampNotReached: BigInt(104),
     },
   };
 
@@ -153,7 +153,7 @@ export const Round = new Factory(
   Contract.fromJson(
     RoundContractJson,
     "",
-    "9fcbe39918570a6173bd02e7bf360ee49a125966197073456788f0c4c312ed48"
+    "7bcd1a50e3c856f2c7e20b807c638920cfa39fe3cdc4fbbc4a9cdf30c093b93c"
   )
 );
 

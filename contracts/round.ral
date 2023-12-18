@@ -16,11 +16,11 @@ Contract Round(
 
 
     enum ErrorCodes {
-        InvalidCaller = 0
-        NotAllPlayerClaimed = 1
-        HouseWon = 2
-        RewardsAlreadyComputed = 3
-        BidTimestampNotReached = 4
+        InvalidCaller = 100
+        NotAllPlayerClaimed = 101
+        HouseWon = 102
+        RewardsAlreadyComputed = 103
+        BidTimestampNotReached = 104
     }
 
 
@@ -59,8 +59,7 @@ Contract Round(
 
     @using(updateFields = true, checkExternalCaller = false)
     pub fn calculateRewards(price: U256) -> (){
-        let actualBlockTs = blockTimeStamp!()
-        assert!(actualBlockTs >= bidEndTimestamp, ErrorCodes.BidTimestampNotReached)
+        assert!(bidEndTimestamp > blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
         assert!(treasuryAmount <= 0, ErrorCodes.RewardsAlreadyComputed)
 
 

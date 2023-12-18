@@ -9,6 +9,7 @@ import {
   Start,
   End,
   Bid,
+  Withdraw,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -20,7 +21,7 @@ export const defaultSigner = new PrivateKeyWallet({
   privateKey: testPrivateKey,
 });
 
-export async function deployPrediction(operator: Address, repeatEveryMinute: number, epoch: bigint) {
+export async function deployPrediction(operator: Address, repeatEverySecond: number, epoch: bigint) {
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
 
@@ -31,7 +32,7 @@ export async function deployPrediction(operator: Address, repeatEveryMinute: num
       epoch: epoch,
       operator: operator,
       feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEveryMinute * 60*1000),
+      repeatEvery: BigInt(repeatEverySecond * 1000),
     },
   });
 }
@@ -100,6 +101,18 @@ export async function bid(
   return await Bid.execute(signer, {
     initialFields: { predictalph: predictalph.contractId, amount: amount, up: up },
     attoAlphAmount: amount+2n*DUST_AMOUNT,
+  });
+}
+
+
+export async function withdraw(
+  signer: SignerProvider,
+  predictalph: PredictalphInstance,
+  epochParticipation: string
+) {
+  return await Withdraw.execute(signer, {
+    initialFields: { predictalph: predictalph.contractId},
+    attoAlphAmount: 10n*DUST_AMOUNT,
   });
 }
 

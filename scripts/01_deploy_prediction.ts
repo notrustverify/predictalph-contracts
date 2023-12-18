@@ -21,7 +21,7 @@ const deployAuction: DeployFunction<Settings> = async (
         epoch: 0n,
         operator: ZERO_ADDRESS,
         feesBasisPts: 0n,
-        repeatEvery: 0n
+        repeatEvery: 0n,
     },
 
   })
