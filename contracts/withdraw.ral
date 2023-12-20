@@ -1,4 +1,3 @@
-TxScript Withdraw(predictalph: Predictalph) {
-    //param , epochParticipation: ByteVec
-    predictalph.withdraw()
+TxScript Withdraw(predictalph: Predictalph, epochParticipation: ByteVec) {
+    predictalph.withdraw(epochParticipation)
 }

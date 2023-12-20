@@ -5,3 +5,7 @@ TxScript Start(predictalph: Predictalph, price: U256) {
 TxScript End(predictalph: Predictalph, price: U256) {
     predictalph.endRound(price)
 }
+
+TxScript DestroyRound(predictalph: Predictalph, arrayEpoch: ByteVec) {
+  predictalph.destroyRound(arrayEpoch)
+}

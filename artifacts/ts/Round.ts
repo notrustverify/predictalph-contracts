@@ -132,10 +132,10 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "calculateRewards", params);
     },
-    claimContract: async (
+    destroy: async (
       params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
     ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "claimContract", params);
+      return testMethod(this, "destroy", params);
     },
     userClaimRewards: async (
       params: TestContractParams<
@@ -153,7 +153,7 @@ export const Round = new Factory(
   Contract.fromJson(
     RoundContractJson,
     "",
-    "7bcd1a50e3c856f2c7e20b807c638920cfa39fe3cdc4fbbc4a9cdf30c093b93c"
+    "125462c48afcbdb3734d1ec6a0518cdf3744ad3c33bdd7643a3a78a5c202b323"
   )
 );
 

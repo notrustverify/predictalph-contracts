@@ -32,6 +32,7 @@ export namespace PredictalphTypes {
   export type Fields = {
     punterTemplateId: HexString;
     roundTemplateId: HexString;
+    dynamicArrayForIntId: HexString;
     epoch: bigint;
     operator: Address;
     feesBasisPts: bigint;
@@ -144,9 +145,9 @@ class Factory extends ContractFactory<
       return testMethod(this, "bid", params);
     },
     withdraw: async (
-      params: Omit<
-        TestContractParams<PredictalphTypes.Fields, never>,
-        "testArgs"
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { arrayEpochIn: HexString }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdraw", params);
@@ -158,6 +159,14 @@ class Factory extends ContractFactory<
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "setNewRepeatEvery", params);
+    },
+    destroyRound: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { epochArray: HexString }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "destroyRound", params);
     },
     setNewFees: async (
       params: TestContractParams<PredictalphTypes.Fields, { basisPts: bigint }>
@@ -179,8 +188,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=4-2=6-2+61=2-1+7=2-4=1-3=1-1=3-2+57=1+20=1-2+425242624272=2-2+82=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=836",
-    "d5cea33d4338c24cf56efc9af6fd8ea3926195a41bf65a0333301abfef218b0e"
+    "=4-2=6-2+61=2-1+7=2-2+11f=1+157=1+20=1-2=2+994=1-1+a9=2-1+f=2-2=1+06=1-2=1-4+16=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1132",
+    "94b482ad3c626636a1a20c833a7a459b087c8081cecb03b60f4e08e595765df1"
   )
 );
 

@@ -27,6 +27,7 @@ Contract Punter(
         return epoch
     }
 
+    @using(assetsInContract = true)
     pub fn destroy() -> (){
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
         destroySelf!(punterAddress)

@@ -1,8 +1,8 @@
 {
   "version": "v2.5.7",
   "name": "Punter",
-  "bytecode": "050509121b40244035010000000102ce0102010000000102ce0302010000000102ce0402010000000102ce0202010000000007b3ce00411340c87bce01b0",
-  "codeHash": "54f576b733065f21808717607e5639c57be247ee1b6baf5b529639e26d81eba9",
+  "bytecode": "050509121b40244035010000000102ce0102010000000102ce0302010000000102ce0402010000000102ce0202010200000007b3ce00411340c87bce01b0",
+  "codeHash": "34e58c5baf543d031205cc37b1a041428a5d14c253aa6b6b65fffe1e03bd10dd",
   "fieldsSig": {
     "names": [
       "prediction",
@@ -79,7 +79,7 @@
     {
       "name": "destroy",
       "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
+      "useAssetsInContract": true,
       "isPublic": true,
       "paramNames": [],
       "paramTypes": [],

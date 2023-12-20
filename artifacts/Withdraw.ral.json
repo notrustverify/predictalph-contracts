@@ -1,15 +1,18 @@
 {
   "version": "v2.5.7",
   "name": "Withdraw",
-  "bytecodeTemplate": "010103000000040c0c{0}0106",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}0106",
   "fieldsSig": {
     "names": [
-      "predictalph"
+      "predictalph",
+      "epochParticipation"
     ],
     "types": [
+      "ByteVec",
       "ByteVec"
     ],
     "isMutable": [
+      false,
       false
     ]
   },

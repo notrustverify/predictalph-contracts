@@ -1,4 +1,11 @@
-import { Address, DUST_AMOUNT, ONE_ALPH, SignerProvider, groupOfAddress, web3 } from "@alephium/web3";
+import {
+  Address,
+  DUST_AMOUNT,
+  ONE_ALPH,
+  SignerProvider,
+  groupOfAddress,
+  web3,
+} from "@alephium/web3";
 import {
   Predictalph,
   Round,
@@ -10,10 +17,12 @@ import {
   End,
   Bid,
   Withdraw,
+  DestroyRound,
+  DynamicArrayForInt,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
-import { waitTxConfirmed as _waitTxConfirmed} from "@alephium/cli";
+import { waitTxConfirmed as _waitTxConfirmed } from "@alephium/cli";
 
 web3.setCurrentNodeProvider("http://127.0.0.1:22973", undefined, fetch);
 export const ZERO_ADDRESS = "tgx7VNFoP9DJiFMFgXXtafQZkUvyEdDHT9ryamHJYrjq";
@@ -21,14 +30,20 @@ export const defaultSigner = new PrivateKeyWallet({
   privateKey: testPrivateKey,
 });
 
-export async function deployPrediction(operator: Address, repeatEverySecond: number, epoch: bigint) {
+export async function deployPrediction(
+  operator: Address,
+  repeatEverySecond: number,
+  epoch: bigint
+) {
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
+  const dynamicArrayContract = await deployDynamicArray();
 
   return await Predictalph.deploy(defaultSigner, {
     initialFields: {
       punterTemplateId: punterTemplateId.contractInstance.contractId,
       roundTemplateId: roundTemplateId.contractInstance.contractId,
+      dynamicArrayForIntId: dynamicArrayContract.contractInstance.contractId,
       epoch: epoch,
       operator: operator,
       feesBasisPts: 100n,
@@ -69,6 +84,10 @@ export async function deployRoundTemplate() {
   });
 }
 
+export async function deployDynamicArray() {
+  return await DynamicArrayForInt.deploy(defaultSigner, { initialFields: {} });
+}
+
 export async function startRound(
   signer: SignerProvider,
   predictalph: PredictalphInstance,
@@ -79,7 +98,6 @@ export async function startRound(
     attoAlphAmount: ONE_ALPH,
   });
 }
-
 
 export async function endRound(
   signer: SignerProvider,
@@ -99,11 +117,14 @@ export async function bid(
   up: boolean
 ) {
   return await Bid.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, amount: amount, up: up },
-    attoAlphAmount: amount+2n*DUST_AMOUNT,
+    initialFields: {
+      predictalph: predictalph.contractId,
+      amount: amount,
+      up: up,
+    },
+    attoAlphAmount: amount + 2n * DUST_AMOUNT,
   });
 }
-
 
 export async function withdraw(
   signer: SignerProvider,
@@ -111,38 +132,58 @@ export async function withdraw(
   epochParticipation: string
 ) {
   return await Withdraw.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId},
-    attoAlphAmount: 10n*DUST_AMOUNT,
+    initialFields: { predictalph: predictalph.contractId, epochParticipation },
+    attoAlphAmount: DUST_AMOUNT,
   });
 }
 
+export async function destroyRound(
+  signer: SignerProvider,
+  predictalph: PredictalphInstance,
+  epochArray
+) {
+  return await DestroyRound.execute(signer, {
+    initialFields: { predictalph: predictalph.contractId,  arrayEpoch: epochArray },
+    attoAlphAmount: DUST_AMOUNT,
+  });
+}
 
-async function waitTxConfirmed<T extends { txId: string }>(promise: Promise<T>): Promise<T> {
-  const result = await promise
-  await _waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1, 1000)
-  return result
+async function waitTxConfirmed<T extends { txId: string }>(
+  promise: Promise<T>
+): Promise<T> {
+  const result = await promise;
+  await _waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1, 1000);
+  return result;
 }
 
 export async function transferAlphTo(to: Address, amount: bigint) {
   return await waitTxConfirmed(
     defaultSigner.signAndSubmitTransferTx({
       signerAddress: testAddress,
-      destinations: [{ address: to, attoAlphAmount: amount }]
+      destinations: [{ address: to, attoAlphAmount: amount }],
     })
-  )
+  );
 }
 
 export async function contractExists(address: string): Promise<boolean> {
   try {
-    const nodeProvider = web3.getCurrentNodeProvider()
+    const nodeProvider = web3.getCurrentNodeProvider();
     await nodeProvider.contracts.getContractsAddressState(address, {
-      group: groupOfAddress(address)
-    })
-    return true
+      group: groupOfAddress(address),
+    });
+    return true;
   } catch (error: any) {
-    if (error instanceof Error && error.message.includes('KeyNotFound')) {
-      return false
+    if (error instanceof Error && error.message.includes("KeyNotFound")) {
+      return false;
     }
-    throw error
+    throw error;
   }
+}
+
+
+export function arrayEpochToBytes(arrayEpoch){
+    const buffer = Buffer.alloc(arrayEpoch.length * 4)
+    arrayEpoch.forEach((value, index) => buffer.writeUInt32BE(value, index * 4))
+    return buffer.toString('hex')
+
 }

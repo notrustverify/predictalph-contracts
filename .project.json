@@ -16,44 +16,58 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "DestroyRound": {
+      "sourceFile": "roundState.ral",
+      "sourceCodeHash": "1f973490d5ed9e99e7ff5f5b28acca5b32a0c22711c47f2c67675bfd2965c922",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "DynamicArrayForInt": {
+      "sourceFile": "dynamicArrayInt.ral",
+      "sourceCodeHash": "9c3cc8904936bc051026e73b9bb1ebfc074f7a83b03b23b0892392d75ec9cd33",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "beb8a20fd7d8e4169c3c36daff2c0fac806dd074ab6908d83a246f8a9c055e81",
+      "warnings": []
+    },
     "End": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "06e29ab2d60c68662691db7d4f4f8f62dae75776b677168c608bca20d3ea646b",
+      "sourceCodeHash": "1f973490d5ed9e99e7ff5f5b28acca5b32a0c22711c47f2c67675bfd2965c922",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Predictalph": {
       "sourceFile": "predict.ral",
-      "sourceCodeHash": "44b27ac4deff78d22021fd5ebc5ffc2e24ba74fabbf36aa14fc840e1c4d7b4c4",
-      "bytecodeDebugPatch": "=4-2=6-2+61=2-1+7=2-4=1-3=1-1=3-2+57=1+20=1-2+425242624272=2-2+82=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=836",
-      "codeHashDebug": "d5cea33d4338c24cf56efc9af6fd8ea3926195a41bf65a0333301abfef218b0e",
+      "sourceCodeHash": "b911312de886d33065b9ecadc5541834e434795a4e5e5c6145bd733c03b35c54",
+      "bytecodeDebugPatch": "=4-2=6-2+61=2-1+7=2-2+11f=1+157=1+20=1-2=2+994=1-1+a9=2-1+f=2-2=1+06=1-2=1-4+16=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+b=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1132",
+      "codeHashDebug": "94b482ad3c626636a1a20c833a7a459b087c8081cecb03b60f4e08e595765df1",
       "warnings": []
     },
     "Punter": {
       "sourceFile": "punter.ral",
-      "sourceCodeHash": "e8a0681a4e1a7e10a745948de9b00df3e2d29f005e355ede7e96ae39e3993fda",
+      "sourceCodeHash": "6cf2f678a78b7f804952d750b19ca59b4ae0fe9cc65c587d721830f6ea3a0438",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "54f576b733065f21808717607e5639c57be247ee1b6baf5b529639e26d81eba9",
+      "codeHashDebug": "34e58c5baf543d031205cc37b1a041428a5d14c253aa6b6b65fffe1e03bd10dd",
       "warnings": []
     },
     "Round": {
       "sourceFile": "round.ral",
-      "sourceCodeHash": "0c2560e88d66c1135486cc28774cac872dd7ec1925d9cb3db7c6c9de4b61ed46",
+      "sourceCodeHash": "56495c9ec71ff68f2be7a5e84e95afd5f67cf9f184489e0c5cbc9f372ddbc4fc",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "7bcd1a50e3c856f2c7e20b807c638920cfa39fe3cdc4fbbc4a9cdf30c093b93c",
+      "codeHashDebug": "125462c48afcbdb3734d1ec6a0518cdf3744ad3c33bdd7643a3a78a5c202b323",
       "warnings": []
     },
     "Start": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "06e29ab2d60c68662691db7d4f4f8f62dae75776b677168c608bca20d3ea646b",
+      "sourceCodeHash": "1f973490d5ed9e99e7ff5f5b28acca5b32a0c22711c47f2c67675bfd2965c922",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Withdraw": {
       "sourceFile": "withdraw.ral",
-      "sourceCodeHash": "8d90d6bc9d9200f3b759462edd4f684c4a1469f05123423abd9906d2547a88ec",
+      "sourceCodeHash": "216fd14cc8965789ea9f101e12fb03e3d7a40be72043fc85e17c133c1f58d238",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

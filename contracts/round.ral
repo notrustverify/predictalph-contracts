@@ -59,16 +59,15 @@ Contract Round(
 
     @using(updateFields = true, checkExternalCaller = false)
     pub fn calculateRewards(price: U256) -> (){
-        assert!(bidEndTimestamp > blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+        assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
         assert!(treasuryAmount <= 0, ErrorCodes.RewardsAlreadyComputed)
 
-
         priceEnd = price
-        if (priceStart > priceEnd) {
+        if (priceEnd > priceStart) {
             rewardBaseCalAmount = amountUp
             treasuryAmount = (totalAmount * feesBasisPts)/10000
             rewardAmount = totalAmount - treasuryAmount
-        } else if (priceStart < priceEnd){
+        } else if (priceEnd < priceStart){
             rewardBaseCalAmount = amountDown
             treasuryAmount = (totalAmount * feesBasisPts)/10000
             rewardAmount = totalAmount - treasuryAmount
@@ -78,14 +77,16 @@ Contract Round(
             rewardAmount = 0
             treasuryAmount = totalAmount
         }
+
+
     }
 
     @using(assetsInContract = true)
-    pub fn claimContract() -> (){
-        checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+    pub fn destroy() -> (){
+        checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
 
         let tokenRemaining = tokenRemaining!(selfAddress!(), ALPH)
-        assert!(tokenRemaining <= treasuryAmount, ErrorCodes.NotAllPlayerClaimed)
+        assert!(tokenRemaining <= 1 alph + treasuryAmount, ErrorCodes.NotAllPlayerClaimed)
         destroySelf!(operator)
     }
 
@@ -94,13 +95,8 @@ Contract Round(
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
         assert!(rewardAmount > 0, ErrorCodes.HouseWon)
 
-        let mut userReward = 0
-        if(priceStart > priceEnd && upBid || priceStart < priceEnd && !upBid ) {
-            userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
-        }
-
-
-        if(userReward > 0){
+        if( (priceEnd > priceStart && upBid) || (priceEnd < priceStart && !upBid) ) {
+            let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
             transferTokenFromSelf!(addressPunter, ALPH, userReward)
             totalAmount = totalAmount - userReward
         }

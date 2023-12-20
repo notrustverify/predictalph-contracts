@@ -12,6 +12,7 @@ import {
   HexString,
 } from "@alephium/web3";
 import { default as BidScriptJson } from "../Bid.ral.json";
+import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
 import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
@@ -21,6 +22,10 @@ export const Bid = new ExecutableScript<{
   amount: bigint;
   up: boolean;
 }>(Script.fromJson(BidScriptJson));
+export const DestroyRound = new ExecutableScript<{
+  predictalph: HexString;
+  arrayEpoch: HexString;
+}>(Script.fromJson(DestroyRoundScriptJson));
 export const End = new ExecutableScript<{
   predictalph: HexString;
   price: bigint;
@@ -29,6 +34,7 @@ export const Start = new ExecutableScript<{
   predictalph: HexString;
   price: bigint;
 }>(Script.fromJson(StartScriptJson));
-export const Withdraw = new ExecutableScript<{ predictalph: HexString }>(
-  Script.fromJson(WithdrawScriptJson)
-);
+export const Withdraw = new ExecutableScript<{
+  predictalph: HexString;
+  epochParticipation: HexString;
+}>(Script.fromJson(WithdrawScriptJson));
