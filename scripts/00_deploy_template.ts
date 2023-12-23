@@ -23,6 +23,7 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         feesBasisPts: 0n,
         bidEndTimestamp: 0n,
         operator: ZERO_ADDRESS,
+        rewardsComputed: false,
         priceEnd: 0n,
         totalAmount: 0n,
         amountUp: 0n,

@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  db:
+    image: redis:7.2.3-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - ./data:/data
+
+  api:
+    hostname: api
+    build: ./api
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+
+  round-mover:
+    hostname: round-mover
+    build: .
+    restart: unless-stopped
+    command: yarn run manage testnet
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=db
+    depends_on:
+      - db
+
+
+  events-listener:
+    hostname: events-listener
+    build: .
+    restart: unless-stopped
+    command: yarn run eventsListener testnet
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+
+

@@ -1,8 +1,8 @@
 {
-  "version": "v2.5.7",
+  "version": "v2.5.9",
   "name": "Round",
-  "bytecode": "0d0809121b4024405240b540de411f010000000102ce0402010000000102a00402010000000102a00602010000000102ce0102010103030017b3ce00411340647ba00116012aa10116024c05a00216012aa1024a04a00316012aa10316001601a901000101004034ce0456321340687ba0040c321340677b1600a100a000ce02334c0da002a106a001ce032c1367102da104a001a0042ba1054a17a000ce02314c0da003a106a001ce032c1367102da104a001a0042ba1054a060ca1060ca105a001a104010200010011b3ce00411340647bb2a41700160013c40de0b6b3a7640000a0042a321340657bce05b001020304004024b3ce00411340647ba0050c331340667ba000ce023316021aa000ce02311602191a1b4c0d1601a0052ca0062d170316001603a8a00116032ba101",
-  "codeHash": "125462c48afcbdb3734d1ec6a0518cdf3744ad3c33bdd7643a3a78a5c202b323",
+  "bytecode": "0e0809121b4024405240b840e1412e010000000102ce0402010000000102a00502010000000102a00702010000000102ce0102010103030017b3ce00411340647ba00216012aa10216024c05a00316012aa1034a04a00416012aa10416001601a901000101004036ce0456321340687ba0050c321340677b1600a101a001ce02334c0da003a107a002ce032c1367102da105a002a0052ba1064a17a001ce02314c0da004a107a002ce032c1367102da105a002a0052ba1064a060ca1070ca106a002a10503a100010200010011b3ce00411340647bb2a41700160013c40de0b6b3a7640000a0052a321340657bce05b00102030400402bb3ce00411340647bce0456321340687ba0001340697ba0060c334c1aa001ce023316021aa001ce02311602191a1b4c0d1601a0062ca0072d170316001603a8a00216032ba102",
+  "codeHash": "cb6a6ac7ef510bb90eb4fd5cdb394c8d60d808368a5ebc11944963dda4f69f56",
   "fieldsSig": {
     "names": [
       "prediction",
@@ -11,6 +11,7 @@
       "feesBasisPts",
       "bidEndTimestamp",
       "operator",
+      "rewardsComputed",
       "priceEnd",
       "totalAmount",
       "amountUp",
@@ -26,6 +27,7 @@
       "U256",
       "U256",
       "Address",
+      "Bool",
       "U256",
       "U256",
       "U256",
@@ -41,6 +43,7 @@
       false,
       false,
       false,
+      true,
       true,
       true,
       true,
@@ -191,13 +194,6 @@
           }
         },
         {
-          "name": "HouseWon",
-          "value": {
-            "type": "U256",
-            "value": "102"
-          }
-        },
-        {
           "name": "RewardsAlreadyComputed",
           "value": {
             "type": "U256",
@@ -209,6 +205,13 @@
           "value": {
             "type": "U256",
             "value": "104"
+          }
+        },
+        {
+          "name": "RewardsNotComputed",
+          "value": {
+            "type": "U256",
+            "value": "105"
           }
         }
       ]

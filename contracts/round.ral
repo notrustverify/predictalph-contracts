@@ -5,6 +5,7 @@ Contract Round(
     feesBasisPts: U256,
     bidEndTimestamp: U256,
     operator: Address,
+    mut rewardsComputed: Bool,
     mut priceEnd: U256,
     mut totalAmount: U256,
     mut amountUp: U256,
@@ -18,9 +19,9 @@ Contract Round(
     enum ErrorCodes {
         InvalidCaller = 100
         NotAllPlayerClaimed = 101
-        HouseWon = 102
         RewardsAlreadyComputed = 103
         BidTimestampNotReached = 104
+        RewardsNotComputed  = 105
     }
 
 
@@ -77,7 +78,8 @@ Contract Round(
             rewardAmount = 0
             treasuryAmount = totalAmount
         }
-
+        
+        rewardsComputed = true
 
     }
 
@@ -93,12 +95,16 @@ Contract Round(
     @using(updateFields = true, assetsInContract = true)
     pub fn userClaimRewards(addressPunter: Address, amountBid: U256, upBid: Bool) -> (){
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-        assert!(rewardAmount > 0, ErrorCodes.HouseWon)
+        assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+        assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
 
-        if( (priceEnd > priceStart && upBid) || (priceEnd < priceStart && !upBid) ) {
-            let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
-            transferTokenFromSelf!(addressPunter, ALPH, userReward)
-            totalAmount = totalAmount - userReward
+        // reward < 0 means that house won, price was equal or the round didnt end and rewards wasnt calculated yet
+        if (rewardAmount > 0) {
+            if( (priceEnd > priceStart && upBid) || (priceEnd < priceStart && !upBid) ) {
+                let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
+                transferTokenFromSelf!(addressPunter, ALPH, userReward)
+                totalAmount = totalAmount - userReward
+            }
         }
     }
 

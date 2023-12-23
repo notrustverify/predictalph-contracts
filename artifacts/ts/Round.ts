@@ -36,6 +36,7 @@ export namespace RoundTypes {
     feesBasisPts: bigint;
     bidEndTimestamp: bigint;
     operator: Address;
+    rewardsComputed: boolean;
     priceEnd: bigint;
     totalAmount: bigint;
     amountUp: bigint;
@@ -88,9 +89,9 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
     ErrorCodes: {
       InvalidCaller: BigInt(100),
       NotAllPlayerClaimed: BigInt(101),
-      HouseWon: BigInt(102),
       RewardsAlreadyComputed: BigInt(103),
       BidTimestampNotReached: BigInt(104),
+      RewardsNotComputed: BigInt(105),
     },
   };
 
@@ -153,7 +154,7 @@ export const Round = new Factory(
   Contract.fromJson(
     RoundContractJson,
     "",
-    "125462c48afcbdb3734d1ec6a0518cdf3744ad3c33bdd7643a3a78a5c202b323"
+    "cb6a6ac7ef510bb90eb4fd5cdb394c8d60d808368a5ebc11944963dda4f69f56"
   )
 );
 

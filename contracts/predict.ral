@@ -71,7 +71,7 @@ enum ErrorCodes {
         emit Debug(`Actual epoch is ${epoch} with start price ${price}`)
 
         let bidTimestampEnd = blockTimeStamp!() + repeatEvery
-        let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,0 ,0 ,0 ,0 ,0, 0, 0)
+        let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false,0 ,0 ,0 ,0 ,0, 0, 0)
 
 
        copyCreateSubContract!{caller -> ALPH: 1 alph}(epochContractId, roundTemplateId, encodedImmFields, encodedMutFields)
@@ -135,6 +135,8 @@ enum ErrorCodes {
             let epochNumber = dynamicArray.get(arrayEpochIn, index)
             let epochContractId = subContractId!(#00 ++ epochNumber)
             let betInfoContractId = subContractId!(#01 ++ toByteVec!(caller) ++ epochNumber)
+            assert!(contractExists!(epochContractId), ErrorCodes.RoundNotExists)
+            assert!(contractExists!(betInfoContractId), ErrorCodes.PunterNotExists)
 
             if(contractExists!(epochContractId) && contractExists!(betInfoContractId)){
                 let betInfoCaller = getBetInfoByEpoch(caller, epochNumber)
@@ -146,10 +148,14 @@ enum ErrorCodes {
                 let upBid = betInfoCaller.getBid()
 
                 let round = getRoundByEpoch(epochNumber)
+
+                // cannot claim if the round didnt end 
+
                 round.userClaimRewards(addressPunter, amountPunter, upBid)
                 betInfoCaller.destroy()
 
-                emit Claimed(addressPunter, amountPunter, epoch)
+                emit Claimed(addressPunter, amountPunter, u256From4Byte!(epochNumber))
+
             }
         }
     }

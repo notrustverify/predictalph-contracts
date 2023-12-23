@@ -22,9 +22,9 @@ const deployAuction: DeployFunction<Settings> = async (
         roundTemplateId: roundTemplateId.contractInstance.contractId,
         dynamicArrayForIntId: dynamicArrayContract.contractInstance.contractId,
         epoch: 0n,
-        operator: ZERO_ADDRESS,
+        operator: deployer.account.address,
         feesBasisPts: 0n,
-        repeatEvery: 0n,
+        repeatEvery: BigInt(120*1000),
     },
 
   })

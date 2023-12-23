@@ -1,7 +1,9 @@
 import { Configuration } from '@alephium/cli'
+import { configDotenv } from 'dotenv'
 
 export type Settings = {}
 
+configDotenv()
 const configuration: Configuration<Settings> = {
   networks: {
     devnet: {
@@ -13,9 +15,9 @@ const configuration: Configuration<Settings> = {
     },
     testnet:{
          //Make sure the two values match what's in your devnet configuration
-      nodeUrl: '',
+      nodeUrl: 'https://wallet.testnet.alephium.org',
       networkId: 1,
-      privateKeys: [],
+      privateKeys: process.env.PRIVATE_KEYS === undefined ? [] : process.env.PRIVATE_KEYS.split(','),
       settings: []
     },
     mainnet: {

@@ -9,9 +9,12 @@ import {
   PunterInstance,
   Round,
   RoundInstance,
+  DynamicArrayForInt,
+  DynamicArrayForIntInstance,
   Predictalph,
   PredictalphInstance,
 } from ".";
+import { default as testnetDeployments } from "../.deployments.testnet.json";
 import { default as devnetDeployments } from "../.deployments.devnet.json";
 
 export type Deployments = {
@@ -19,6 +22,7 @@ export type Deployments = {
   contracts: {
     Punter: DeployContractExecutionResult<PunterInstance>;
     Round: DeployContractExecutionResult<RoundInstance>;
+    DynamicArrayForInt: DeployContractExecutionResult<DynamicArrayForIntInstance>;
     Predictalph: DeployContractExecutionResult<PredictalphInstance>;
   };
 };
@@ -35,6 +39,12 @@ function toDeployments(json: any): Deployments {
       ...json.contracts["Round"],
       contractInstance: Round.at(
         json.contracts["Round"].contractInstance.address
+      ),
+    },
+    DynamicArrayForInt: {
+      ...json.contracts["DynamicArrayForInt"],
+      contractInstance: DynamicArrayForInt.at(
+        json.contracts["DynamicArrayForInt"].contractInstance.address
       ),
     },
     Predictalph: {
@@ -54,7 +64,12 @@ export function loadDeployments(
   networkId: NetworkId,
   deployerAddress?: string
 ): Deployments {
-  const deployments = networkId === "devnet" ? devnetDeployments : undefined;
+  const deployments =
+    networkId === "testnet"
+      ? testnetDeployments
+      : networkId === "devnet"
+      ? devnetDeployments
+      : undefined;
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);
   }
