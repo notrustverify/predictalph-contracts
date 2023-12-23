@@ -65,10 +65,11 @@ async function startRound(
   if (roundExist) return;
 
   const price = await getPrice(cgClient);
+  const priceToStore = BigInt(price*intPriceDivision) //store it as a int
 
   try {
     const txStart = await Start.execute(wallet, {
-      initialFields: { predictalph: predictalphContractId, price: 10n },
+      initialFields: { predictalph: predictalphContractId, price: priceToStore },
       attoAlphAmount: ONE_ALPH,
     });
 
@@ -129,11 +130,11 @@ async function endRound(privKey: string, group: number, contractName: string) {
       endTimestamp = Number(roundState.fields.bidEndTimestamp);
 
       const price = await getPrice(cgClient);
-
+      const priceToStore = BigInt(price*intPriceDivision) //store it as a int
     try {
       if (Date.now() >= endTimestamp) {
         const txStart = await End.execute(wallet, {
-          initialFields: { predictalph: predictalphContractId, price: 11n },
+          initialFields: { predictalph: predictalphContractId, price: priceToStore },
           attoAlphAmount: ONE_ALPH,
         });
         console.log(`End round ${predictionStates.fields.epoch} ${txStart.txId} with price ${price}`);
@@ -172,6 +173,8 @@ const cgClient = new CoinGeckoClient({
   timeout: 10000,
   autoRetry: true,
 });
+
+const intPriceDivision = 10_000
 
 let networkToUse = process.argv.slice(2)[0];
 if (networkToUse === undefined) networkToUse = "mainnet";
