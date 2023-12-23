@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ var rdb *redis.Client
 func main() {
 
 	err := godotenv.Load(".env")
+	redisHost := os.Getenv("REDIS_HOST")
 	if err != nil {
 		fmt.Println("No env file, will use system variable")
 	}
@@ -29,7 +31,7 @@ func main() {
 	}
 
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     fmt.Sprintf("%s:6379", redisHost),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 		Protocol: 3,  // specify 2 for RESP 2 or 3 for RESP 3

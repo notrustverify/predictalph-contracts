@@ -6,6 +6,8 @@ services:
     command: redis-server --save 20 1 --loglevel warning
     volumes: 
       - ./data:/data
+    env_file:
+      - .env
 
   api:
     hostname: api
@@ -20,8 +22,6 @@ services:
     command: yarn run manage testnet
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=db
     depends_on:
       - db
 

@@ -20,8 +20,6 @@ services:
     command: yarn run manage testnet
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=db
     depends_on:
       - db
 
