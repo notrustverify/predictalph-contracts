@@ -23,8 +23,8 @@ const deployAuction: DeployFunction<Settings> = async (
         dynamicArrayForIntId: dynamicArrayContract.contractInstance.contractId,
         epoch: 0n,
         operator: deployer.account.address,
-        feesBasisPts: 0n,
-        repeatEvery: BigInt(120*1000),
+        feesBasisPts: 100n,
+        repeatEvery: BigInt(3600*1000),
     },
 
   })
