@@ -17,7 +17,7 @@ RUN go mod download
 COPY *.go ./
 
 # Build
-RUN CGO_ENABLED=1 GOOS=linux go build -o api-mining-stats
+RUN CGO_ENABLED=1 GOOS=linux go build -o predictalph-api
 
 # Run the tests in the container
 #FROM build-stage AS run-test-stage
@@ -26,5 +26,5 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o api-mining-stats
 # Deploy the application binary into a lean image
 FROM alpine:edge
 WORKDIR /
-COPY --from=build-stage /app/api-mining-stats /api-mining-stats
-CMD ["/api-mining-stats"]
+COPY --from=build-stage /app/predictalph-api /predictalph-api
+CMD ["/predictalph-api"]
