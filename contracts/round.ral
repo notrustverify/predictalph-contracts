@@ -64,11 +64,11 @@ Contract Round(
         assert!(treasuryAmount <= 0, ErrorCodes.RewardsAlreadyComputed)
 
         priceEnd = price
-        if (priceEnd > priceStart) {
+        if (price > priceStart) {
             rewardBaseCalAmount = amountUp
             treasuryAmount = (totalAmount * feesBasisPts)/10000
             rewardAmount = totalAmount - treasuryAmount
-        } else if (priceEnd < priceStart){
+        } else if (price < priceStart){
             rewardBaseCalAmount = amountDown
             treasuryAmount = (totalAmount * feesBasisPts)/10000
             rewardAmount = totalAmount - treasuryAmount
@@ -78,7 +78,7 @@ Contract Round(
             rewardAmount = 0
             treasuryAmount = totalAmount
         }
-        
+
         rewardsComputed = true
 
     }

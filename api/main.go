@@ -20,6 +20,10 @@ func main() {
 	err := godotenv.Load(".env")
 	redisHost := os.Getenv("REDIS_HOST")
 
+	if redisHost == "" {
+		redisHost = "127.0.0.1"
+	}
+
 	if err != nil {
 		fmt.Println("No env file, will use system variable")
 	}
