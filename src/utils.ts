@@ -53,6 +53,7 @@ import { CoinGeckoClient } from "coingecko-api-v3";
         operator: operator,
         feesBasisPts: 100n,
         repeatEvery: BigInt(repeatEverySecond * 1000),
+        claimedByAnyoneDelay: 0n
       },
     });
   }
@@ -65,6 +66,7 @@ import { CoinGeckoClient } from "coingecko-api-v3";
         epoch: 0n,
         upBid: false,
         amountBid: 0n,
+        claimedByAnyoneAt: 0n
       },
     });
   }
@@ -86,6 +88,7 @@ import { CoinGeckoClient } from "coingecko-api-v3";
         treasuryAmount: 0n,
         rewardAmount: 0n,
         rewardBaseCalAmount: 0n,
+        counterAttendees: 0n
       },
     });
   }
