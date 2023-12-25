@@ -19,6 +19,7 @@ import {
   Withdraw,
   DestroyRound,
   DynamicArrayForInt,
+  WithdrawAddress,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -48,6 +49,7 @@ export async function deployPrediction(
       operator: operator,
       feesBasisPts: 100n,
       repeatEvery: BigInt(repeatEverySecond * 1000),
+      claimedByAnyoneDelay: BigInt(1*1000)
     },
   });
 }
@@ -60,6 +62,7 @@ export async function deployPunterTemplate() {
       epoch: 0n,
       upBid: false,
       amountBid: 0n,
+      claimedByAnyoneAt: 0n
     },
   });
 }
@@ -81,6 +84,7 @@ export async function deployRoundTemplate() {
       treasuryAmount: 0n,
       rewardAmount: 0n,
       rewardBaseCalAmount: 0n,
+      counterAttendees: 0n
     },
   });
 }
@@ -134,6 +138,19 @@ export async function withdraw(
 ) {
   return await Withdraw.execute(signer, {
     initialFields: { predictalph: predictalph.contractId, epochParticipation },
+    attoAlphAmount: DUST_AMOUNT,
+  });
+}
+
+
+export async function withdrawOnBehalf(
+  signer: SignerProvider,
+  predictalph: PredictalphInstance,
+  epochParticipation: string,
+  addressToClaim: string
+) {
+  return await WithdrawAddress.execute(signer, {
+    initialFields: { predictalph: predictalph.contractId, epochParticipation, addressToClaim },
     attoAlphAmount: DUST_AMOUNT,
   });
 }

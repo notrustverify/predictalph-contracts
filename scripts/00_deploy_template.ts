@@ -11,7 +11,9 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         punterAddress: ZERO_ADDRESS,
         epoch: 0n,
         upBid: false,
-        amountBid: 0n
+        amountBid: 0n,
+        claimedByAnyoneAt: 0n
+
     }
   })
 
@@ -30,7 +32,8 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         amountDown: 0n,
         treasuryAmount: 0n,
         rewardAmount: 0n,
-        rewardBaseCalAmount: 0n
+        rewardBaseCalAmount: 0n,
+        counterAttendees: 0n
     }
   })
 }

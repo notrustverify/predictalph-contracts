@@ -4,8 +4,9 @@
     "target": "es2020",
     "esModuleInterop": true,
     "module": "commonjs",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowJs": false
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "api"],
   "include": ["src/**/*.ts", "test/**/*.ts", "scripts/**/*.ts", "alephium.config.ts", "artifacts/**/*.ts"]
 }

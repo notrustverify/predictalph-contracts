@@ -35,6 +35,7 @@ export namespace PunterTypes {
     epoch: bigint;
     upBid: boolean;
     amountBid: bigint;
+    claimedByAnyoneAt: bigint;
   };
 
   export type State = ContractState<Fields>;
@@ -53,6 +54,10 @@ export namespace PunterTypes {
       result: CallContractResult<bigint>;
     };
     getRoundEpoch: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<bigint>;
+    };
+    getClaimedByAnyone: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
@@ -103,10 +108,20 @@ class Factory extends ContractFactory<PunterInstance, PunterTypes.Fields> {
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
+    getClaimedByAnyone: async (
+      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
+    ): Promise<TestContractResult<bigint>> => {
+      return testMethod(this, "getClaimedByAnyone", params);
+    },
     destroy: async (
       params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "destroy", params);
+    },
+    destroyByOther: async (
+      params: TestContractParams<PunterTypes.Fields, { from: Address }>
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "destroyByOther", params);
     },
   };
 }
@@ -116,7 +131,7 @@ export const Punter = new Factory(
   Contract.fromJson(
     PunterContractJson,
     "",
-    "34e58c5baf543d031205cc37b1a041428a5d14c253aa6b6b65fffe1e03bd10dd"
+    "b05092c77ff27c5278afb6930d4046fdaa3a522ae3a7d031d6fbd30074170d24"
   )
 );
 
@@ -171,6 +186,17 @@ export class PunterInstance extends ContractInstance {
         Punter,
         this,
         "getRoundEpoch",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    getClaimedByAnyone: async (
+      params?: PunterTypes.CallMethodParams<"getClaimedByAnyone">
+    ): Promise<PunterTypes.CallMethodResult<"getClaimedByAnyone">> => {
+      return callMethod(
+        Punter,
+        this,
+        "getClaimedByAnyone",
         params === undefined ? {} : params,
         getContractByCodeHash
       );

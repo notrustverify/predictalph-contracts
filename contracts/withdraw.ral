@@ -1,3 +1,8 @@
 TxScript Withdraw(predictalph: Predictalph, epochParticipation: ByteVec) {
     predictalph.withdraw(epochParticipation)
 }
+
+
+TxScript WithdrawAddress(predictalph: Predictalph, epochParticipation: ByteVec, addressToClaim: Address) {
+    predictalph.withdrawAddress(epochParticipation, addressToClaim)
+}

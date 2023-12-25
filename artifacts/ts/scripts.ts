@@ -16,6 +16,7 @@ import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
 import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
+import { default as WithdrawAddressScriptJson } from "../WithdrawAddress.ral.json";
 
 export const Bid = new ExecutableScript<{
   predictalph: HexString;
@@ -38,3 +39,8 @@ export const Withdraw = new ExecutableScript<{
   predictalph: HexString;
   epochParticipation: HexString;
 }>(Script.fromJson(WithdrawScriptJson));
+export const WithdrawAddress = new ExecutableScript<{
+  predictalph: HexString;
+  epochParticipation: HexString;
+  addressToClaim: Address;
+}>(Script.fromJson(WithdrawAddressScriptJson));

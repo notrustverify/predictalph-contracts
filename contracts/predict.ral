@@ -5,14 +5,15 @@ Contract Predictalph (
     mut epoch: U256,
     mut operator: Address,
     mut feesBasisPts: U256,
-    mut repeatEvery: U256
+    mut repeatEvery: U256,
+    mut claimedByAnyoneDelay: U256     
 ) {
 
-    event BetBull(from: Address, epoch: U256, amount: U256, up: Bool)
-    event BetBear(from: Address, epoch: U256, amount: U256, up: Bool)
+    event BetBull(from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
+    event BetBear(from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
     event RoundEnded(epoch: U256, price: U256)
     event RoundStarted(epoch: U256, price: U256)
-    event Claimed(from: Address, amount: U256, epoch: U256)
+    event Claimed(punterAddress: Address, from:Address, amount: U256, epoch: U256)
 
 enum ErrorCodes {
     PunterNotExists = 1
@@ -24,6 +25,7 @@ enum ErrorCodes {
     RoundNotExists = 7
     AlreadyPlayed = 8
     NotEnoughAlph = 9
+    CannotBeClaimedYet = 10
   }
 
   
@@ -71,7 +73,7 @@ enum ErrorCodes {
         emit Debug(`Actual epoch is ${epoch} with start price ${price}`)
 
         let bidTimestampEnd = blockTimeStamp!() + repeatEvery
-        let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false,0 ,0 ,0 ,0 ,0, 0, 0)
+        let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false,0 ,0 ,0 ,0 ,0, 0, 0, 0)
 
 
        copyCreateSubContract!{caller -> ALPH: 1 alph}(epochContractId, roundTemplateId, encodedImmFields, encodedMutFields)
@@ -101,9 +103,11 @@ enum ErrorCodes {
 
         let round = getRound()
         let endRoundTimestamp = round.getEndRoundTime()
-        assert!(blockTimeStamp!() < endRoundTimestamp, ErrorCodes.BidTimestampReached)
+        let timestampNow = blockTimeStamp!()
+        assert!(timestampNow < endRoundTimestamp, ErrorCodes.BidTimestampReached)
         assert!(isAssetAddress!(caller), ErrorCodes.InvalidPunterAddress)
-        assert!(amount >= 2 alph, ErrorCodes.NotEnoughAlph)
+        assert!(amount >= 1 alph, ErrorCodes.NotEnoughAlph)
+
         // use address for th path to be able to find it back 
         let bidderContractId =  #01 ++ toByteVec!(caller) ++ u256To4Byte!(epoch)
 
@@ -112,16 +116,17 @@ enum ErrorCodes {
 
        
         let bidAmount = amount - 1 alph
-        let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContract!(), caller, epoch, up, bidAmount)
+        let claimedByAnyoneTimestamp = timestampNow+claimedByAnyoneDelay
+        let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContract!(), caller, epoch, up, bidAmount, claimedByAnyoneTimestamp)
         copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
         round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, up)
         
                
 
         if (up){
-            emit BetBull(caller, epoch, amount, up)
+            emit BetBull(caller, epoch, amount, up, claimedByAnyoneTimestamp)
         } else {
-            emit BetBear(caller, epoch, amount, up)
+            emit BetBear(caller, epoch, amount, up, claimedByAnyoneTimestamp)
         }
         
     }
@@ -129,7 +134,7 @@ enum ErrorCodes {
     @using(checkExternalCaller = false)
     pub fn withdraw(arrayEpochIn: ByteVec) -> () {
         let caller = callerAddress!()
-        let dynamicArray = DynamicArrayForInt(dynamicArrayForIntId) 
+        let dynamicArray = DynamicArrayForInt(dynamicArrayForIntId)
 
         for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
             let epochNumber = dynamicArray.get(arrayEpochIn, index)
@@ -143,7 +148,8 @@ enum ErrorCodes {
                 
                 let addressPunter = betInfoCaller.getAddress()
                 checkCaller!(caller == addressPunter, ErrorCodes.InvalidCaller)
-        
+                
+
                 let amountPunter = betInfoCaller.getAmountBid()
                 let upBid = betInfoCaller.getBid()
 
@@ -154,7 +160,48 @@ enum ErrorCodes {
                 round.userClaimRewards(addressPunter, amountPunter, upBid)
                 betInfoCaller.destroy()
 
-                emit Claimed(addressPunter, amountPunter, u256From4Byte!(epochNumber))
+                // emit who call and with and which punter it concerned
+                emit Claimed(addressPunter ,caller ,amountPunter, u256From4Byte!(epochNumber))
+
+            }
+        }
+    }
+
+
+    @using(checkExternalCaller = false)
+    pub fn withdrawAddress(arrayEpochIn: ByteVec, addressToClaim: Address) -> () {
+        let caller = callerAddress!()
+        let dynamicArray = DynamicArrayForInt(dynamicArrayForIntId)
+        let timestampNow = blockTimeStamp!()
+
+        for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
+            let epochNumber = dynamicArray.get(arrayEpochIn, index)
+            let epochContractId = subContractId!(#00 ++ epochNumber)
+            let betInfoContractId = subContractId!(#01 ++ toByteVec!(addressToClaim) ++ epochNumber)
+            assert!(contractExists!(epochContractId), ErrorCodes.RoundNotExists)
+            assert!(contractExists!(betInfoContractId), ErrorCodes.PunterNotExists)
+
+            if(contractExists!(epochContractId) && contractExists!(betInfoContractId)){
+                let betInfoCaller = getBetInfoByEpoch(addressToClaim, epochNumber)
+                
+                let addressPunter = betInfoCaller.getAddress()
+                let canBeClaimedAt = betInfoCaller.getClaimedByAnyone()
+                
+                assert!(timestampNow > canBeClaimedAt, ErrorCodes.CannotBeClaimedYet)
+
+
+                let amountPunter = betInfoCaller.getAmountBid()
+                let upBid = betInfoCaller.getBid()
+
+                let round = getRoundByEpoch(epochNumber)
+
+                // cannot claim if the round didnt end 
+
+                round.userClaimRewards(addressToClaim, amountPunter, upBid)
+                betInfoCaller.destroyByOther(caller)
+
+                // emit who call and with and which punter it concerned
+                emit Claimed(addressPunter ,caller ,amountPunter, u256From4Byte!(epochNumber))
 
             }
         }
@@ -197,6 +244,12 @@ enum ErrorCodes {
     pub fn setNewOperator(newOperator: Address) -> (){
         checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
         operator = newOperator
+    }
+
+    @using(updateFields = true, checkExternalCaller = false)
+    pub fn setNewClaimedByAnyone(newClaimedByAnyoneDelay: U256) -> (){
+        checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+        claimedByAnyoneDelay = newClaimedByAnyoneDelay
     }
 
 }

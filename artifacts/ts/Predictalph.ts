@@ -37,6 +37,7 @@ export namespace PredictalphTypes {
     operator: Address;
     feesBasisPts: bigint;
     repeatEvery: bigint;
+    claimedByAnyoneDelay: bigint;
   };
 
   export type State = ContractState<Fields>;
@@ -46,12 +47,14 @@ export namespace PredictalphTypes {
     epoch: bigint;
     amount: bigint;
     up: boolean;
+    claimedByAnyoneTimestamp: bigint;
   }>;
   export type BetBearEvent = ContractEvent<{
     from: Address;
     epoch: bigint;
     amount: bigint;
     up: boolean;
+    claimedByAnyoneTimestamp: bigint;
   }>;
   export type RoundEndedEvent = ContractEvent<{ epoch: bigint; price: bigint }>;
   export type RoundStartedEvent = ContractEvent<{
@@ -59,6 +62,7 @@ export namespace PredictalphTypes {
     price: bigint;
   }>;
   export type ClaimedEvent = ContractEvent<{
+    punterAddress: Address;
     from: Address;
     amount: bigint;
     epoch: bigint;
@@ -91,6 +95,7 @@ class Factory extends ContractFactory<
       RoundNotExists: BigInt(7),
       AlreadyPlayed: BigInt(8),
       NotEnoughAlph: BigInt(9),
+      CannotBeClaimedYet: BigInt(10),
     },
   };
 
@@ -152,6 +157,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdraw", params);
     },
+    withdrawAddress: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { arrayEpochIn: HexString; addressToClaim: Address }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "withdrawAddress", params);
+    },
     setNewRepeatEvery: async (
       params: TestContractParams<
         PredictalphTypes.Fields,
@@ -181,6 +194,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "setNewOperator", params);
     },
+    setNewClaimedByAnyone: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { newClaimedByAnyoneDelay: bigint }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "setNewClaimedByAnyone", params);
+    },
   };
 }
 
@@ -188,8 +209,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=4-2=6+61=1+07=2+12=1-2=1-2+1=1+8=1-3+202=2-2+a6=2+b6=2-3=1+3=1-3+313=1+3=1-2+3=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+c=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1158",
-    "2a48ca28abf4ddc54f2c7fa85ae957b2a547c4a0ef934cb092e55da8294965f4"
+    "=4-2=6-6+61=2-2+7c=2-1+2=2+1594=1+1=1-1=2-1=1+a=2-2+6e437e=2-2+cb=2-2+db=2-2+eb=2-2+fb=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+d=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1590",
+    "397128412cc7081d4d83cfdab70d381653cb9ae4c4dd1630c3f51d4ed5c5118a"
   )
 );
 

@@ -1,5 +1,5 @@
 {
-  "version": "v2.5.9",
+  "version": "v2.5.7",
   "name": "Bid",
   "bytecodeTemplate": "01010300000009b4{1}a2{1}{2}0e0c{0}0105",
   "fieldsSig": {

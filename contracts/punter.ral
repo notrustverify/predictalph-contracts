@@ -3,7 +3,8 @@ Contract Punter(
     punterAddress: Address,
     epoch: U256,
     upBid: Bool,
-    amountBid: U256
+    amountBid: U256,
+    claimedByAnyoneAt: U256
 ) {
 
     enum ErrorCodes {
@@ -27,9 +28,19 @@ Contract Punter(
         return epoch
     }
 
+    pub fn getClaimedByAnyone() -> (U256){
+        return claimedByAnyoneAt
+    }
+
     @using(assetsInContract = true)
     pub fn destroy() -> (){
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
         destroySelf!(punterAddress)
+    }
+
+    @using(assetsInContract = true)
+    pub fn destroyByOther(from: Address) -> (){
+        checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+        destroySelf!(from)
     }
 }

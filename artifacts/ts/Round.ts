@@ -44,6 +44,7 @@ export namespace RoundTypes {
     treasuryAmount: bigint;
     rewardAmount: bigint;
     rewardBaseCalAmount: bigint;
+    counterAttendees: bigint;
   };
 
   export type State = ContractState<Fields>;
@@ -154,7 +155,7 @@ export const Round = new Factory(
   Contract.fromJson(
     RoundContractJson,
     "",
-    "7cfb21d60afb3fb0a4e681a3e38084114395cd5f846e4c86d5346074a8edca57"
+    "607fe938fc76a2e5e09fbe29cf34eecb83e70af96435e856dca0efcc57f035fe"
   )
 );
 

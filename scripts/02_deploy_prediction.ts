@@ -15,6 +15,9 @@ const deployAuction: DeployFunction<Settings> = async (
   const roundTemplateId = deployer.getDeployContractResult('Round')
   const dynamicArrayContract = deployer.getDeployContractResult('DynamicArrayForInt')
 
+
+  const ONE_WEEK_SEC = 604800
+  const ONE_DAY_SEC = 86400
   const settings = network.settings
   const auction = await deployer.deployContract(Predictalph, {
     initialFields: {
@@ -25,7 +28,10 @@ const deployAuction: DeployFunction<Settings> = async (
         operator: deployer.account.address,
         feesBasisPts: 100n,
         repeatEvery: BigInt(3600*1000),
-        //repeatEvery: BigInt(120*1000)
+        //repeatEvery: BigInt(240*1000),
+        //claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC *1000)
+        claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
+
     },
 
   })
