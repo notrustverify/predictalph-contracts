@@ -40,36 +40,38 @@ claimedByAnyoneDelay | U256    | after how much time anyone can claim rewards to
 
 #### Round
 
-                    | Type        | Description | Mutable
-------------------- | ----------- | ----------- | -------
-prediction          | Predictalph | contract id of predictalph            | no
-epoch               | U256        | round epoch            | no
-priceStart          | U256        | price at the beginning of the round            | no
-feesBasisPts        | U256        | fees for round            | yes
-bidEndTimestamp     | U256        | timestamp on when round is done            | yes
-operator            | Address     |  prediction game administrator           | yes
-rewardsComputed     | Bool        |  true if rewards calculated           | yes
-boostedUp           | Bool        |   true if boost for round was added in up         | yes
-boostedDown         | Bool        |  true if boost for round was added in down          | yes
-priceEnd            | U256        |  price at the end of round           | yes
-totalAmount         | U256        | total amount for the round             | yes
-amountUp            | U256        |  total amount for up side           | yes
-amountDown          | U256        | total amount for down side            | yes
-treasuryAmount      | U256        | total amount for fees pool            | yes
-rewardAmount        | U256        | amount             | yes
-rewardBaseCalAmount | U256        | rewards pool without fees, used to compute ratio rewards per user           | yes
-counterAttendees    | U256        | number of bidder            | yes
+| Field               | Type        | Description                                                       | Mutable |
+|---------------------|-------------|-------------------------------------------------------------------|---------|
+| prediction          | Predictalph | contract id of predictalph                                        | no      |
+| epoch               | U256        | round epoch                                                       | no      |
+| priceStart          | U256        | price at the beginning of the round                               | no      |
+| feesBasisPts        | U256        | fees for round                                                    | yes     |
+| bidEndTimestamp     | U256        | timestamp on when round is done                                   | yes     |
+| operator            | Address     | prediction game administrator                                     | yes     |
+| rewardsComputed     | Bool        | true if rewards calculated                                        | yes     |
+| boostedUp           | Bool        | true if boost for round was added in up                           | yes     |
+| boostedDown         | Bool        | true if boost for round was added in down                         | yes     |
+| priceEnd            | U256        | price at the end of round                                         | yes     |
+| totalAmount         | U256        | total amount for the round                                        | yes     |
+| amountUp            | U256        | total amount for up side                                          | yes     |
+| amountDown          | U256        | total amount for down side                                        | yes     |
+| treasuryAmount      | U256        | total amount for fees pool                                        | yes     |
+| rewardAmount        | U256        | amount                                                            | yes     |
+| rewardBaseCalAmount | U256        | rewards pool without fees, used to compute ratio rewards per user | yes     |
+| counterAttendees    | U256        | number of bidder                                                  | yes     |
+
 
 #### Punter (bidder)
 
-                  | Type        | Description | Mutable
------------------ | ----------- | ----------- | -------
-prediction        | Predictalph |  contract id of predictalph           | no
-punterAddress     | Address     | wallet address of the bidder            | no
-epoch             | U256        | epoch where the bidder is playing            | no
-upBid             | Bool        | side selected            | no
-amountBid         | U256        |  amount bid           | no
-claimedByAnyoneAt | U256        | when the rewards can be claimed if the bidder didn't            | no
+|                   | Type        | Description                                          | Mutable |
+|-------------------|-------------|------------------------------------------------------|---------|
+| prediction        | Predictalph | contract id of predictalph                           | no      |
+| punterAddress     | Address     | wallet address of the bidder                         | no      |
+| epoch             | U256        | epoch where the bidder is playing                    | no      |
+| upBid             | Bool        | side selected                                        | no      |
+| amountBid         | U256        | amount bid                                           | no      |
+| claimedByAnyoneAt | U256        | when the rewards can be claimed if the bidder didn't | no      |
+
 
 
 ### Components

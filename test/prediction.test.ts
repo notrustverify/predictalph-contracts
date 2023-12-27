@@ -347,11 +347,11 @@ describe("unit tests", () => {
     expect(amountUp).toEqual(10n * ONE_ALPH + 9n * ONE_ALPH);
     expect(amountDown).toEqual(11n * ONE_ALPH);
     expect(totalAmount).toEqual(10n * ONE_ALPH + 20n * ONE_ALPH);
-    expect(treasuryAmount).toEqual(1n * 10n **16n+20n * 10n ** 16n);
+    expect(treasuryAmount).toEqual(300000000000000000n);
     expect(roundState.asset.alphAmount).toEqual(10n*ONE_ALPH + 21n * ONE_ALPH);
     expect(predictionState.fields.epoch).toEqual(1n);
     expect(rewardBaseCalAmount).toEqual(amountUp);
-    expect(rewardAmount).toEqual(20n * ONE_ALPH - (1n * 10n **16n+20n * 10n ** 16n));
+    expect(rewardAmount).toEqual(29700000000000000000n);
     expect(priceEnd).toEqual(11n);
 
     const arrayEpochBytes = arrayEpochToBytes([0])
@@ -363,7 +363,7 @@ describe("unit tests", () => {
 
     const totalAmountWithdraw = roundStateWithdraw.fields.totalAmount;
 
-    expect(totalAmountWithdraw).toEqual(treasuryAmount);
+    expect(totalAmountWithdraw).toEqual(16931578947368421053n);
     expect(roundStateWithdraw.asset.alphAmount).toEqual(
       ONE_ALPH + treasuryAmount
     );
