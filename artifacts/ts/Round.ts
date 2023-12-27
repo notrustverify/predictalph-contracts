@@ -37,6 +37,8 @@ export namespace RoundTypes {
     bidEndTimestamp: bigint;
     operator: Address;
     rewardsComputed: boolean;
+    boostedUp: boolean;
+    boostedDown: boolean;
     priceEnd: bigint;
     totalAmount: bigint;
     amountUp: bigint;
@@ -134,6 +136,14 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "calculateRewards", params);
     },
+    boost: async (
+      params: TestContractParams<
+        RoundTypes.Fields,
+        { from: Address; amount: bigint; up: boolean }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "boost", params);
+    },
     destroy: async (
       params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
     ): Promise<TestContractResult<null>> => {
@@ -155,7 +165,7 @@ export const Round = new Factory(
   Contract.fromJson(
     RoundContractJson,
     "",
-    "607fe938fc76a2e5e09fbe29cf34eecb83e70af96435e856dca0efcc57f035fe"
+    "9f2de039b440849411021a1df48c9856bc5805f3df9d49142543fa2a462587d3"
   )
 );
 

@@ -15,7 +15,7 @@ const configuration: Configuration<Settings> = {
     },
     testnet:{
          //Make sure the two values match what's in your devnet configuration
-      nodeUrl: 'http://127.0.0.1:12973',
+      nodeUrl: process.env.TESTNET_NODE,
       networkId: 1,
       privateKeys: process.env.PRIVATE_KEYS === undefined ? [] : process.env.PRIVATE_KEYS.split(','),
       settings: []

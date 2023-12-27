@@ -165,14 +165,6 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdrawAddress", params);
     },
-    setNewRepeatEvery: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
-        { newRecurrence: bigint }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "setNewRepeatEvery", params);
-    },
     destroyRound: async (
       params: TestContractParams<
         PredictalphTypes.Fields,
@@ -180,6 +172,22 @@ class Factory extends ContractFactory<
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "destroyRound", params);
+    },
+    boostRound: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { amount: bigint; up: boolean; epochToBoost: bigint }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "boostRound", params);
+    },
+    setNewRepeatEvery: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { newRecurrence: bigint }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "setNewRepeatEvery", params);
     },
     setNewFees: async (
       params: TestContractParams<PredictalphTypes.Fields, { basisPts: bigint }>
@@ -209,8 +217,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=4-2=6-6+61=2-2+7c=2-1+2=2+1594=1+1=1-1=2-1=1+a=2-2+6e437e=2-2+cb=2-2+db=2-2+eb=2-2+fb=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+d=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1590",
-    "397128412cc7081d4d83cfdab70d381653cb9ae4c4dd1630c3f51d4ed5c5118a"
+    "=4-2=6+61=1+07=2-7+123=2-2+5b=2-2+16=2-2+bc=2-2+70=2-1=1+d=2-2+de=2-2+ee=2-2+fe=1-3+4=1+e441e=6+0=4-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+f=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1660",
+    "710752073a238c3362157f95c302da280cfd099f855c64e0c507d08b622ef426"
   )
 );
 

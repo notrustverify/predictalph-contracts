@@ -16,10 +16,9 @@
     "mainnetdeploy": "cli deploy --network mainnet",
     "build": "tsc --build .",
     "withdraw": "tsc --build . && node dist/src/withdraw.js",
-    "destroy": "tsc --build . && node dist/src/destroy.js",
     "manage": "tsc --build . && node dist/src/manage.js",
     "eventsListener": "tsc --build . && node dist/src/eventsListener.js",
-    "api": "tsc --build . && node dist/src/api/index.js"
+    "destroy": "tsc --build . && node dist/src/destroy.js "
   },
   "author": "",
   "license": "ISC",

@@ -9,3 +9,10 @@ TxScript End(predictalph: Predictalph, price: U256) {
 TxScript DestroyRound(predictalph: Predictalph, arrayEpoch: ByteVec) {
   predictalph.destroyRound(arrayEpoch)
 }
+
+TxScript BoostRound(predictalph: Predictalph, amount: U256, up: Bool, epochToBoost: U256){
+  let caller = callerAddress!()
+  predictalph.boostRound{caller -> ALPH: amount}(amount, up, epochToBoost)
+}
+
+

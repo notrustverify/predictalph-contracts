@@ -12,6 +12,7 @@ import {
   HexString,
 } from "@alephium/web3";
 import { default as BidScriptJson } from "../Bid.ral.json";
+import { default as BoostRoundScriptJson } from "../BoostRound.ral.json";
 import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
@@ -23,6 +24,12 @@ export const Bid = new ExecutableScript<{
   amount: bigint;
   up: boolean;
 }>(Script.fromJson(BidScriptJson));
+export const BoostRound = new ExecutableScript<{
+  predictalph: HexString;
+  amount: bigint;
+  up: boolean;
+  epochToBoost: bigint;
+}>(Script.fromJson(BoostRoundScriptJson));
 export const DestroyRound = new ExecutableScript<{
   predictalph: HexString;
   arrayEpoch: HexString;

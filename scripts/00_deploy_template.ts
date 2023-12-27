@@ -33,7 +33,9 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         treasuryAmount: 0n,
         rewardAmount: 0n,
         rewardBaseCalAmount: 0n,
-        counterAttendees: 0n
+        counterAttendees: 0n,
+        boostedDown: false,
+        boostedUp: false
     }
   })
 }

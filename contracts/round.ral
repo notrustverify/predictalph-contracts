@@ -6,6 +6,8 @@ Contract Round(
     bidEndTimestamp: U256,
     operator: Address,
     mut rewardsComputed: Bool,
+    mut boostedUp: Bool,
+    mut boostedDown: Bool,
     mut priceEnd: U256,
     mut totalAmount: U256,
     mut amountUp: U256,
@@ -14,6 +16,7 @@ Contract Round(
     mut rewardAmount: U256,
     mut rewardBaseCalAmount: U256,
     mut counterAttendees: U256
+
 ){
 
 
@@ -47,6 +50,8 @@ Contract Round(
     @using(updateFields = true, assetsInContract = true, preapprovedAssets = true)
     pub fn updateAmount(from: Address, amount: U256, up: Bool) -> () {
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+        assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
 
         totalAmount = totalAmount + amount
         
@@ -82,6 +87,26 @@ Contract Round(
         }
 
         rewardsComputed = true
+
+    }
+
+
+    // add more rewards toward a side to incentive people to play
+    @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
+    pub fn boost(from: Address, amount: U256, up: Bool) -> (){
+        assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+        totalAmount = totalAmount + amount
+        
+        if (up) {
+            amountUp = amountUp + amount
+            boostedUp = true
+        } else {
+            amountDown = amountDown + amount
+            boostedDown = true
+        }
+
+        transferTokenToSelf!(from, ALPH, amount)
 
     }
 

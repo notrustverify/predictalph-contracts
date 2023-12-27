@@ -27,8 +27,8 @@ const deployAuction: DeployFunction<Settings> = async (
         epoch: 0n,
         operator: deployer.account.address,
         feesBasisPts: 100n,
-        repeatEvery: BigInt(3600*1000),
-        //repeatEvery: BigInt(240*1000),
+        //repeatEvery: BigInt(3600*1000),
+        repeatEvery: BigInt(240*1000),
         //claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC *1000)
         claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
 

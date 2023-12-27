@@ -73,7 +73,7 @@ enum ErrorCodes {
         emit Debug(`Actual epoch is ${epoch} with start price ${price}`)
 
         let bidTimestampEnd = blockTimeStamp!() + repeatEvery
-        let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false,0 ,0 ,0 ,0 ,0, 0, 0, 0)
+        let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false, false, false, 0 ,0 ,0 ,0 ,0, 0, 0, 0)
 
 
        copyCreateSubContract!{caller -> ALPH: 1 alph}(epochContractId, roundTemplateId, encodedImmFields, encodedMutFields)
@@ -207,14 +207,6 @@ enum ErrorCodes {
         }
     }
 
-    
-
-    @using(updateFields = true, checkExternalCaller = false)
-    pub fn setNewRepeatEvery(newRecurrence: U256) -> (){
-        checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
-        repeatEvery = newRecurrence
-
-    }
 
     pub fn destroyRound(epochArray: ByteVec) -> (){
         checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
@@ -230,6 +222,22 @@ enum ErrorCodes {
                 round.destroy()
             }
         }
+
+    }
+
+
+    @using(preapprovedAssets = true, checkExternalCaller = false)
+    pub fn boostRound(amount: U256, up: Bool, epochToBoost: U256) -> (){
+        let caller = callerAddress!()
+        let roundToBoost = getRoundByEpoch(u256To4Byte!(epochToBoost))
+
+        roundToBoost.boost{caller -> ALPH: amount}(caller, amount, up)
+    }
+
+    @using(updateFields = true, checkExternalCaller = false)
+    pub fn setNewRepeatEvery(newRecurrence: U256) -> (){
+        checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+        repeatEvery = newRecurrence
 
     }
 
