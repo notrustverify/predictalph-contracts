@@ -193,7 +193,7 @@ describe("unit tests", () => {
     expect(exists).toEqual(false);
   });
 
-  /*
+  
 
   test("2 rounds, 3 players, player 1 claim other rewards", async () => {
     const bidder1 = bidders[0];
@@ -723,6 +723,5 @@ describe("unit tests", () => {
     expect(exists).toEqual(false);
   });
 
-*/
   
 });

@@ -10,7 +10,7 @@
     "testnetcompile": "cli compile -n testnet",
     "devcompile": "cli compile -n devnet",
     "mainnetcompile": "cli compile -n mainnet",
-    "test": "cli test",
+    "test": "cli test -i -v",
     "devdeploy": "cli deploy --network devnet",
     "testnetdeploy": "cli deploy --network testnet",
     "mainnetdeploy": "cli deploy --network mainnet",
