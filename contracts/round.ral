@@ -6,6 +6,7 @@ Contract Round(
     bidEndTimestamp: U256,
     operator: Address,
     mut rewardsComputed: Bool,
+    mut totalAmountBoost: U256,
     mut priceEnd: U256,
     mut totalAmount: U256,
     mut amountUp: U256,
@@ -14,6 +15,7 @@ Contract Round(
     mut rewardAmount: U256,
     mut rewardBaseCalAmount: U256,
     mut counterAttendees: U256
+
 ){
 
 
@@ -47,6 +49,8 @@ Contract Round(
     @using(updateFields = true, assetsInContract = true, preapprovedAssets = true)
     pub fn updateAmount(from: Address, amount: U256, up: Bool) -> () {
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+        assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
 
         totalAmount = totalAmount + amount
         
@@ -85,6 +89,19 @@ Contract Round(
 
     }
 
+
+    // add more rewards toward a side to incentive people to play
+    @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
+    pub fn boost(from: Address, amount: U256) -> (){
+        assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+        totalAmountBoost = totalAmountBoost + amount
+        totalAmount = totalAmount + amount
+        
+        transferTokenToSelf!(from, ALPH, amount)
+
+    }
+
     @using(assetsInContract = true)
     pub fn destroy() -> (){
         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
@@ -103,6 +120,7 @@ Contract Round(
         if (rewardAmount > 0) {
             if( (priceEnd > priceStart && upBid) || (priceEnd < priceStart && !upBid) ) {
                 let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
+
                 transferTokenFromSelf!(addressPunter, ALPH, userReward)
                 totalAmount = totalAmount - userReward
             }

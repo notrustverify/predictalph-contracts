@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@alephium/cli@^0.27.0":
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/@alephium/cli/-/cli-0.27.0.tgz#fb7ed5eb05747cae5a53e41171812fdef82af60c"
-  integrity sha512-dEEzhp3va/vR9Ii9bMOy4NEW+GNXgE25oqB1qxgBpCQh8q44z8uk/3LoNW1GCVer7gvLy1RBDlqdNP6UVHcH2Q==
+"@alephium/cli@^0.27.5":
+  version "0.27.5"
+  resolved "https://registry.yarnpkg.com/@alephium/cli/-/cli-0.27.5.tgz#c159b28ff57e011fc26f08a5e7bf990a753cf3cc"
+  integrity sha512-TjgDBtrKhNDT+mlDLWMS4wq8gp+/kSgkULTOQqE/Q/ZSZZS9PHO7uqkodn4MNzXFH2o84YxdSQTZjqD75sgCVQ==
   dependencies:
-    "@alephium/web3" "^0.27.0"
-    "@alephium/web3-wallet" "^0.27.0"
+    "@alephium/web3" "^0.27.5"
+    "@alephium/web3-wallet" "^0.27.5"
     commander "^9.5.0"
     cross-fetch "^3.1.5"
     crypto-js "^4.1.1"
@@ -56,6 +56,20 @@
     elliptic "6.5.4"
     fs-extra "10.0.1"
 
+"@alephium/web3-wallet@^0.27.5":
+  version "0.27.5"
+  resolved "https://registry.yarnpkg.com/@alephium/web3-wallet/-/web3-wallet-0.27.5.tgz#77b9c1e45d96f3ecbced2ffc061b1ce5e2d29b3e"
+  integrity sha512-bGHBP16+qRUGBZvb0CWNJAQqGRWka39jh3xnS67AwX/dVfMpxPBHpETRECb1JLUjiA0TsM0vl7lBRC4ow35NnA==
+  dependencies:
+    "@alephium/web3" "^0.27.5"
+    "@noble/secp256k1" "1.7.1"
+    "@types/node" "^16.18.23"
+    bip32 "3.1.0"
+    bip39 "3.0.4"
+    buffer "^6.0.3"
+    elliptic "6.5.4"
+    fs-extra "10.0.1"
+
 "@alephium/web3@^0.27.0":
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@alephium/web3/-/web3-0.27.0.tgz#f96925a85e4ee783f06b6c954474e312b7239b32"
@@ -78,6 +92,24 @@
   version "0.27.2"
   resolved "https://registry.yarnpkg.com/@alephium/web3/-/web3-0.27.2.tgz#870c5b9e0fd2156c6d810c45dc66ee54595b2210"
   integrity sha512-4uR7DTgFBOkvU9hKi+mlCNDnzMFvTQ1hPQjrtyZVbK+fxyB4PIu6BfVqxa0R/xurYJnzsWjUZqbWnN/nRG5dKQ==
+  dependencies:
+    "@noble/secp256k1" "1.7.1"
+    base-x "4.0.0"
+    bignumber.js "^9.1.1"
+    blakejs "1.2.1"
+    bn.js "5.2.1"
+    buffer "^6.0.3"
+    cross-fetch "^3.1.5"
+    crypto-browserify "^3.12.0"
+    elliptic "6.5.4"
+    eventemitter3 "^4.0.7"
+    path-browserify "^1.0.1"
+    stream-browserify "^3.0.0"
+
+"@alephium/web3@^0.27.5":
+  version "0.27.5"
+  resolved "https://registry.yarnpkg.com/@alephium/web3/-/web3-0.27.5.tgz#5be9dba7d054ad4381a2629294b7e7df6c13c65b"
+  integrity sha512-uqKJ5Yp9Kfv+QQN6tFVQBHqCA+SvtRlhqcSuyPjqnFFY8jaTjvbGgUsgU8F9W6X8o7CurZUFHy6T+yd9oEvDHg==
   dependencies:
     "@noble/secp256k1" "1.7.1"
     base-x "4.0.0"

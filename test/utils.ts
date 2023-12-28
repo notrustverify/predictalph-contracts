@@ -20,6 +20,7 @@ import {
   DestroyRound,
   DynamicArrayForInt,
   WithdrawAddress,
+  BoostRound,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -84,7 +85,8 @@ export async function deployRoundTemplate() {
       treasuryAmount: 0n,
       rewardAmount: 0n,
       rewardBaseCalAmount: 0n,
-      counterAttendees: 0n
+      counterAttendees: 0n,
+      totalAmountBoost: 0n
     },
   });
 }
@@ -165,6 +167,21 @@ export async function destroyRound(
     attoAlphAmount: DUST_AMOUNT,
   });
 }
+
+
+export async function boostRound(
+  signer: SignerProvider,
+  predictalph: PredictalphInstance,
+  epoch: bigint,
+  amount: bigint,
+  up: boolean
+) {
+  return await BoostRound.execute(signer, {
+    initialFields: { predictalph: predictalph.contractId, amount: amount  ,epochToBoost: epoch},
+    attoAlphAmount: amount + DUST_AMOUNT,
+  });
+}
+
 
 async function waitTxConfirmed<T extends { txId: string }>(
   promise: Promise<T>
