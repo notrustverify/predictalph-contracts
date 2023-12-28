@@ -60,7 +60,7 @@ counterAttendees    | U256        | number of bidder                            
 
 #### Punter (bidder)
 
-                  | Type        | Description                                          | Mutable
+Field             | Type        | Description                                          | Mutable
 ----------------- | ----------- | ---------------------------------------------------- | -------
 prediction        | Predictalph | contract id of predictalph                           | no
 punterAddress     | Address     | wallet address of the bidder                         | no
