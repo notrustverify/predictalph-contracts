@@ -13,7 +13,6 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         upBid: false,
         amountBid: 0n,
         claimedByAnyoneAt: 0n
-
     }
   })
 
@@ -34,8 +33,7 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         rewardAmount: 0n,
         rewardBaseCalAmount: 0n,
         counterAttendees: 0n,
-        boostedDown: false,
-        boostedUp: false
+        totalAmountBoost: 0n
     }
   })
 }

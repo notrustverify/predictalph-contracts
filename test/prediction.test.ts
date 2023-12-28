@@ -8,6 +8,7 @@ import {
   sleep,
   subContractId,
   fetchContractState,
+  DUST_AMOUNT,
 } from "@alephium/web3";
 import {
   expectAssertionError,
@@ -45,7 +46,7 @@ describe("unit tests", () => {
   web3.setCurrentNodeProvider("http://127.0.0.1:22973");
 
   const groupIndex = groupOfAddress(testAddress);
-  const bidDurationSecond = 5;
+  const bidDurationSecond = 3;
   jest.setTimeout(3 * 1000 * 60);
   let predictionGame: PredictalphInstance;
   let round: RoundInstance;
@@ -144,32 +145,38 @@ describe("unit tests", () => {
     //const bidder1State = getRoundBidder(bidder1.address, 0n);
     //console.log(bidder1State);
     expect(roundState.fields.feesBasisPts).toEqual(100n)
-    expect(amountUp).toEqual(10n * ONE_ALPH + 9n * ONE_ALPH);
+    expect(amountUp).toEqual(9n * ONE_ALPH);
     expect(amountDown).toEqual(11n * ONE_ALPH);
-    expect(totalAmount).toEqual(10n * ONE_ALPH + 20n * ONE_ALPH);
+    expect(totalAmount).toEqual(30n * ONE_ALPH);
     expect(treasuryAmount).toEqual(3n * 10n**17n);
     expect(roundState.asset.alphAmount).toEqual(10n*ONE_ALPH + 21n * ONE_ALPH);
     expect(predictionState.fields.epoch).toEqual(1n);
+    expect(roundState.fields.totalAmountBoost).toEqual(10n * ONE_ALPH)
     expect(rewardBaseCalAmount).toEqual(amountUp);
     expect(rewardAmount).toEqual(297n*10n**17n);
     expect(priceEnd).toEqual(11n);
 
     const arrayEpochBytes = arrayEpochToBytes([0])
-    
+
+
     await withdraw(bidder1, predictionGame, arrayEpochBytes);
 
     const bidder2Balance = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(bidder2.address)
+
     await withdraw(bidder2, predictionGame, arrayEpochBytes);
     const bidder2BalanceAfterWithdraw = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(bidder2.address)
 
-    expect(BigInt(bidder2BalanceAfterWithdraw.balance)).toBeCloseTo(BigInt(bidder2Balance.balance)+ONE_ALPH)
+    // round amount to get right amount
+    expect((BigInt(bidder2Balance.balance)+ONE_ALPH)/10n**17n).toEqual(BigInt(bidder2BalanceAfterWithdraw.balance)/10n**17n)
 
     const roundStateWithdraw = await getRoundState(0n);
     console.log(roundStateWithdraw.fields)
 
     const totalAmountWithdraw = roundStateWithdraw.fields.totalAmount;
+    const rewardBaseCalAmountWithdraw = roundStateWithdraw.fields.rewardBaseCalAmount
+    expect(treasuryAmount).toEqual(totalAmountWithdraw);
 
-    expect(totalAmountWithdraw).toEqual(15931578947368421053n);
+    //console.log(roundStateWithdraw.asset.alphAmount)
     expect(roundStateWithdraw.asset.alphAmount).toEqual(
       ONE_ALPH + totalAmountWithdraw
     );
@@ -186,7 +193,8 @@ describe("unit tests", () => {
     expect(exists).toEqual(false);
   });
 
-/*
+  /*
+
   test("2 rounds, 3 players, player 1 claim other rewards", async () => {
     const bidder1 = bidders[0];
     const bidder2 = bidders[1];
@@ -714,7 +722,6 @@ describe("unit tests", () => {
     );
     expect(exists).toEqual(false);
   });
-
 
 */
   

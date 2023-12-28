@@ -27,7 +27,6 @@ export const Bid = new ExecutableScript<{
 export const BoostRound = new ExecutableScript<{
   predictalph: HexString;
   amount: bigint;
-  up: boolean;
   epochToBoost: bigint;
 }>(Script.fromJson(BoostRoundScriptJson));
 export const DestroyRound = new ExecutableScript<{

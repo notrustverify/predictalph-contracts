@@ -86,8 +86,7 @@ export async function deployRoundTemplate() {
       rewardAmount: 0n,
       rewardBaseCalAmount: 0n,
       counterAttendees: 0n,
-      boostedDown: false,
-      boostedUp: false
+      totalAmountBoost: 0n
     },
   });
 }
@@ -178,7 +177,7 @@ export async function boostRound(
   up: boolean
 ) {
   return await BoostRound.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, amount: amount  ,epochToBoost: epoch, up: up },
+    initialFields: { predictalph: predictalph.contractId, amount: amount  ,epochToBoost: epoch},
     attoAlphAmount: amount + DUST_AMOUNT,
   });
 }

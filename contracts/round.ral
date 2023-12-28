@@ -6,8 +6,7 @@ Contract Round(
     bidEndTimestamp: U256,
     operator: Address,
     mut rewardsComputed: Bool,
-    mut boostedUp: Bool,
-    mut boostedDown: Bool,
+    mut totalAmountBoost: U256,
     mut priceEnd: U256,
     mut totalAmount: U256,
     mut amountUp: U256,
@@ -93,19 +92,12 @@ Contract Round(
 
     // add more rewards toward a side to incentive people to play
     @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
-    pub fn boost(from: Address, amount: U256, up: Bool) -> (){
+    pub fn boost(from: Address, amount: U256) -> (){
         assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
 
+        totalAmountBoost = totalAmountBoost + amount
         totalAmount = totalAmount + amount
         
-        if (up) {
-            amountUp = amountUp + amount
-            boostedUp = true
-        } else {
-            amountDown = amountDown + amount
-            boostedDown = true
-        }
-
         transferTokenToSelf!(from, ALPH, amount)
 
     }
@@ -128,6 +120,7 @@ Contract Round(
         if (rewardAmount > 0) {
             if( (priceEnd > priceStart && upBid) || (priceEnd < priceStart && !upBid) ) {
                 let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
+
                 transferTokenFromSelf!(addressPunter, ALPH, userReward)
                 totalAmount = totalAmount - userReward
             }

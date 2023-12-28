@@ -1,22 +1,19 @@
 {
   "version": "v2.5.9",
   "name": "BoostRound",
-  "bytecodeTemplate": "0101030001000cb417001600{1}a2{1}{2}{3}0f0c{0}0109",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}0109",
   "fieldsSig": {
     "names": [
       "predictalph",
       "amount",
-      "up",
       "epochToBoost"
     ],
     "types": [
       "ByteVec",
       "U256",
-      "Bool",
       "U256"
     ],
     "isMutable": [
-      false,
       false,
       false,
       false
