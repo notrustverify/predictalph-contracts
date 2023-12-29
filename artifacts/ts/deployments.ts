@@ -11,8 +11,6 @@ import {
   RoundInstance,
   Predictalph,
   PredictalphInstance,
-  DynamicArrayForInt,
-  DynamicArrayForIntInstance,
 } from ".";
 import { default as mainnetDeployments } from "../.deployments.mainnet.json";
 import { default as testnetDeployments } from "../.deployments.testnet.json";
@@ -24,7 +22,6 @@ export type Deployments = {
     Punter: DeployContractExecutionResult<PunterInstance>;
     Round: DeployContractExecutionResult<RoundInstance>;
     Predictalph: DeployContractExecutionResult<PredictalphInstance>;
-    DynamicArrayForInt?: DeployContractExecutionResult<DynamicArrayForIntInstance>;
   };
 };
 
@@ -53,9 +50,6 @@ function toDeployments(json: any): Deployments {
         ? undefined
         : {
             ...json.contracts["DynamicArrayForInt"],
-            contractInstance: DynamicArrayForInt.at(
-              json.contracts["DynamicArrayForInt"].contractInstance.address
-            ),
           },
   };
   return {
