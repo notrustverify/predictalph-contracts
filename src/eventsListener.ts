@@ -186,7 +186,6 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
 
 async function getPunterBid(
   privKey: string,
-  group: number,
   contractName: string
 ) {
   const wallet = new PrivateKeyWallet({
@@ -201,9 +200,9 @@ async function getPunterBid(
     "./artifacts/.deployments." + networkToUse + ".json"
   );
   //Make sure it match your address group
-  const accountGroup = group;
+  const  group = wallet.group;
   const deployed = deployments.getDeployedContractResult(
-    accountGroup,
+    group,
     contractName
   );
 
@@ -276,9 +275,7 @@ web3.setCurrentNodeProvider(nodeProvider);
 
 const redis = new Redis({ host: process.env.REDIS_HOST });
 
-const group = 0;
 getPunterBid(
-  configuration.networks[networkToUse].privateKeys[group],
-  group,
+  configuration.networks[networkToUse].privateKeys[0],
   "Predictalph"
 );

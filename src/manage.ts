@@ -24,7 +24,6 @@ import { CoinGeckoClient } from "coingecko-api-v3";
 
 async function startRound(
   privKey: string,
-  group: number,
   contractName: string
 ) {
   const wallet = new PrivateKeyWallet({
@@ -32,16 +31,15 @@ async function startRound(
     keyType: undefined,
     nodeProvider: web3.getCurrentNodeProvider(),
   });
-
+  const group = wallet.group
   //.deployments contains the info of our `TokenFaucet` deployement, as we need to now the contractId and address
   //This was auto-generated with the `cli deploy` of our `scripts/0_deploy_faucet.ts`
   const deployments = await Deployments.from(
     "./artifacts/.deployments." + networkToUse + ".json"
   );
   //Make sure it match your address group
-  const accountGroup = group;
   const deployed = deployments.getDeployedContractResult(
-    accountGroup,
+    group,
     contractName
   );
   const predictalphContractId = deployed.contractInstance.contractId;
@@ -88,7 +86,7 @@ async function startRound(
   }
 }
 
-async function endRound(privKey: string, group: number, contractName: string) {
+async function endRound(privKey: string, contractName: string) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
     keyType: undefined,
@@ -101,9 +99,10 @@ async function endRound(privKey: string, group: number, contractName: string) {
     "./artifacts/.deployments." + networkToUse + ".json"
   );
   //Make sure it match your address group
-  const accountGroup = group;
+  const group = wallet.group
+
   const deployed = deployments.getDeployedContractResult(
-    accountGroup,
+    group,
     contractName
   );
   const predictalphContractId = deployed.contractInstance.contractId;
@@ -155,7 +154,6 @@ async function endRound(privKey: string, group: number, contractName: string) {
 
           startRound(
             configuration.networks[networkToUse].privateKeys[group],
-            group,
             "Predictalph"
           );
         }
@@ -202,15 +200,13 @@ const nodeProvider = new NodeProvider(
 
 //Sometimes, it's convenient to setup a global NodeProvider for your project:
 web3.setCurrentNodeProvider(nodeProvider);
-const group = 0;
+
 startRound(
-  configuration.networks[networkToUse].privateKeys[group],
-  group,
+  configuration.networks[networkToUse].privateKeys[0],
   "Predictalph"
 );
 
 endRound(
-  configuration.networks[networkToUse].privateKeys[group],
-  group,
+  configuration.networks[networkToUse].privateKeys[0],
   "Predictalph"
 );
