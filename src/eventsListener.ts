@@ -24,6 +24,9 @@ import { Redis } from "ioredis"
 import { CoinGeckoClient } from "coingecko-api-v3";
 
 
+const POLLING_INTERVAL_EVENTS = 6*1000
+
+
 
 async function getAllEpochAddress(address: string){
     if (!keyExists(address) || !keyExists("claim"+address) ){
@@ -74,7 +77,7 @@ async function setKeyValue(key: string, value: string){
   // `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
    const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-    pollingInterval: 4000,
+    pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: (event: PredictalphTypes.BetBearEvent): Promise<void> => {
         //if(BigInt(actualEpoch) == event.fields.epoch){
@@ -94,7 +97,7 @@ async function setKeyValue(key: string, value: string){
 
    const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-    pollingInterval: 4000,
+    pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: (event: PredictalphTypes.BetBullEvent): Promise<void> => {
       //  if(BigInt(actualEpoch) == event.fields.epoch){
@@ -115,7 +118,7 @@ async function setKeyValue(key: string, value: string){
 
   const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> = {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-    pollingInterval: 4000,
+    pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: (event: PredictalphTypes.RoundEndedEvent): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`)
@@ -132,7 +135,7 @@ async function setKeyValue(key: string, value: string){
 
   const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent> = {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-    pollingInterval: 4000,
+    pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: (event: PredictalphTypes.RoundEndedEvent): Promise<void> => {
       console.log(`Round Started(${event.fields.epoch}, ${event.fields.price})`)
@@ -150,7 +153,7 @@ async function setKeyValue(key: string, value: string){
 
   const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-    pollingInterval: 4000,
+    pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: (event: PredictalphTypes.ClaimedEvent): Promise<void> => {
       console.log(`Claimed(${event.fields.from}, ${event.fields.amount/ONE_ALPH}, ${event.fields.epoch})`)
@@ -214,7 +217,9 @@ const contractIdKeyExists = await keyExists("contractid")
   const subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(optionsRoundStart, 0)
   const subscriptionClaimed = predictalphDeployed.subscribeClaimedEvent(optionsClaimed, 0)
 
-  
+  if (subscriptionBear.isCancelled || subscriptionBull.isCancelled || subscriptionRoundEnd.isCancelled || subscriptionRoundStart.isCancelled || subscriptionClaimed.isCancelled ) {
+    throw new Error("One event has been cancelled, exit")
+  }
 
 }
 
@@ -222,7 +227,6 @@ const retryFetch = fetchRetry.default(fetch, {
   retries: 10,
   retryDelay: 1000,
 });
-
 
 
 let networkToUse = process.argv.slice(2)[0];
