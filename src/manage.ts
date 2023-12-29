@@ -83,6 +83,8 @@ async function startRound(
     console.log("Start round done");
   } catch (error) {
     console.error(error);
+    throw new Error(`error start round ${error}`)
+
   }
 }
 
@@ -159,6 +161,7 @@ async function endRound(privKey: string, group: number, contractName: string) {
         }
       } catch (error) {
         console.error(error);
+        throw new Error(`error end round ${error}`)
       }
     }
 

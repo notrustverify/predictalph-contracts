@@ -17,14 +17,14 @@ const configuration: Configuration<Settings> = {
          //Make sure the two values match what's in your devnet configuration
       nodeUrl: process.env.TESTNET_NODE,
       networkId: 1,
-      privateKeys: process.env.PRIVATE_KEYS === undefined ? [] : process.env.PRIVATE_KEYS.split(','),
+      privateKeys: process.env.TESTNET_PRIVATE_KEYS === undefined ? [] : process.env.TESTNET_PRIVATE_KEYS.split(','),
       settings: []
     },
     mainnet: {
          //Make sure the two values match what's in your devnet configuration
-      nodeUrl: 'http://localhost:22973',
+      nodeUrl: process.env.MAINNET_NODE === undefined ? 'http://localhost:12973' : process.env.MAINNET_NODE ,
       networkId: 0,
-      privateKeys: [],
+      privateKeys: process.env.MAINNET_PRIVATE_KEYS === undefined ? [] : process.env.MAINNET_PRIVATE_KEYS.split(','),
       settings: []
     }
   }
