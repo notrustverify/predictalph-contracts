@@ -18,7 +18,6 @@ import {
   Bid,
   Withdraw,
   DestroyRound,
-  DynamicArrayForInt,
   WithdrawAddress,
   BoostRound,
 } from "../artifacts/ts";
@@ -39,13 +38,11 @@ export async function deployPrediction(
 ) {
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
-  const dynamicArrayContract = await deployDynamicArray();
 
   return await Predictalph.deploy(defaultSigner, {
     initialFields: {
       punterTemplateId: punterTemplateId.contractInstance.contractId,
       roundTemplateId: roundTemplateId.contractInstance.contractId,
-      dynamicArrayForIntId: dynamicArrayContract.contractInstance.contractId,
       epoch: epoch,
       operator: operator,
       feesBasisPts: 100n,
@@ -91,9 +88,6 @@ export async function deployRoundTemplate() {
   });
 }
 
-export async function deployDynamicArray() {
-  return await DynamicArrayForInt.deploy(defaultSigner, { initialFields: {} });
-}
 
 export async function startRound(
   signer: SignerProvider,

@@ -1,7 +1,7 @@
 {
   "version": "v2.5.9",
   "name": "DestroyRound",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0108",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}0109",
   "fieldsSig": {
     "names": [
       "predictalph",

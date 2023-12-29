@@ -13,7 +13,6 @@ const deployAuction: DeployFunction<Settings> = async (
 
   const punterTemplateId = deployer.getDeployContractResult('Punter')
   const roundTemplateId = deployer.getDeployContractResult('Round')
-  const dynamicArrayContract = deployer.getDeployContractResult('DynamicArrayForInt')
 
 
   const ONE_WEEK_SEC = 604800
@@ -23,14 +22,13 @@ const deployAuction: DeployFunction<Settings> = async (
     initialFields: {
         punterTemplateId: punterTemplateId.contractInstance.contractId,
         roundTemplateId: roundTemplateId.contractInstance.contractId,
-        dynamicArrayForIntId: dynamicArrayContract.contractInstance.contractId,
         epoch: 0n,
         operator: deployer.account.address,
         feesBasisPts: 100n,
-        //repeatEvery: BigInt(3600*1000),
-        repeatEvery: BigInt(240*1000),
-        //claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC *1000)
-        claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
+        repeatEvery: BigInt(3600*1000),
+        //repeatEvery: BigInt(240*1000),
+        claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC *1000)
+        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
 
     },
 

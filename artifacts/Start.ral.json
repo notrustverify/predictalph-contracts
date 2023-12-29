@@ -1,7 +1,7 @@
 {
   "version": "v2.5.9",
   "name": "Start",
-  "bytecodeTemplate": "01010300000008b413c40de0b6b3a7640000a2{1}0d0c{0}0103",
+  "bytecodeTemplate": "01010300000008b413c40de0b6b3a7640000a2{1}0d0c{0}0104",
   "fieldsSig": {
     "names": [
       "predictalph",

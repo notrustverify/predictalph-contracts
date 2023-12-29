@@ -21,7 +21,6 @@ import {
     Bid,
     Withdraw,
     DestroyRound,
-    DynamicArrayForInt,
     PredictalphTypes,
   } from "../artifacts/ts";
   import { PrivateKeyWallet } from "@alephium/web3-wallet";
@@ -42,13 +41,11 @@ import { CoinGeckoClient } from "coingecko-api-v3";
   ) {
     const punterTemplateId = await deployPunterTemplate();
     const roundTemplateId = await deployRoundTemplate();
-    const dynamicArrayContract = await deployDynamicArray();
   
     return await Predictalph.deploy(defaultSigner, {
       initialFields: {
         punterTemplateId: punterTemplateId.contractInstance.contractId,
         roundTemplateId: roundTemplateId.contractInstance.contractId,
-        dynamicArrayForIntId: dynamicArrayContract.contractInstance.contractId,
         epoch: epoch,
         operator: operator,
         feesBasisPts: 100n,
@@ -94,9 +91,6 @@ import { CoinGeckoClient } from "coingecko-api-v3";
     });
   }
   
-  export async function deployDynamicArray() {
-    return await DynamicArrayForInt.deploy(defaultSigner, { initialFields: {} });
-  }
   
   export async function startRound(
     signer: SignerProvider,

@@ -2,7 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export * from "./DynamicArrayForInt";
 export * from "./Predictalph";
 export * from "./Punter";
 export * from "./Round";

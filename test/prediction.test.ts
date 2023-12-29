@@ -23,7 +23,6 @@ import {
   RoundInstance,
   PunterInstance,
   Bid,
-  DynamicArrayForInt,
 } from "../artifacts/ts";
 import {
   deployPrediction,
@@ -89,14 +88,6 @@ describe("unit tests", () => {
     const bidderContract = Round.at(addressFromContractId(bidderContractId));
     const state = await bidderContract.fetchState();
     return state;
-  }
-
-  async function getArray(contractId: string){
-
-  const array = DynamicArrayForInt.at(addressFromContractId(contractId))
-  const arrayState = await array.fetchState()
-
-  return arrayState
   }
 
   beforeEach(async () => {

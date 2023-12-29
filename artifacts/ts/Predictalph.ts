@@ -32,7 +32,6 @@ export namespace PredictalphTypes {
   export type Fields = {
     punterTemplateId: HexString;
     roundTemplateId: HexString;
-    dynamicArrayForIntId: HexString;
     epoch: bigint;
     operator: Address;
     feesBasisPts: bigint;
@@ -67,6 +66,25 @@ export namespace PredictalphTypes {
     amount: bigint;
     epoch: bigint;
   }>;
+
+  export interface CallMethodTable {
+    getArrayElem: {
+      params: CallContractParams<{ array: HexString; index: bigint }>;
+      result: CallContractResult<HexString>;
+    };
+  }
+  export type CallMethodParams<T extends keyof CallMethodTable> =
+    CallMethodTable[T]["params"];
+  export type CallMethodResult<T extends keyof CallMethodTable> =
+    CallMethodTable[T]["result"];
+  export type MultiCallParams = Partial<{
+    [Name in keyof CallMethodTable]: CallMethodTable[Name]["params"];
+  }>;
+  export type MultiCallResults<T extends MultiCallParams> = {
+    [MaybeName in keyof T]: MaybeName extends keyof CallMethodTable
+      ? CallMethodTable[MaybeName]["result"]
+      : undefined;
+  };
 }
 
 class Factory extends ContractFactory<
@@ -97,6 +115,7 @@ class Factory extends ContractFactory<
       NotEnoughAlph: BigInt(9),
       CannotBeClaimedYet: BigInt(10),
     },
+    SubContractTypes: { Round: "00", Punter: "01" },
   };
 
   at(address: string): PredictalphInstance {
@@ -104,13 +123,21 @@ class Factory extends ContractFactory<
   }
 
   tests = {
-    getRound: async (
+    getArrayElem: async (
+      params: TestContractParams<
+        PredictalphTypes.Fields,
+        { array: HexString; index: bigint }
+      >
+    ): Promise<TestContractResult<HexString>> => {
+      return testMethod(this, "getArrayElem", params);
+    },
+    getCurrentRound: async (
       params: Omit<
         TestContractParams<PredictalphTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResult<HexString>> => {
-      return testMethod(this, "getRound", params);
+      return testMethod(this, "getCurrentRound", params);
     },
     getRoundByEpoch: async (
       params: TestContractParams<
@@ -217,8 +244,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=4-2=6-6+61=2-1=1+c=2-1=1-1=2-1+15a=2-2+15=1-3+2bb=3-1+f=2-2+bc=2-2+db=2-2+eb=2-2+fb440b441b=11-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+e=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1654",
-    "2fdb1f5ce3043fa268f14fcb8270a9105b5f03bd29987cefad1057ee26b71e87"
+    "=10-4=4-2+8=1-3=1-1=1-1+9f=2-2=1-1=1-1=1-3+17d=1+2=1+8=1-1+2cc=2-1+7=3-2+bc=2-2+db=2-2+eb=2-2+fb440b441b=81-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+e=52+16027e0212526f756e6420636f6e74726163742069642000a00016007e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1584",
+    "ffa44b0baf686cb44bae5ad95000bed88462ab698b42d88ee3ef3199ddab8a44"
   )
 );
 
@@ -317,5 +344,30 @@ export class PredictalphInstance extends ContractInstance {
       options,
       fromCount
     );
+  }
+
+  methods = {
+    getArrayElem: async (
+      params: PredictalphTypes.CallMethodParams<"getArrayElem">
+    ): Promise<PredictalphTypes.CallMethodResult<"getArrayElem">> => {
+      return callMethod(
+        Predictalph,
+        this,
+        "getArrayElem",
+        params,
+        getContractByCodeHash
+      );
+    },
+  };
+
+  async multicall<Calls extends PredictalphTypes.MultiCallParams>(
+    calls: Calls
+  ): Promise<PredictalphTypes.MultiCallResults<Calls>> {
+    return (await multicallMethods(
+      Predictalph,
+      this,
+      calls,
+      getContractByCodeHash
+    )) as PredictalphTypes.MultiCallResults<Calls>;
   }
 }
