@@ -89,8 +89,7 @@ import { CoinGeckoClient } from "coingecko-api-v3";
         rewardAmount: 0n,
         rewardBaseCalAmount: 0n,
         counterAttendees: 0n,
-        boostedDown: false,
-        boostedUp: false
+        totalAmountBoost: 0n
       },
     });
   }

@@ -217,7 +217,7 @@ const contractIdKeyExists = await keyExists("contractid")
   const subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(optionsRoundStart, 0)
   const subscriptionClaimed = predictalphDeployed.subscribeClaimedEvent(optionsClaimed, 0)
 
-  if (subscriptionBear.isCancelled || subscriptionBull.isCancelled || subscriptionRoundEnd.isCancelled || subscriptionRoundStart.isCancelled || subscriptionClaimed.isCancelled ) {
+  if (subscriptionBear.isCancelled() || subscriptionBull.isCancelled() || subscriptionRoundEnd.isCancelled() || subscriptionRoundStart.isCancelled() || subscriptionClaimed.isCancelled() ) {
     throw new Error("One event has been cancelled, exit")
   }
 
