@@ -22,10 +22,10 @@ import {
   getRoundContractState,
 } from "./utils";
 import { CoinGeckoClient } from "coingecko-api-v3";
+import { access } from "fs";
 
 async function destroyRound(
   privKey: string,
-  group: number,
   contractName: string,
   arrayRound: number[]
 ) {
@@ -41,9 +41,9 @@ async function destroyRound(
     "./artifacts/.deployments." + networkToUse + ".json"
   );
   //Make sure it match your address group
-  const accountGroup = group;
+  const group = wallet.group;
   const deployed = deployments.getDeployedContractResult(
-    accountGroup,
+    group,
     contractName
   );
   const predictalphContractId = deployed.contractInstance.contractId;
@@ -128,10 +128,9 @@ const nodeProvider = new NodeProvider(
 
 //Sometimes, it's convenient to setup a global NodeProvider for your project:
 web3.setCurrentNodeProvider(nodeProvider);
-const group = 0;
+
 destroyRound(
-  configuration.networks[networkToUse].privateKeys[group],
-  group,
+  configuration.networks[networkToUse].privateKeys[0],
   "Predictalph",
   arrayRound
 

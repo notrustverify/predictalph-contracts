@@ -1,9 +1,10 @@
 TxScript Start(predictalph: Predictalph, price: U256) {
-    predictalph.startRound{callerAddress!() -> ALPH : 1 alph}(price)
+  let caller = callerAddress!() 
+    predictalph.startRound{callerAddress!() -> ALPH : 1 alph}(caller, price)
   }
 
-TxScript End(predictalph: Predictalph, price: U256) {
-    predictalph.endRound(price)
+TxScript End(predictalph: Predictalph, price: U256, immediatelyStart: Bool) {
+  predictalph.endRound{callerAddress!() -> ALPH : 1 alph}(price, immediatelyStart)
 }
 
 TxScript DestroyRound(predictalph: Predictalph, arrayEpoch: ByteVec) {

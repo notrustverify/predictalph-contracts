@@ -143,6 +143,7 @@ async function endRound(privKey: string, contractName: string) {
             initialFields: {
               predictalph: predictalphContractId,
               price: priceToStore,
+              immediatelyStart: true
             },
             attoAlphAmount: ONE_ALPH,
           });
@@ -152,10 +153,11 @@ async function endRound(privKey: string, contractName: string) {
           await waitTxConfirmed(nodeProvider, txStart.txId, 1, 1000);
           console.log("End round done");
 
+          /*
           startRound(
             configuration.networks[networkToUse].privateKeys[group],
             "Predictalph"
-          );
+          );*/
         }
       } catch (error) {
         console.error(error);

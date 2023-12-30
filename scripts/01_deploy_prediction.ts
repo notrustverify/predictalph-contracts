@@ -34,6 +34,10 @@ const deployAuction: DeployFunction<Settings> = async (
 
   })
 
+  console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
+  console.log(`Punter contract address: ${punterTemplateId.contractInstance.address}`)
+  console.log(`Round contract id: ${roundTemplateId.contractInstance.contractId}`)
+  console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${auction.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${auction.contractInstance.address}`)
 }

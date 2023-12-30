@@ -120,7 +120,7 @@ describe("unit tests", () => {
     await boostRound(operator, predictionGame, 0n, 10n*ONE_ALPH, true)
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n);
+    await endRound(operator, predictionGame, 11n, false);
 
     const predictionState = await predictionGame.fetchState();
     const roundState = await getRoundState(0n);
@@ -201,7 +201,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, false);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n)
+    await endRound(operator, predictionGame, 11n, false)
 
     //ROUND TWO
     await startRound(operator, predictionGame, 10n);
@@ -217,7 +217,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, true);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n)
+    await endRound(operator, predictionGame, 11n, false)
 
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
@@ -259,7 +259,7 @@ describe("unit tests", () => {
 
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 9n);
+    await endRound(operator, predictionGame, 9n, false);
 
     const predictionState = await predictionGame.fetchState();
     const roundState = await getRoundState(0n);
@@ -329,7 +329,7 @@ describe("unit tests", () => {
     await bid(bidder2, predictionGame, 11n * ONE_ALPH + ONE_ALPH, false);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n);
+    await endRound(operator, predictionGame, 11n, false);
 
     const predictionState = await predictionGame.fetchState();
     const roundState = await getRoundState(0n);
@@ -404,7 +404,7 @@ describe("unit tests", () => {
 
     await sleep((bidDurationSecond+1) * 1000);
 
-    await endRound(operator, predictionGame, 11n);
+    await endRound(operator, predictionGame, 11n, false);
 
     const predictionState = await predictionGame.fetchState();
 
@@ -436,7 +436,7 @@ describe("unit tests", () => {
 
     await sleep((bidDurationSecond+1) * 1000);
 
-    await endRound(operator, predictionGame, 11n);
+    await endRound(operator, predictionGame, 11n, false);
    
     await withdraw(bidder2, predictionGame, "00");
 
@@ -462,7 +462,7 @@ describe("unit tests", () => {
     //create contract
     await bid(bidder1, predictionGame, 2n * ONE_ALPH, true);
     await expectAssertionError(
-      endRound(operator, predictionGame, 11n),
+      endRound(operator, predictionGame, 11n, false),
       predictionGame.address,
       6
     );
@@ -484,7 +484,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, false);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n)
+    await endRound(operator, predictionGame, 11n, false)
 
     //ROUND TWO
     await startRound(operator, predictionGame, 10n);
@@ -500,7 +500,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, true);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n)
+    await endRound(operator, predictionGame, 11n, false)
 
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
@@ -526,7 +526,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, false);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n)
+    await endRound(operator, predictionGame, 11n, false)
 
     //ROUND TWO
     await startRound(operator, predictionGame, 10n);
@@ -542,7 +542,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, true);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n)
+    await endRound(operator, predictionGame, 11n, false)
 
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
@@ -596,11 +596,37 @@ describe("unit tests", () => {
   });
 
 
+  test("Start round and directly start new one",async () => {
+    
+    await startRound(operator, predictionGame, 10n);
+    const predictionState = await predictionGame.fetchState();
+    const roundState = await getRoundState(0n);
+
+
+    await sleep((bidDurationSecond+1) * 1000);
+
+    await endRound(operator, predictionGame, 11n, true)
+    const predictionStateRound1 = await predictionGame.fetchState();
+    const roundStateRound1 = await getRoundState(1n);
+
+    expect(predictionStateRound1.fields.epoch).toEqual(1n)
+    const exists = await contractExists(
+      addressFromContractId(
+        getSubContractId(
+          "00" +
+            (predictionState.fields.epoch).toString(16).padStart(8, "0")
+        )
+      )
+    );
+    expect(exists).toEqual(true);
+
+  })
+
   test("End before start", async () => {
 
     console.log("Game contract id", predictionGame.contractId);
     await expectAssertionError(
-      endRound(operator, predictionGame, 10n),
+      endRound(operator, predictionGame, 10n, false),
       predictionGame.address,
       7
     );
@@ -630,7 +656,7 @@ describe("unit tests", () => {
       4
     );
 
-    await endRound(operator, predictionGame, 11n);
+    await endRound(operator, predictionGame, 11n, false);
 
     //const predictionState = await predictionGame.fetchState();
 
@@ -659,7 +685,7 @@ describe("unit tests", () => {
 
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 9n);
+    await endRound(operator, predictionGame, 9n, false);
 
     const predictionState = await predictionGame.fetchState();
     const roundState = await getRoundState(0n);

@@ -15,10 +15,10 @@
     "testnetdeploy": "cli deploy --network testnet",
     "mainnetdeploy": "cli deploy --network mainnet",
     "build": "tsc --build .",
-    "withdraw": "tsc --build . && node dist/src/withdraw.js",
-    "manage": "tsc --build . && node dist/src/manage.js",
-    "eventsListener": "tsc --build . && node dist/src/eventsListener.js",
-    "destroy": "tsc --build . && node dist/src/destroy.js "
+    "withdraw": "node dist/src/withdraw.js",
+    "manage": "node dist/src/manage.js",
+    "eventsListener": "node dist/src/eventsListener.js",
+    "destroy": "node dist/src/destroy.js "
   },
   "author": "",
   "license": "ISC",

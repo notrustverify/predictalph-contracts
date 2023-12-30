@@ -47,7 +47,7 @@ export async function deployPrediction(
       operator: operator,
       feesBasisPts: 100n,
       repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: BigInt(1*1000)
+      claimedByAnyoneDelay: BigInt(1 * 1000),
     },
   });
 }
@@ -60,7 +60,7 @@ export async function deployPunterTemplate() {
       epoch: 0n,
       upBid: false,
       amountBid: 0n,
-      claimedByAnyoneAt: 0n
+      claimedByAnyoneAt: 0n,
     },
   });
 }
@@ -83,11 +83,10 @@ export async function deployRoundTemplate() {
       rewardAmount: 0n,
       rewardBaseCalAmount: 0n,
       counterAttendees: 0n,
-      totalAmountBoost: 0n
+      totalAmountBoost: 0n,
     },
   });
 }
-
 
 export async function startRound(
   signer: SignerProvider,
@@ -103,10 +102,11 @@ export async function startRound(
 export async function endRound(
   signer: SignerProvider,
   predictalph: PredictalphInstance,
-  price: bigint
+  price: bigint,
+  immediatelyStart: boolean
 ) {
   return await End.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, price: price },
+    initialFields: { predictalph: predictalph.contractId, price: price, immediatelyStart: immediatelyStart },
     attoAlphAmount: ONE_ALPH,
   });
 }
@@ -138,7 +138,6 @@ export async function withdraw(
   });
 }
 
-
 export async function withdrawOnBehalf(
   signer: SignerProvider,
   predictalph: PredictalphInstance,
@@ -146,7 +145,11 @@ export async function withdrawOnBehalf(
   addressToClaim: string
 ) {
   return await WithdrawAddress.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, epochParticipation, addressToClaim },
+    initialFields: {
+      predictalph: predictalph.contractId,
+      epochParticipation,
+      addressToClaim,
+    },
     attoAlphAmount: DUST_AMOUNT,
   });
 }
@@ -157,11 +160,13 @@ export async function destroyRound(
   epochArray
 ) {
   return await DestroyRound.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId,  arrayEpoch: epochArray },
+    initialFields: {
+      predictalph: predictalph.contractId,
+      arrayEpoch: epochArray,
+    },
     attoAlphAmount: DUST_AMOUNT,
   });
 }
-
 
 export async function boostRound(
   signer: SignerProvider,
@@ -171,11 +176,14 @@ export async function boostRound(
   up: boolean
 ) {
   return await BoostRound.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, amount: amount  ,epochToBoost: epoch},
+    initialFields: {
+      predictalph: predictalph.contractId,
+      amount: amount,
+      epochToBoost: epoch,
+    },
     attoAlphAmount: amount + DUST_AMOUNT,
   });
 }
-
 
 async function waitTxConfirmed<T extends { txId: string }>(
   promise: Promise<T>
@@ -209,10 +217,8 @@ export async function contractExists(address: string): Promise<boolean> {
   }
 }
 
-
-export function arrayEpochToBytes(arrayEpoch){
-    const buffer = Buffer.alloc(arrayEpoch.length * 4)
-    arrayEpoch.forEach((value, index) => buffer.writeUInt32BE(value, index * 4))
-    return buffer.toString('hex')
-
+export function arrayEpochToBytes(arrayEpoch) {
+  const buffer = Buffer.alloc(arrayEpoch.length * 4);
+  arrayEpoch.forEach((value, index) => buffer.writeUInt32BE(value, index * 4));
+  return buffer.toString("hex");
 }

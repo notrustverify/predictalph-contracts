@@ -65,10 +65,14 @@ enum ErrorCodes {
 
 
     @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
-    pub fn startRound(price: U256) -> (){
-        let caller = callerAddress!()
+    pub fn startRound(from: Address, price: U256) -> (){
+        let mut caller = callerAddress!()
+        checkCaller!(caller == operator || caller == selfAddress!(), ErrorCodes.InvalidCaller)
 
-        checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+        if(caller == selfAddress!()){
+            caller = from
+        }
+
 
         let roundContractPath = SubContractTypes.Round ++ u256To4Byte!(epoch)
 
@@ -84,8 +88,8 @@ enum ErrorCodes {
         emit RoundStarted(epoch, price)
     }
 
-    @using(updateFields = true, checkExternalCaller = true)
-    pub fn endRound(actualPrice: U256) -> () {
+    @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
+    pub fn endRound(actualPrice: U256, immediatelyStart: Bool) -> () {
         let caller = callerAddress!()
 
         checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
@@ -99,6 +103,10 @@ enum ErrorCodes {
 
         emit RoundEnded(epoch, actualPrice)
         epoch = epoch + 1
+
+        if(immediatelyStart){
+            startRound{ caller -> ALPH: 1 alph}(caller, actualPrice)
+        }
     }
 
     @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = false)

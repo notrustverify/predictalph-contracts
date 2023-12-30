@@ -106,10 +106,11 @@ import { CoinGeckoClient } from "coingecko-api-v3";
   export async function endRound(
     signer: SignerProvider,
     predictalph: PredictalphInstance,
-    price: bigint
+    price: bigint,
+    immediatelyStart: boolean
   ) {
     return await End.execute(signer, {
-      initialFields: { predictalph: predictalph.contractId, price: price },
+      initialFields: { predictalph: predictalph.contractId, price: price, immediatelyStart: immediatelyStart },
       attoAlphAmount: ONE_ALPH,
     });
   }

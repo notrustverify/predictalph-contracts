@@ -36,6 +36,7 @@ export const DestroyRound = new ExecutableScript<{
 export const End = new ExecutableScript<{
   predictalph: HexString;
   price: bigint;
+  immediatelyStart: boolean;
 }>(Script.fromJson(EndScriptJson));
 export const Start = new ExecutableScript<{
   predictalph: HexString;
