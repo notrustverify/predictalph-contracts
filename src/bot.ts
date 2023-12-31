@@ -45,6 +45,10 @@ let predictalphContractId;
 let predictalphContractAddress;
 let group = 0;
 
+
+const ALPH="ℵ"
+const MAX_MESSAGE_BET=6
+
 // `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
 const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
@@ -57,11 +61,11 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
         event.fields.up
       }, ${event.fields.epoch})`
     );
-    if (bearCounter <= 4 && event.fields.epoch == currentEpoch) {
+    if (bearCounter <= MAX_MESSAGE_BET && event.fields.epoch == currentEpoch) {
       sendMessage(
         bot,
         chatId,
-        `\n🔽 Round ${event.fields.epoch} - <b>New Bear</b> in the Room\n<a href="https://alph.bet">Want to bet against ?</a>`
+        `\n\n🔽 Round ${event.fields.epoch} - <b>New Bear</b> in the Room. 🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n<a href="https://alph.bet">Want to bet against ?</a>`
       );
       bearCounter++;
     }
@@ -88,11 +92,11 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         event.fields.up
       }, ${event.fields.epoch})`
     );
-    if (bullCounter <= 4 && event.fields.epoch == currentEpoch) {
+    if (bullCounter <= MAX_MESSAGE_BET && event.fields.epoch == currentEpoch) {
       sendMessage(
         bot,
         chatId,
-        `\n🔼 Round ${event.fields.epoch} - <b>New Bull</b> in the Room\n<a href="https://alph.bet">Want to bet against ?</a>`
+        `\n\n🔼 Round ${event.fields.epoch} - <b>New Bull</b> in the Room. 🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n<a href="https://alph.bet">Want to bet against ?</a>`
       );
       bullCounter++;
     }
