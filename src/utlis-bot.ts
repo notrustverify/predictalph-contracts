@@ -19,7 +19,7 @@ const tenMinutes = 10 * 60 * 1000;
 const threeHours = 3 * 3600 * 1000;
 
 export function sendMessage(bot: TelegramBot, chatId: string, message: string) {
-
+console.log(`Send message ${message}`)
  bot.sendMessage(chatId, message, { parse_mode: "HTML" });
 }
 
