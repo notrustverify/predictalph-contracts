@@ -32,16 +32,18 @@ import { sendMessage } from "./utlis-bot";
 
 const POLLING_INTERVAL_EVENTS = 6 * 1000;
 
-
 const token = process.env.TG_TOKEN ?? "";
 const chatId = "@alephiumbet";
 const bot = new TelegramBot(token, { polling: false });
 
-let bullCounter = 0
-let bearCounter = 0
+let bullCounter = 0;
+let bearCounter = 0;
 
-let currentEpoch = BigInt(0)
+let currentEpoch = BigInt(0);
 
+let predictalphContractId;
+let predictalphContractAddress;
+let group = 0;
 
 // `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
 const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
@@ -54,12 +56,14 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       `Bear(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.up
       }, ${event.fields.epoch})`
-
-      
     );
-    if (bearCounter <= 4 && event.fields.epoch == currentEpoch){
-      sendMessage(bot,chatId,`📉 Round ${event.fields.epoch} - New Bear in the Room\n.<a href="https://alph.bet">Want to bet against ?</a>`)
-      bearCounter++
+    if (bearCounter <= 4 && event.fields.epoch == currentEpoch) {
+      sendMessage(
+        bot,
+        chatId,
+        `\n🔽 Round ${event.fields.epoch} - <b>New Bear</b> in the Room\n<a href="https://alph.bet">Want to bet against ?</a>`
+      );
+      bearCounter++;
     }
     //}
     return Promise.resolve();
@@ -83,9 +87,13 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         event.fields.up
       }, ${event.fields.epoch})`
     );
-    if (bullCounter <= 4 && event.fields.epoch == currentEpoch){
-      sendMessage(bot,chatId,`📈 Round ${event.fields.epoch} - New Bull in the Room\n.<a href="https://alph.bet">Want to bet against ?</a>`)
-      bullCounter++
+    if (bullCounter <= 4 && event.fields.epoch == currentEpoch) {
+      sendMessage(
+        bot,
+        chatId,
+        `\n🔼 Round ${event.fields.epoch} - <b>New Bull</b> in the Room\n<a href="https://alph.bet">Want to bet against ?</a>`
+      );
+      bullCounter++;
     }
     //}
     return Promise.resolve();
@@ -120,21 +128,41 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
 
 const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent> =
   {
-    // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
-    // The `messageCallback` will be called every time we recive a new event
-    messageCallback: (
+    messageCallback: async (
       event: PredictalphTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
-
       );
-        bullCounter = 0
-        bearCounter = 0
+      bullCounter = 0;
+      bearCounter = 0;
 
-        if(event.fields.epoch == currentEpoch)
-      sendMessage(bot,chatId,`🏛️ Round ${event.fields.epoch} just started. Locked price is <b>$${Number(event.fields.price)/10000}</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`)      
+      let getLastRoundState
+      if (event.fields.epoch == currentEpoch && event.fields.epoch > 0n){
+      getLastRoundState = await getRoundContractState(
+        predictalphContractId,
+        event.fields.epoch - 1n,
+        group
+      );
+      }
+
+      const priceEnd = getLastRoundState.fields.priceEnd
+      const priceStart = getLastRoundState.fields.priceStart
+      const totalAmount = getLastRoundState.fields.totalAmount/ONE_ALPH
+      const bullWon = priceEnd > priceStart ;
+      const houseWon = getLastRoundState.fields.priceEnd == getLastRoundState.fields.priceStart;
+
+      if (event.fields.epoch == currentEpoch)
+        sendMessage(
+          bot,
+          chatId,
+          `Last round ended: <b>${ houseWon ? "House Won" : bullWon ? "Bull won" : "Bear won"}</b>. Total Amount played: ${totalAmount}ℵ\n\n🏛️ Round ${
+            event.fields.epoch
+          } just started. Locked price is <b>$${
+            Number(event.fields.price) / 10000
+          }</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`
+        );
       //setKeyValue("epoch",Number(event.fields.epoch))
       return Promise.resolve();
     },
@@ -167,10 +195,7 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
   },
 };
 
-async function getPunterBid(
-  privKey: string,
-  contractName: string
-) {
+async function getPunterBid(privKey: string, contractName: string) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
     keyType: undefined,
@@ -183,21 +208,17 @@ async function getPunterBid(
     "./artifacts/.deployments." + networkToUse + ".json"
   );
   //Make sure it match your address group
-  const  group = wallet.group;
-  const deployed = deployments.getDeployedContractResult(
-    group,
-    contractName
-  );
+  group = wallet.group;
+  const deployed = deployments.getDeployedContractResult(group, contractName);
 
   const predictalphInstance = deployed.contractInstance;
-  const predictalphContractId = deployed.contractInstance.contractId;
-  const predictalphContractAddress = deployed.contractInstance.address;
+  predictalphContractId = deployed.contractInstance.contractId;
+  predictalphContractAddress = deployed.contractInstance.address;
   const predictalphDeployed = await Predictalph.at(predictalphContractAddress);
 
+  const predictionStates = await predictalphDeployed.fetchState();
 
-  const predictionStates = await  predictalphDeployed.fetchState()
-
-  currentEpoch = predictionStates.fields.epoch
+  currentEpoch = predictionStates.fields.epoch;
 
   const subscriptionBear = predictalphDeployed.subscribeBetBearEvent(
     optionsBear,
