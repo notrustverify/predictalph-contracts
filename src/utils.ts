@@ -220,3 +220,5 @@ export async function getPrice(cgClient: CoinGeckoClient){
     return Math.round((alphCoinGecko.alephium.usd + Number.EPSILON) * 1000) / 1000;
 
 }
+
+
