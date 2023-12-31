@@ -37,5 +37,13 @@ services:
     depends_on:
       - db
 
+  bot:
+    hostname: bot
+    build: .
+    restart: unless-stopped
+    command: yarn run bot testnet
+    env_file:
+      - .env
+
 
 
