@@ -65,7 +65,7 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       sendMessage(
         bot,
         chatId,
-        `\n\n🔽 Round ${event.fields.epoch} - <b>New Bear</b> in the Room. 🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n<a href="https://alph.bet">Want to bet against ?</a>`
+        `\n\n🔼 Round ${event.fields.epoch} - <b>New Bear</b> in the room.\n🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
       bearCounter++;
     }
@@ -96,7 +96,7 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
       sendMessage(
         bot,
         chatId,
-        `\n\n🔼 Round ${event.fields.epoch} - <b>New Bull</b> in the Room. 🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n<a href="https://alph.bet">Want to bet against ?</a>`
+        `\n\n🔼 Round ${event.fields.epoch} - <b>New Bull</b> in the room.\n🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
       bullCounter++;
     }
@@ -153,8 +153,6 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
         );
       }
 
-
-
       let message = "";
 
       if (getLastRoundState !== undefined) {
@@ -172,13 +170,13 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
         event.fields.epoch
       } just started. Locked price is <b>$${
         Number(event.fields.price) / 10000
-      }</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`;
+      }</b>.\nWho is the bear, who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`;
 
       if (event.fields.epoch == currentEpoch){
         sendMessage(bot, chatId,message);
       }else if (event.fields.epoch > currentEpoch){
         sendMessage(bot, chatId,message);
-        currentEpoch = event.fields.epoch+1n
+        currentEpoch = event.fields.epoch
       }
 
       return Promise.resolve();
