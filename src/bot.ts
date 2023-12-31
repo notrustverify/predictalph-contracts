@@ -148,6 +148,7 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
           group
         );
       }
+      let message = "";
 
       if (getLastRoundState !== undefined) {
         const priceEnd = getLastRoundState.fields.priceEnd;
@@ -155,20 +156,18 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
         const totalAmount = getLastRoundState.fields.totalAmount / ONE_ALPH;
         const bullWon = priceEnd > priceStart;
         const houseWon = priceEnd == priceStart;
-
-        if (event.fields.epoch == currentEpoch)
-          sendMessage(
-            bot,
-            chatId,
-            `Last round ended: <b>${
-              houseWon ? "House Won" : bullWon ? "Bull won" : "Bear won"
-            }</b>. Total Amount played: ${totalAmount}ℵ\n\n🏛️ Round ${
-              event.fields.epoch
-            } just started. Locked price is <b>$${
-              Number(event.fields.price) / 10000
-            }</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`
-          );
+        message += `Last round ended: <b>${
+          houseWon ? "House Won" : bullWon ? "Bull won" : "Bear won"
+        }</b>. Total Amount played: ${totalAmount}ℵ\n\n`;
       }
+
+      message += `🏛️ Round ${
+        event.fields.epoch
+      } just started. Locked price is <b>$${
+        Number(event.fields.price) / 10000
+      }</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`;
+
+      if (event.fields.epoch == currentEpoch) sendMessage(bot, chatId,message);
 
       return Promise.resolve();
     },
