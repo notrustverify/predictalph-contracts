@@ -65,7 +65,7 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       sendMessage(
         bot,
         chatId,
-        `\n\n🔼 Round ${event.fields.epoch} - <b>New Bear</b> in the room.\n🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
+        `\n\n🐻 Round ${event.fields.epoch} - <b>New Bear</b> in the room.\n🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
       bearCounter++;
     }
@@ -96,7 +96,7 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
       sendMessage(
         bot,
         chatId,
-        `\n\n🔼 Round ${event.fields.epoch} - <b>New Bull</b> in the room.\n🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
+        `\n\n🐂 Round ${event.fields.epoch} - <b>New Bull</b> in the room.\n🎫 Bet ${event.fields.amount / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
       bullCounter++;
     }
