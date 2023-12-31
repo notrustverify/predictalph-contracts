@@ -65,6 +65,7 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       );
       bearCounter++;
     }
+
     //}
     return Promise.resolve();
   },
@@ -95,6 +96,7 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
       );
       bullCounter++;
     }
+
     //}
     return Promise.resolve();
   },
@@ -138,32 +140,36 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       bullCounter = 0;
       bearCounter = 0;
 
-      let getLastRoundState
-      if (event.fields.epoch == currentEpoch && event.fields.epoch > 0n){
-      getLastRoundState = await getRoundContractState(
-        predictalphContractId,
-        event.fields.epoch - 1n,
-        group
-      );
+      let getLastRoundState;
+      if (event.fields.epoch == currentEpoch) {
+        getLastRoundState = await getRoundContractState(
+          predictalphContractId,
+          event.fields.epoch - 1n,
+          group
+        );
       }
 
-      const priceEnd = getLastRoundState.fields.priceEnd
-      const priceStart = getLastRoundState.fields.priceStart
-      const totalAmount = getLastRoundState.fields.totalAmount/ONE_ALPH
-      const bullWon = priceEnd > priceStart ;
-      const houseWon = getLastRoundState.fields.priceEnd == getLastRoundState.fields.priceStart;
+      if (getLastRoundState !== undefined) {
+        const priceEnd = getLastRoundState.fields.priceEnd;
+        const priceStart = getLastRoundState.fields.priceStart;
+        const totalAmount = getLastRoundState.fields.totalAmount / ONE_ALPH;
+        const bullWon = priceEnd > priceStart;
+        const houseWon = priceEnd == priceStart;
 
-      if (event.fields.epoch == currentEpoch)
-        sendMessage(
-          bot,
-          chatId,
-          `Last round ended: <b>${ houseWon ? "House Won" : bullWon ? "Bull won" : "Bear won"}</b>. Total Amount played: ${totalAmount}ℵ\n\n🏛️ Round ${
-            event.fields.epoch
-          } just started. Locked price is <b>$${
-            Number(event.fields.price) / 10000
-          }</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`
-        );
-      //setKeyValue("epoch",Number(event.fields.epoch))
+        if (event.fields.epoch == currentEpoch)
+          sendMessage(
+            bot,
+            chatId,
+            `Last round ended: <b>${
+              houseWon ? "House Won" : bullWon ? "Bull won" : "Bear won"
+            }</b>. Total Amount played: ${totalAmount}ℵ\n\n🏛️ Round ${
+              event.fields.epoch
+            } just started. Locked price is <b>$${
+              Number(event.fields.price) / 10000
+            }</b>.\nWho is the bear who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`
+          );
+      }
+
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
@@ -184,6 +190,7 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
         event.fields.epoch
       })`
     );
+
     //setKeyValue("epoch",Number(event.fields.epoch))
     return Promise.resolve();
   },
