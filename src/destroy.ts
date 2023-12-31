@@ -55,22 +55,28 @@ async function destroyRound(
 
 const onlyRoundExists = []
 
-for (const value of arrayRound){
+for (const epoch of arrayRound){
     const roundContractId = getRoundContractId(
         predictalphContractId,
-       BigInt(value),
+       BigInt(epoch),
         wallet.group
       );
     
       const roundExist = await contractExists(
         addressFromContractId(roundContractId)
       );
-      if (roundExist && value !== Number(predictionStates?.fields.epoch)) onlyRoundExists.push(value)
+
+       
+      if (roundExist && epoch !== Number(predictionStates?.fields.epoch)) {
+        const getRoundState = await getRoundContractState(predictalphContractId, BigInt(epoch), group)
+        if (getRoundState.fields.counterAttendees <= 0)
+          onlyRoundExists.push(epoch)
+        else
+          console.log(`Round ${epoch}, ${getRoundState.fields.counterAttendees} attendees left`)
+      }
 }
 
-  
-console.log(onlyRoundExists.length)
-if(onlyRoundExists.length > 0) {
+  if(onlyRoundExists.length > 0) {
   try {
     const tx = await DestroyRound.execute(wallet, {
       initialFields: {
