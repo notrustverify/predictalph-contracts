@@ -20,7 +20,7 @@ const threeHours = 3 * 3600 * 1000;
 
 export function sendMessage(bot: TelegramBot, chatId: string, message: string) {
 console.log(`Send message ${message}`)
-bot.sendMessage(chatId, message, { parse_mode: "HTML", link_preview_options: false});
+bot.sendMessage(chatId, message, { parse_mode: "HTML", disable_web_page_preview: true});
 }
 
 const formatter = new Intl.RelativeTimeFormat(undefined, {
