@@ -173,9 +173,9 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       }</b>.\nWho is the bear, who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`;
 
       if (event.fields.epoch == currentEpoch){
-        sendMessage(bot, chatId,message);
+       // sendMessage(bot, chatId,message);
       }else if (event.fields.epoch > currentEpoch){
-        sendMessage(bot, chatId,message);
+        //sendMessage(bot, chatId,message);
         currentEpoch = event.fields.epoch
       }
 
