@@ -28,11 +28,23 @@ import {
 } from "./utils";
 import { CoinGeckoClient } from "coingecko-api-v3";
 import TelegramBot from "node-telegram-bot-api";
-import { sendMessage } from "./utlis-bot";
+import { sendMessage, sendTweet } from "./utlis-bot";
+import { TwitterApi, TwitterApiV2Settings, TwitterApiReadWrite } from "twitter-api-v2";
 
 const POLLING_INTERVAL_EVENTS = 6 * 1000;
 
 const token = process.env.TG_TOKEN ?? "";
+
+  const twitterClient = new TwitterApi(   {
+  appKey: process.env.API_KEY,
+  appSecret: process.env.API_KEY_SECRET,
+  accessToken: process.env.ACCESS_TOKEN,
+  accessSecret: process.env.ACCESS_TOKEN_SECRET,
+
+})
+
+
+
 const chatId = "@alephiumbet";
 const bot = new TelegramBot(token, { polling: false });
 
@@ -62,11 +74,12 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       }, ${event.fields.epoch})`
     );
     if (bearCounter <= MAX_MESSAGE_BET && event.fields.epoch == currentEpoch) {
-      sendMessage(
+     sendMessage(
         bot,
         chatId,
         `\n\n🐻 Round ${event.fields.epoch} - <b>New Bear</b> in the room.\n🎫 Bet ${event.fields.amount-ONE_ALPH / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
+      sendTweet(twitterClient, `🐻 Round ${event.fields.epoch} -New Bear in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet` )
       bearCounter++;
     }
 
@@ -98,6 +111,9 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         chatId,
         `\n\n🐂 Round ${event.fields.epoch} - <b>New Bull</b> in the room.\n🎫 Bet ${event.fields.amount-ONE_ALPH / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
+
+        sendTweet(twitterClient,`🐂 Round ${event.fields.epoch} - New Bull in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet`)
+
       bullCounter++;
     }
 
