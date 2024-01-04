@@ -79,7 +79,7 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
         chatId,
         `\n\n🐻 Round ${event.fields.epoch} - <b>New Bear</b> in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
-      sendTweet(twitterClient, `🐻 Round ${event.fields.epoch} -New Bear in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet\n#alephium #dapp${randomChar()}` )
+      sendTweet(twitterClient, `🐻 Round ${event.fields.epoch} - New Bear in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet\n#alephium #dapp ${randomChar()}` )
       bearCounter++;
     }
 
@@ -112,7 +112,7 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         `\n\n🐂 Round ${event.fields.epoch} - <b>New Bull</b> in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
 
-        sendTweet(twitterClient,`🐂 Round ${event.fields.epoch} - New Bull in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet\n#alephium #dapp${randomChar()}`)
+        sendTweet(twitterClient,`🐂 Round ${event.fields.epoch} - New Bull in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet\n#alephium #dapp ${randomChar()}`)
 
       bullCounter++;
     }
