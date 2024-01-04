@@ -27,7 +27,7 @@ bot.sendMessage(chatId, message, { parse_mode: "HTML", disable_web_page_preview:
 export async function sendTweet(client: TwitterApi, message: string){
   try {
     await client.v2.tweet(message);
-    console.log("success");
+    //console.log("success");
   } catch (error) {
     console.error(error);
   }
@@ -56,4 +56,8 @@ export function formatTimeAgo(duration: number) {
     }
     duration /= division.amount;
   }
+}
+
+export function randomChar(){
+  return Math.random().toString(36).slice(2, 6);
 }

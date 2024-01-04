@@ -28,7 +28,7 @@ import {
 } from "./utils";
 import { CoinGeckoClient } from "coingecko-api-v3";
 import TelegramBot from "node-telegram-bot-api";
-import { sendMessage, sendTweet } from "./utlis-bot";
+import { sendMessage, sendTweet, randomChar } from "./utlis-bot";
 import { TwitterApi, TwitterApiV2Settings, TwitterApiReadWrite } from "twitter-api-v2";
 
 const POLLING_INTERVAL_EVENTS = 6 * 1000;
@@ -79,7 +79,7 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
         chatId,
         `\n\n🐻 Round ${event.fields.epoch} - <b>New Bear</b> in the room.\n🎫 Bet ${event.fields.amount-ONE_ALPH / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
-      sendTweet(twitterClient, `🐻 Round ${event.fields.epoch} -New Bear in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet` )
+      sendTweet(twitterClient, `🐻 Round ${event.fields.epoch} -New Bear in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet\n${randomChar()}` )
       bearCounter++;
     }
 
@@ -112,7 +112,7 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         `\n\n🐂 Round ${event.fields.epoch} - <b>New Bull</b> in the room.\n🎫 Bet ${event.fields.amount-ONE_ALPH / ONE_ALPH}${ALPH}\n\nWant to bet against ? <a href="https://alph.bet">Play here</a>`
       );
 
-        sendTweet(twitterClient,`🐂 Round ${event.fields.epoch} - New Bull in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet`)
+        sendTweet(twitterClient,`🐂 Round ${event.fields.epoch} - New Bull in the room.\n🎫 Bet ${(Number(event.fields.amount-ONE_ALPH) / Number(ONE_ALPH)).toFixed(3)}${ALPH}\n\nWant to bet against ? Play here 👇 https://alph.bet\n${randomChar()}`)
 
       bullCounter++;
     }
@@ -160,6 +160,7 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       bullCounter = 0;
       bearCounter = 0;
 
+      /*
       let getLastRoundState;
       if (event.fields.epoch == currentEpoch) {
         getLastRoundState = await getRoundContractState(
@@ -187,7 +188,7 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       } just started. Locked price is <b>$${
         Number(event.fields.price) / 10000
       }</b>.\nWho is the bear, who is the bull?\n\n🧮 Try your guess at <a href="https://alph.bet">ALPH.bet</a>`;
-
+*/
       if (event.fields.epoch == currentEpoch){
        // sendMessage(bot, chatId,message);
       }else if (event.fields.epoch > currentEpoch){
