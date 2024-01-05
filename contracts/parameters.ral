@@ -1,0 +1,3 @@
+TxScript NewInterval(predictalph: Predictalph, newRecurrence: U256){
+    predictalph.setNewRepeatEvery(newRecurrence)
+  }
