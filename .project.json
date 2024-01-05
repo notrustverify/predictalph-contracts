@@ -44,6 +44,13 @@
       "codeHashDebug": "",
       "warnings": []
     },
+    "NewInterval": {
+      "sourceFile": "parameters.ral",
+      "sourceCodeHash": "ccf26003d9126df02a64336378c880cca96c7e82b26122aefd18bde6e09714b0",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
     "Predictalph": {
       "sourceFile": "predict.ral",
       "sourceCodeHash": "6b238aed82580dcb45e2fdf32bd8b8aa7685e9e1714dfcee558c011342c7f51b",

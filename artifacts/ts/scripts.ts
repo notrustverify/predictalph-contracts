@@ -15,6 +15,7 @@ import { default as BidScriptJson } from "../Bid.ral.json";
 import { default as BoostRoundScriptJson } from "../BoostRound.ral.json";
 import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
+import { default as NewIntervalScriptJson } from "../NewInterval.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
 import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
 import { default as WithdrawAddressScriptJson } from "../WithdrawAddress.ral.json";
@@ -38,6 +39,10 @@ export const End = new ExecutableScript<{
   price: bigint;
   immediatelyStart: boolean;
 }>(Script.fromJson(EndScriptJson));
+export const NewInterval = new ExecutableScript<{
+  predictalph: HexString;
+  newRecurrence: bigint;
+}>(Script.fromJson(NewIntervalScriptJson));
 export const Start = new ExecutableScript<{
   predictalph: HexString;
   price: bigint;
