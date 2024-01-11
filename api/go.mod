@@ -10,6 +10,10 @@ require (
 require (
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mattn/go-sqlite3 v1.14.19 // indirect
+
 )
 
 require (

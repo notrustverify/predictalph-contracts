@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,11 +10,15 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/redis/go-redis/v9"
 )
 
 var ctx = context.Background()
 var rdb *redis.Client
+var db *sql.DB
+
+const ONE_ALPH = 10e18
 
 func main() {
 
@@ -42,17 +47,29 @@ func main() {
 		Protocol: 3,  // specify 2 for RESP 2 or 3 for RESP 3
 	})
 
+	db = connect("../data/roundsData.sqlite")
+
 	router := gin.Default()
 	router.Use(cors.New(corsConfig))
-	router.GET("/round/:address", getStats)
+	router.GET("/round/:address", getUserRoundsPlayed)
+	router.GET("/allround/:address", getAllUserRounds)
 
 	router.Run("0.0.0.0:8080")
 
 }
 
-func getStats(c *gin.Context) {
-	userRound := getRoundParticipation(rdb, c.Param("address"))
-	if len(userRound) > 0 {
+func getUserRoundsPlayed(c *gin.Context) {
+	userRound, err := getRoundParticipation(rdb, db, c.Param("address"), 0)
+	if len(userRound) > 0 && err == nil {
+		c.JSON(http.StatusOK, userRound)
+	} else {
+		c.JSON(http.StatusNotFound, fmt.Sprintf("address %s not found", c.Param("address")))
+	}
+}
+
+func getAllUserRounds(c *gin.Context) {
+	userRound, err := getRoundParticipation(rdb, db, c.Param("address"), 1)
+	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
 		c.JSON(http.StatusNotFound, fmt.Sprintf("address %s not found", c.Param("address")))
