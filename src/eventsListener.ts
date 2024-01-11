@@ -28,6 +28,8 @@ import {
 } from "./utils";
 import { Redis } from "ioredis";
 import { CoinGeckoClient } from "coingecko-api-v3";
+import { Address, Round, RoundParticipation, connect } from "./database/db";
+import { Sequelize } from "sequelize";
 
 const POLLING_INTERVAL_EVENTS = 6 * 1000;
 
@@ -77,14 +79,43 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
-  messageCallback: (event: PredictalphTypes.BetBearEvent): Promise<void> => {
+  messageCallback: async (
+    event: PredictalphTypes.BetBearEvent
+  ): Promise<void> => {
     //if(BigInt(actualEpoch) == event.fields.epoch){
     console.log(
       `Bear(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.up
       }, ${event.fields.epoch})`
     );
+    const userAddress = event.fields.from;
+    const epoch = event.fields.epoch;
     setNewEpochUser(event.fields.from, event.fields.epoch);
+    Address.create({ address: userAddress })
+      .then(() => {
+        console.log("created");
+      })
+      .catch((error) => {
+        console.error("already exists");
+      });
+
+    const addrId = await Address.findOne({ where: { address: userAddress } });
+    const roundId = await Round.findOne({ where: { epoch: epoch } });
+
+    RoundParticipation.create({
+      RoundId: roundId.id,
+      AddressId: addrId.id,
+      upBid: event.fields.up,
+      amountBid: event.fields.amount,
+      claimed: false,
+    })
+      .then(() => {
+        console.log("round participation created");
+      })
+      .catch((error) => {
+        console.error("already exists");
+      });
+
     //}
     return Promise.resolve();
   },
@@ -100,14 +131,44 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
-  messageCallback: (event: PredictalphTypes.BetBullEvent): Promise<void> => {
+  messageCallback: async (
+    event: PredictalphTypes.BetBullEvent
+  ): Promise<void> => {
     //  if(BigInt(actualEpoch) == event.fields.epoch){
+
     console.log(
       `Bull(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.up
       }, ${event.fields.epoch})`
     );
     setNewEpochUser(event.fields.from, event.fields.epoch);
+    const userAddress = event.fields.from;
+    const epoch = event.fields.epoch;
+    setNewEpochUser(event.fields.from, event.fields.epoch);
+    Address.create({ address: userAddress })
+      .then(() => {
+        console.log("created");
+      })
+      .catch((error) => {
+        console.error("already exists");
+      });
+
+    const addrId = await Address.findOne({ where: { address: userAddress } });
+    const roundId = await Round.findOne({ where: { epoch: epoch } });
+
+    RoundParticipation.create({
+      RoundId: roundId.id,
+      AddressId: addrId.id,
+      upBid: event.fields.up,
+      amountBid: event.fields.amount,
+      claimed: false,
+    })
+      .then(() => {
+        console.log("round participation created");
+      })
+      .catch((error) => {
+        console.error("already exists");
+      });
 
     //}
     return Promise.resolve();
@@ -125,10 +186,27 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
-    messageCallback: (
+    messageCallback: async (
       event: PredictalphTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
+
+      Round.create({
+        epoch: event.fields.epoch,
+        priceEnd: event.fields.price,
+      })
+        .then(() => {
+
+          
+        })
+        .catch((error) => {
+          console.error("already exists");
+          Round.update(
+            { priceEnd: event.fields.price },
+            { where: { epoch: event.fields.epoch } }
+          );
+
+        });
 
       return Promise.resolve();
     },
@@ -145,13 +223,28 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
-    messageCallback: (
+    messageCallback: async (
       event: PredictalphTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
       );
       //setKeyValue("epoch",Number(event.fields.epoch))
+      Round.create({
+        epoch: event.fields.epoch,
+        priceStart: event.fields.price,
+      })
+        .then(() => {
+        })
+        .catch((error) => {
+          console.error("already exists");
+          Round.update(
+            { priceStart: event.fields.price },
+            { where: { epoch: event.fields.epoch } }
+          );
+
+        });
+
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
@@ -166,14 +259,26 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
-  messageCallback: (event: PredictalphTypes.ClaimedEvent): Promise<void> => {
+  messageCallback: async (
+    event: PredictalphTypes.ClaimedEvent
+  ): Promise<void> => {
     console.log(
-      `Claimed(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
+      `Claimed(from: ${event.fields.from}, for: ${event.fields.punterAddress}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.epoch
       })`
     );
+
+    const userAddress = event.fields.punterAddress;
+    const epoch = event.fields.epoch;
+    const addrId = await Address.findOne({ where: { address: userAddress } });
+    const roundId = await Round.findOne({ where: { epoch: epoch } });
+
+    RoundParticipation.update(
+      { claimed: true },
+      { where: { AddressId: addrId.id, RoundId: roundId.id } }
+    );
     //setKeyValue("epoch",Number(event.fields.epoch))
-    setEpochClaimed(event.fields.from, event.fields.epoch);
+    setEpochClaimed(event.fields.punterAddress, event.fields.epoch);
     return Promise.resolve();
   },
   // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
@@ -186,7 +291,8 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
 
 async function getPunterBid(
   privKey: string,
-  contractName: string
+  contractName: string,
+  sequelize: Sequelize
 ) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
@@ -200,11 +306,8 @@ async function getPunterBid(
     "./artifacts/.deployments." + networkToUse + ".json"
   );
   //Make sure it match your address group
-  const  group = wallet.group;
-  const deployed = deployments.getDeployedContractResult(
-    group,
-    contractName
-  );
+  const group = wallet.group;
+  const deployed = deployments.getDeployedContractResult(group, contractName);
 
   const predictalphInstance = deployed.contractInstance;
   const predictalphContractId = deployed.contractInstance.contractId;
@@ -214,34 +317,42 @@ async function getPunterBid(
   const contractIdKeyExists = await keyExists("contractid");
   if (contractIdKeyExists) {
     const contractId = await redis.get("contractid");
+
     if (contractId != predictalphContractId) {
       console.log("Contract changed, flush db");
       await redis.flushdb();
     }
   }
 
-  setKeyValue("contractid", predictalphContractId);
+  const contractEventsCounter =
+    await predictalphDeployed.getContractEventsCurrentCount();
+  let eventCounterSaved = Number(await redis.get(KEY_NAME_COUNTER_EVENT));
 
+  setKeyValue("contractid", predictalphContractId);
+  const subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(
+    optionsRoundStart,
+    eventCounterSaved
+  );
   const subscriptionBear = predictalphDeployed.subscribeBetBearEvent(
     optionsBear,
-    0
+    eventCounterSaved
   );
   const subscriptionBull = predictalphDeployed.subscribeBetBullEvent(
     optionsBull,
-    0
+    eventCounterSaved
   );
   const subscriptionRoundEnd = predictalphDeployed.subscribeRoundEndedEvent(
     optionsRoundEnd,
-    0
+    eventCounterSaved
   );
-  const subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(
-    optionsRoundStart,
-    0
-  );
+
   const subscriptionClaimed = predictalphDeployed.subscribeClaimedEvent(
     optionsClaimed,
-    0
+    eventCounterSaved
   );
+  console.log(contractEventsCounter, eventCounterSaved);
+
+  setKeyValue(KEY_NAME_COUNTER_EVENT, contractEventsCounter.toString());
 
   if (
     subscriptionBear.isCancelled() ||
@@ -259,6 +370,8 @@ const retryFetch = fetchRetry.default(fetch, {
   retryDelay: 1000,
 });
 
+const KEY_NAME_COUNTER_EVENT = "eventsCounter";
+
 let networkToUse = process.argv.slice(2)[0];
 if (networkToUse === undefined) networkToUse = "mainnet";
 //Select our network defined in alephium.config.ts
@@ -274,8 +387,19 @@ const nodeProvider = new NodeProvider(
 web3.setCurrentNodeProvider(nodeProvider);
 
 const redis = new Redis({ host: process.env.REDIS_HOST });
+const sequelize = connect("./data/roundsData.sqlite");
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Connection has been established successfully.");
+  })
+  .catch((error) => {
+    console.error("Unable to connect to the database: ", error);
+  });
 
 getPunterBid(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph"
+  "Predictalph",
+  sequelize
 );
