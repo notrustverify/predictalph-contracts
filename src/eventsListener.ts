@@ -92,11 +92,9 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
 
     if (!created)
       await roundParticipation.update({
-        RoundId: roundId.id,
-        AddressId: addrId.id,
         upBid: event.fields.up,
         amountBid: event.fields.amount,
-        claimedByAnyone: claimedByAnyone
+        claimedByAnyoneTimestamp: claimedByAnyone
 
       });
     //}
@@ -141,12 +139,10 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
     );
 
     if (!created)
-      roundParticipation.update({
-        RoundId: roundId.id,
-        AddressId: addrId.id,
+      await roundParticipation.update({
         upBid: event.fields.up,
         amountBid: event.fields.amount,
-        claimedByAnyone: claimedByAnyone
+        claimedByAnyoneTimestamp: claimedByAnyone
       });
 
     //}
@@ -188,7 +184,7 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
       1000n
     );
 
-    if (!created) roundParticipation.update({ claimed: true });
+    if (!created) await roundParticipation.update({ claimed: true });
 
     return Promise.resolve();
   },
