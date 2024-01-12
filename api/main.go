@@ -1,21 +1,18 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/redis/go-redis/v9"
 )
 
-var ctx = context.Background()
-var rdb *redis.Client
 var db *sql.DB
 
 const ONE_ALPH = 10e18
@@ -40,13 +37,6 @@ func main() {
 		AllowCredentials: true,
 	}
 
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:6379", redisHost),
-		Password: "", // no password set
-		DB:       0,  // use default DB
-		Protocol: 3,  // specify 2 for RESP 2 or 3 for RESP 3
-	})
-
 	db = connect("../data/roundsData.sqlite")
 
 	router := gin.Default()
@@ -55,6 +45,8 @@ func main() {
 	router.GET("/allround/:address", getAllUserRounds)
 	router.GET("/topplayer", getTopPlayers)
 	router.GET("/round/notclaimed", getAllRoundNotClaimed)
+	router.GET("/round/claimed", getAllRoundClaimed)
+	router.GET("/address/expiredclaim", getExpiredClaimed)
 
 	router.Run("0.0.0.0:8080")
 
@@ -89,6 +81,25 @@ func getTopPlayers(c *gin.Context) {
 
 func getAllRoundNotClaimed(c *gin.Context) {
 	userRound, err := getRoundClaimedOrNot(db, 0)
+	if len(userRound) > 0 && err == nil {
+		c.JSON(http.StatusOK, userRound)
+	} else {
+		c.JSON(http.StatusNotFound, "nobody played yet")
+	}
+}
+
+func getAllRoundClaimed(c *gin.Context) {
+	userRound, err := getRoundClaimedOrNot(db, 1)
+	if len(userRound) > 0 && err == nil {
+		c.JSON(http.StatusOK, userRound)
+	} else {
+		c.JSON(http.StatusNotFound, "nobody played yet")
+	}
+}
+
+func getExpiredClaimed(c *gin.Context) {
+	now := int(time.Now().UTC().Unix())
+	userRound, err := getExpiredClaimedOrNot(db, now, false)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {

@@ -20,13 +20,27 @@ type Round struct {
 }
 
 type RoundParticipation struct {
-	AddressId int     `json:"addressId"`
-	RoundId   int     `json:"roundId"`
-	UpBid     bool    `json:"upBid"`
-	AmountBid int     `json:"amountBid"`
-	Claimed   bool    `json:"claimed"`
-	Round     Round   `json:"round"`
-	Address   Address `json:"address"`
+	AddressId                int     `json:"addressId"`
+	RoundId                  int     `json:"roundId"`
+	UpBid                    bool    `json:"upBid"`
+	AmountBid                float64 `json:"amountBid"`
+	Claimed                  bool    `json:"claimed"`
+	ClaimedByAnyoneTimestamp int     `json:"claimedByAnyoneTimestamp"`
+
+	Round   Round   `json:"round"`
+	Address Address `json:"address"`
+}
+
+type RoundParticipationPlayed struct {
+	AddressId                int     `json:"addressId"`
+	RoundId                  int     `json:"roundId"`
+	UpBid                    bool    `json:"upBid"`
+	AmountBid                float64 `json:"amountBid"`
+	Claimed                  bool    `json:"claimed"`
+	ClaimedByAnyoneTimestamp int     `json:"claimedByAnyoneTimestamp"`
+	NumberOfPlays            int     `json:"numberPlayed"`
+
+	Address Address `json:"address"`
 }
 
 func getIdFromAddress(db *sql.DB, addr string) (Address, error) {
@@ -75,7 +89,7 @@ func getRoundParticipation(db *sql.DB, addr string, isClaimedRound int) ([]Round
 		fmt.Println(err)
 		return []RoundParticipation{}, err
 	}
-	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid from RoundParticipations WHERE AddressId = ? AND CLAIMED = ?", address.Id, isClaimedRound)
+	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid, ClaimedByAnyoneTimestamp from RoundParticipations WHERE AddressId = ? AND CLAIMED = ?", address.Id, isClaimedRound)
 	if err != nil {
 		fmt.Println(err)
 
@@ -87,7 +101,7 @@ func getRoundParticipation(db *sql.DB, addr string, isClaimedRound int) ([]Round
 
 	for rows.Next() {
 		i := RoundParticipation{}
-		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid)
+		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid, &i.ClaimedByAnyoneTimestamp)
 
 		roundData, err := getRoundFromId(db, i.RoundId)
 		if err != nil {
@@ -108,8 +122,39 @@ func getRoundParticipation(db *sql.DB, addr string, isClaimedRound int) ([]Round
 	return roundParticipation, err
 }
 
-func getAllPlayer(db *sql.DB, limit int) ([]RoundParticipation, error) {
-	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid from RoundParticipations GROUP BY AddressId LIMIT ?", limit)
+func getAllPlayer(db *sql.DB, limit int) ([]RoundParticipationPlayed, error) {
+	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid, ClaimedByAnyoneTimestamp, count(addressId) as numPlay from RoundParticipations GROUP BY AddressId ORDER BY numPlay DESC LIMIT ?", limit)
+	if err != nil {
+		fmt.Println(err)
+
+		return []RoundParticipationPlayed{}, err
+	}
+	defer rows.Close()
+
+	roundParticipation := []RoundParticipationPlayed{}
+
+	for rows.Next() {
+		i := RoundParticipationPlayed{}
+		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.NumberOfPlays)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		userData, err := getAddressFromId(db, i.AddressId)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		i.Address = userData
+
+		roundParticipation = append(roundParticipation, i)
+	}
+	return roundParticipation, err
+}
+
+func getRoundClaimedOrNot(db *sql.DB, isClaimedRound int) ([]RoundParticipation, error) {
+	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid, ClaimedByAnyoneTimestamp from RoundParticipations WHERE CLAIMED = ?", isClaimedRound)
 	if err != nil {
 		fmt.Println(err)
 
@@ -121,28 +166,30 @@ func getAllPlayer(db *sql.DB, limit int) ([]RoundParticipation, error) {
 
 	for rows.Next() {
 		i := RoundParticipation{}
-		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid)
+		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid, &i.ClaimedByAnyoneTimestamp)
 
 		roundData, err := getRoundFromId(db, i.RoundId)
 		if err != nil {
 			fmt.Println(err)
 		}
 
+		addrData, err := getAddressFromId(db, i.AddressId)
 		if err != nil {
 			fmt.Println(err)
-			return nil, err
 		}
 
 		i.Round = roundData
+		i.Address = addrData
 
 		roundParticipation = append(roundParticipation, i)
 	}
-	fmt.Printf("%+v", roundParticipation)
+
 	return roundParticipation, err
+
 }
 
-func getRoundClaimedOrNot(db *sql.DB, isClaimedRound int) ([]RoundParticipation, error) {
-	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid from RoundParticipations WHERE CLAIMED = ?", isClaimedRound)
+func getExpiredClaimedOrNot(db *sql.DB, timeNow int, isClaimed bool) ([]RoundParticipation, error) {
+	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid, ClaimedByAnyoneTimestamp from RoundParticipations WHERE ClaimedByAnyoneTimestamp < ? AND Claimed = ?", timeNow*1000, isClaimed)
 	if err != nil {
 		fmt.Println(err)
 
@@ -154,7 +201,10 @@ func getRoundClaimedOrNot(db *sql.DB, isClaimedRound int) ([]RoundParticipation,
 
 	for rows.Next() {
 		i := RoundParticipation{}
-		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid)
+		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid, &i.ClaimedByAnyoneTimestamp)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		roundData, err := getRoundFromId(db, i.RoundId)
 		if err != nil {

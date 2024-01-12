@@ -38,6 +38,7 @@ import {
   createAndGetNewRound,
 } from "./database/db";
 import { Sequelize, where } from "sequelize";
+import { exit } from "process";
 
 const POLLING_INTERVAL_EVENTS = 6 * 1000;
 
@@ -71,10 +72,11 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
     console.log(
       `Bear(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.up
-      }, ${event.fields.epoch})`
+      }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
+    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
 
     const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
     const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
@@ -84,7 +86,8 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       addrId,
       event.fields.up,
       event.fields.amount,
-      false
+      false,
+      claimedByAnyone
     );
 
     if (!created)
@@ -93,7 +96,8 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
         AddressId: addrId.id,
         upBid: event.fields.up,
         amountBid: event.fields.amount,
-        claimed: false,
+        claimedByAnyone: claimedByAnyone
+
       });
     //}
     return Promise.resolve();
@@ -118,20 +122,22 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
     console.log(
       `Bull(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.up
-      }, ${event.fields.epoch})`
+      }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
+    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
 
     const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
     const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
-
+      
     const [roundParticipation, created] = await createAndGetNewParticipation(
       roundId,
       addrId,
       event.fields.up,
       event.fields.amount,
-      false
+      false,
+      claimedByAnyone
     );
 
     if (!created)
@@ -140,7 +146,7 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         AddressId: addrId.id,
         upBid: event.fields.up,
         amountBid: event.fields.amount,
-        claimed: false,
+        claimedByAnyone: claimedByAnyone
       });
 
     //}
@@ -169,6 +175,7 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
 
     const userAddressEvent = event.fields.punterAddress;
     const epoch = event.fields.epoch;
+
     const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
     const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
 
@@ -177,8 +184,10 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
       addrId,
       false,
       0n,
-      true
+      true,
+      1000n
     );
+
     if (!created) roundParticipation.update({ claimed: true });
 
     return Promise.resolve();
@@ -206,14 +215,13 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
         defaults: { priceEnd: event.fields.price },
       });
       if (!created) await round.update({ priceEnd: event.fields.price });
-
+      
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
       subscription.unsubscribe();
-      
       return Promise.resolve();
     },
   };
