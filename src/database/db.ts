@@ -1,3 +1,4 @@
+import { exit } from "process";
 import { Sequelize, Model, DataTypes } from "sequelize";
 
 export class Address extends Model {
@@ -52,7 +53,7 @@ export function initDb(sequelize: Sequelize) {
         unique: true,
       },
       priceEnd: { type: DataTypes.NUMBER, allowNull: true, defaultValue: 0 },
-      priceStart: DataTypes.NUMBER,
+      priceStart: { type: DataTypes.NUMBER, allowNull: true, defaultValue: 0 },
     },
     {
       sequelize,
@@ -90,6 +91,64 @@ export function initDb(sequelize: Sequelize) {
     });
 }
 
+export async function createAndGetNewRound(epoch: bigint, price: Number, isStart: false) : Promise<[Round, boolean]>{
+  let defaultData = {}
+
+  if (isStart)
+    defaultData = {priceStart: price}
+  else
+    defaultData = {priceEnd: price}
+
+    try {
+
+  const [round, created] = await Round.findCreateFind({
+    where: { epoch: epoch },
+    defaults: { defaultData },
+  });
+  return [round, created]
+}catch(error){
+    console.log(error)
+    exit
+  
+  }
+
+}
+
+export async function createAndGetNewAddress(address: string): Promise<[Address, boolean]> {
+  try {
+  const [addrId, created] = await Address.findCreateFind({
+    where: { address: address },
+    defaults: { address: address },
+  });
+  return [addrId, created]
+}catch (error){
+  console.log(error)
+  exit
+
+}
+}
+export async function createAndGetNewParticipation(roundId: Round, addrId: Address, upBid: boolean,amountBid: bigint, claimed: boolean): Promise<[RoundParticipation, boolean]> {
+try {
+  const [round, created] = await RoundParticipation.findCreateFind({
+    where: { RoundId: roundId.id, AddressId: addrId.id },
+    defaults: {
+      RoundId: roundId.id,
+      AddressId: addrId.id,
+      upBid: upBid,
+      amountBid: amountBid,
+      claimed: claimed,
+    }
+  });
+  return [round, created]
+
+} catch (error) {
+  console.log(error)
+  exit
+}
+  
+}
+
+
 export function connect(filePath: string) {
   const sequelize = new Sequelize({
     dialect: "sqlite",
@@ -97,7 +156,7 @@ export function connect(filePath: string) {
     retry: {
       max: 20,
     },
-    logging: console.log,
+   logging: console.log,
   });
 
   initDb(sequelize);

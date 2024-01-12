@@ -53,13 +53,15 @@ func main() {
 	router.Use(cors.New(corsConfig))
 	router.GET("/round/:address", getUserRoundsPlayed)
 	router.GET("/allround/:address", getAllUserRounds)
+	router.GET("/topplayer", getTopPlayers)
+	router.GET("/round/notclaimed", getAllRoundNotClaimed)
 
 	router.Run("0.0.0.0:8080")
 
 }
 
 func getUserRoundsPlayed(c *gin.Context) {
-	userRound, err := getRoundParticipation(rdb, db, c.Param("address"), 0)
+	userRound, err := getRoundParticipation(db, c.Param("address"), 0)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
@@ -68,10 +70,28 @@ func getUserRoundsPlayed(c *gin.Context) {
 }
 
 func getAllUserRounds(c *gin.Context) {
-	userRound, err := getRoundParticipation(rdb, db, c.Param("address"), 1)
+	userRound, err := getRoundParticipation(db, c.Param("address"), 1)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
 		c.JSON(http.StatusNotFound, fmt.Sprintf("address %s not found", c.Param("address")))
+	}
+}
+
+func getTopPlayers(c *gin.Context) {
+	userRound, err := getAllPlayer(db, 10)
+	if len(userRound) > 0 && err == nil {
+		c.JSON(http.StatusOK, userRound)
+	} else {
+		c.JSON(http.StatusNotFound, "nobody played yet")
+	}
+}
+
+func getAllRoundNotClaimed(c *gin.Context) {
+	userRound, err := getRoundClaimedOrNot(db, 0)
+	if len(userRound) > 0 && err == nil {
+		c.JSON(http.StatusOK, userRound)
+	} else {
+		c.JSON(http.StatusNotFound, "nobody played yet")
 	}
 }

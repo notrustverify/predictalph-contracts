@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/redis/go-redis/v9"
 )
 
 type Address struct {
@@ -21,26 +20,16 @@ type Round struct {
 }
 
 type RoundParticipation struct {
-	AddressId int   `json:"addressId"`
-	RoundId   int   `json:"roundId"`
-	UpBid     bool  `json:"upBid"`
-	AmountBid int   `json:"amountBid"`
-	Claimed   bool  `json:"claimed"`
-	Round     Round `json:"Round"`
+	AddressId int     `json:"addressId"`
+	RoundId   int     `json:"roundId"`
+	UpBid     bool    `json:"upBid"`
+	AmountBid int     `json:"amountBid"`
+	Claimed   bool    `json:"claimed"`
+	Round     Round   `json:"round"`
+	Address   Address `json:"address"`
 }
 
-func keyExists(rdb *redis.Client, key string) bool {
-	_, err := rdb.Get(ctx, key).Result()
-	if err == redis.Nil {
-		return false
-	} else if err != nil {
-		panic(err)
-	} else {
-		return true
-	}
-}
-
-func getIdAddress(db *sql.DB, addr string) (Address, error) {
+func getIdFromAddress(db *sql.DB, addr string) (Address, error) {
 
 	row := db.QueryRow("SELECT id,address from Addresses WHERE address = ?", addr)
 	address := Address{}
@@ -51,6 +40,19 @@ func getIdAddress(db *sql.DB, addr string) (Address, error) {
 	}
 
 	return address, err
+}
+
+func getAddressFromId(db *sql.DB, id int) (Address, error) {
+
+	row := db.QueryRow("SELECT id,address from Addresses WHERE id = ?", id)
+	addr := Address{}
+	var err error
+	if err = row.Scan(&addr.Id, &addr.Address); err == sql.ErrNoRows {
+		fmt.Printf("address not found")
+		return Address{}, err
+	}
+
+	return addr, err
 }
 
 func getRoundFromId(db *sql.DB, id int) (Round, error) {
@@ -66,9 +68,9 @@ func getRoundFromId(db *sql.DB, id int) (Round, error) {
 	return round, err
 }
 
-func getRoundParticipation(rdb *redis.Client, db *sql.DB, addr string, isClaimedRound int) ([]RoundParticipation, error) {
+func getRoundParticipation(db *sql.DB, addr string, isClaimedRound int) ([]RoundParticipation, error) {
 
-	address, err := getIdAddress(db, addr)
+	address, err := getIdFromAddress(db, addr)
 	if err != nil {
 		fmt.Println(err)
 		return []RoundParticipation{}, err
@@ -98,11 +100,80 @@ func getRoundParticipation(rdb *redis.Client, db *sql.DB, addr string, isClaimed
 		}
 
 		i.Round = roundData
+		i.Address = address
 
 		roundParticipation = append(roundParticipation, i)
 	}
 	fmt.Printf("%+v", roundParticipation)
 	return roundParticipation, err
+}
+
+func getAllPlayer(db *sql.DB, limit int) ([]RoundParticipation, error) {
+	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid from RoundParticipations GROUP BY AddressId LIMIT ?", limit)
+	if err != nil {
+		fmt.Println(err)
+
+		return []RoundParticipation{}, err
+	}
+	defer rows.Close()
+
+	roundParticipation := []RoundParticipation{}
+
+	for rows.Next() {
+		i := RoundParticipation{}
+		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid)
+
+		roundData, err := getRoundFromId(db, i.RoundId)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		i.Round = roundData
+
+		roundParticipation = append(roundParticipation, i)
+	}
+	fmt.Printf("%+v", roundParticipation)
+	return roundParticipation, err
+}
+
+func getRoundClaimedOrNot(db *sql.DB, isClaimedRound int) ([]RoundParticipation, error) {
+	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid from RoundParticipations WHERE CLAIMED = ?", isClaimedRound)
+	if err != nil {
+		fmt.Println(err)
+
+		return []RoundParticipation{}, err
+	}
+	defer rows.Close()
+
+	roundParticipation := []RoundParticipation{}
+
+	for rows.Next() {
+		i := RoundParticipation{}
+		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid)
+
+		roundData, err := getRoundFromId(db, i.RoundId)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		addrData, err := getAddressFromId(db, i.AddressId)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		i.Round = roundData
+		i.Address = addrData
+
+		roundParticipation = append(roundParticipation, i)
+	}
+
+	return roundParticipation, err
+
 }
 
 func connect(file string) *sql.DB {

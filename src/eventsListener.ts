@@ -28,33 +28,18 @@ import {
 } from "./utils";
 import { Redis } from "ioredis";
 import { CoinGeckoClient } from "coingecko-api-v3";
-import { Address, Round, RoundParticipation, connect } from "./database/db";
-import { Sequelize } from "sequelize";
+import {
+  Address,
+  Round,
+  RoundParticipation,
+  connect,
+  createAndGetNewAddress,
+  createAndGetNewParticipation,
+  createAndGetNewRound,
+} from "./database/db";
+import { Sequelize, where } from "sequelize";
 
 const POLLING_INTERVAL_EVENTS = 6 * 1000;
-
-async function getAllEpochAddress(address: string) {
-  if (!keyExists(address) || !keyExists("claim" + address)) {
-    return 0;
-  }
-  redis.sdiff(address, "claim" + address, async (err, result) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log(result);
-      //await redis.del(address)
-      return result;
-    }
-  });
-}
-
-function setNewEpochUser(address: string, epoch: bigint) {
-  redis.sadd(address, Number(epoch));
-}
-
-function setEpochClaimed(address: string, epoch: bigint) {
-  redis.sadd("claim" + address, Number(epoch));
-}
 
 async function keyExists(key: string) {
   const reply = await redis.exists(key);
@@ -88,34 +73,28 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
         event.fields.up
       }, ${event.fields.epoch})`
     );
-    const userAddress = event.fields.from;
+    const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
-    setNewEpochUser(event.fields.from, event.fields.epoch);
-    Address.create({ address: userAddress })
-      .then(() => {
-        console.log("created");
-      })
-      .catch((error) => {
-        console.error("already exists");
+
+    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
+    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
+
+    const [roundParticipation, created] = await createAndGetNewParticipation(
+      roundId,
+      addrId,
+      event.fields.up,
+      event.fields.amount,
+      false
+    );
+
+    if (!created)
+      await roundParticipation.update({
+        RoundId: roundId.id,
+        AddressId: addrId.id,
+        upBid: event.fields.up,
+        amountBid: event.fields.amount,
+        claimed: false,
       });
-
-    const addrId = await Address.findOne({ where: { address: userAddress } });
-    const roundId = await Round.findOne({ where: { epoch: epoch } });
-
-    RoundParticipation.create({
-      RoundId: roundId.id,
-      AddressId: addrId.id,
-      upBid: event.fields.up,
-      amountBid: event.fields.amount,
-      claimed: false,
-    })
-      .then(() => {
-        console.log("round participation created");
-      })
-      .catch((error) => {
-        console.error("already exists");
-      });
-
     //}
     return Promise.resolve();
   },
@@ -141,36 +120,67 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         event.fields.up
       }, ${event.fields.epoch})`
     );
-    setNewEpochUser(event.fields.from, event.fields.epoch);
-    const userAddress = event.fields.from;
+    const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
-    setNewEpochUser(event.fields.from, event.fields.epoch);
-    Address.create({ address: userAddress })
-      .then(() => {
-        console.log("created");
-      })
-      .catch((error) => {
-        console.error("already exists");
-      });
 
-    const addrId = await Address.findOne({ where: { address: userAddress } });
-    const roundId = await Round.findOne({ where: { epoch: epoch } });
+    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
+    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
 
-    RoundParticipation.create({
-      RoundId: roundId.id,
-      AddressId: addrId.id,
-      upBid: event.fields.up,
-      amountBid: event.fields.amount,
-      claimed: false,
-    })
-      .then(() => {
-        console.log("round participation created");
-      })
-      .catch((error) => {
-        console.error("already exists");
+    const [roundParticipation, created] = await createAndGetNewParticipation(
+      roundId,
+      addrId,
+      event.fields.up,
+      event.fields.amount,
+      false
+    );
+
+    if (!created)
+      roundParticipation.update({
+        RoundId: roundId.id,
+        AddressId: addrId.id,
+        upBid: event.fields.up,
+        amountBid: event.fields.amount,
+        claimed: false,
       });
 
     //}
+    return Promise.resolve();
+  },
+  // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
+  errorCallback: (error, subscription): Promise<void> => {
+    console.error(error);
+    subscription.unsubscribe();
+    return Promise.resolve();
+  },
+};
+
+const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
+  // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
+  pollingInterval: POLLING_INTERVAL_EVENTS,
+  // The `messageCallback` will be called every time we recive a new event
+  messageCallback: async (
+    event: PredictalphTypes.ClaimedEvent
+  ): Promise<void> => {
+    console.log(
+      `Claimed(from: ${event.fields.from}, for: ${
+        event.fields.punterAddress
+      }, ${event.fields.amount / ONE_ALPH}, ${event.fields.epoch})`
+    );
+
+    const userAddressEvent = event.fields.punterAddress;
+    const epoch = event.fields.epoch;
+    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
+    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
+
+    const [roundParticipation, created] = await createAndGetNewParticipation(
+      roundId,
+      addrId,
+      false,
+      0n,
+      true
+    );
+    if (!created) roundParticipation.update({ claimed: true });
+
     return Promise.resolve();
   },
   // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
@@ -191,22 +201,11 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
 
-      Round.create({
-        epoch: event.fields.epoch,
-        priceEnd: event.fields.price,
-      })
-        .then(() => {
-
-          
-        })
-        .catch((error) => {
-          console.error("already exists");
-          Round.update(
-            { priceEnd: event.fields.price },
-            { where: { epoch: event.fields.epoch } }
-          );
-
-        });
+      const [round, created] = await Round.findCreateFind({
+        where: { epoch: event.fields.epoch },
+        defaults: { priceEnd: event.fields.price },
+      });
+      if (!created) await round.update({ priceEnd: event.fields.price });
 
       return Promise.resolve();
     },
@@ -214,6 +213,7 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
       subscription.unsubscribe();
+      
       return Promise.resolve();
     },
   };
@@ -230,20 +230,11 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
       );
       //setKeyValue("epoch",Number(event.fields.epoch))
-      Round.create({
-        epoch: event.fields.epoch,
-        priceStart: event.fields.price,
-      })
-        .then(() => {
-        })
-        .catch((error) => {
-          console.error("already exists");
-          Round.update(
-            { priceStart: event.fields.price },
-            { where: { epoch: event.fields.epoch } }
-          );
-
-        });
+      const [round, created] = await Round.findCreateFind({
+        where: { epoch: event.fields.epoch },
+        defaults: { priceStart: event.fields.price },
+      });
+      if (!created) await round.update({ priceStart: event.fields.price });
 
       return Promise.resolve();
     },
@@ -254,40 +245,6 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       return Promise.resolve();
     },
   };
-
-const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
-  // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-  pollingInterval: POLLING_INTERVAL_EVENTS,
-  // The `messageCallback` will be called every time we recive a new event
-  messageCallback: async (
-    event: PredictalphTypes.ClaimedEvent
-  ): Promise<void> => {
-    console.log(
-      `Claimed(from: ${event.fields.from}, for: ${event.fields.punterAddress}, ${event.fields.amount / ONE_ALPH}, ${
-        event.fields.epoch
-      })`
-    );
-
-    const userAddress = event.fields.punterAddress;
-    const epoch = event.fields.epoch;
-    const addrId = await Address.findOne({ where: { address: userAddress } });
-    const roundId = await Round.findOne({ where: { epoch: epoch } });
-
-    RoundParticipation.update(
-      { claimed: true },
-      { where: { AddressId: addrId.id, RoundId: roundId.id } }
-    );
-    //setKeyValue("epoch",Number(event.fields.epoch))
-    setEpochClaimed(event.fields.punterAddress, event.fields.epoch);
-    return Promise.resolve();
-  },
-  // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
-  errorCallback: (error, subscription): Promise<void> => {
-    console.error(error);
-    subscription.unsubscribe();
-    return Promise.resolve();
-  },
-};
 
 async function getPunterBid(
   privKey: string,
@@ -329,18 +286,22 @@ async function getPunterBid(
   let eventCounterSaved = Number(await redis.get(KEY_NAME_COUNTER_EVENT));
 
   setKeyValue("contractid", predictalphContractId);
+  
   const subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(
     optionsRoundStart,
     eventCounterSaved
   );
+  
   const subscriptionBear = predictalphDeployed.subscribeBetBearEvent(
     optionsBear,
     eventCounterSaved
   );
+  
   const subscriptionBull = predictalphDeployed.subscribeBetBullEvent(
     optionsBull,
     eventCounterSaved
   );
+  
   const subscriptionRoundEnd = predictalphDeployed.subscribeRoundEndedEvent(
     optionsRoundEnd,
     eventCounterSaved
@@ -350,6 +311,7 @@ async function getPunterBid(
     optionsClaimed,
     eventCounterSaved
   );
+  
   console.log(contractEventsCounter, eventCounterSaved);
 
   setKeyValue(KEY_NAME_COUNTER_EVENT, contractEventsCounter.toString());
