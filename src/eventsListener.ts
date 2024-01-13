@@ -286,7 +286,7 @@ async function getPunterBid(
     if (contractId != predictalphContractId) {
       console.log("Contract changed, flush db");
       await redis.flushdb();
-      await initDb(sequelize, true)
+      initDb(sequelize, true)
     }
   }
 
