@@ -76,7 +76,6 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
       }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
 
-    await redis.incr(KEY_NAME_COUNTER_EVENT)
 
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
@@ -126,7 +125,6 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         event.fields.up
       }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
-    await redis.incr(KEY_NAME_COUNTER_EVENT)
 
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
@@ -174,7 +172,6 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
         event.fields.punterAddress
       }, ${event.fields.amount / ONE_ALPH}, ${event.fields.epoch})`
     );
-    await redis.incr(KEY_NAME_COUNTER_EVENT)
 
     const userAddressEvent = event.fields.punterAddress;
     const epoch = event.fields.epoch;
@@ -212,7 +209,6 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
       event: PredictalphTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
-      await redis.incr(KEY_NAME_COUNTER_EVENT)
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch },
@@ -241,7 +237,6 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
       );
-      await redis.incr(KEY_NAME_COUNTER_EVENT)
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch },
@@ -326,7 +321,7 @@ async function getPunterBid(
     eventCounterSaved
   );
   
-  console.log(contractEventsCounter, eventCounterSaved);
+  console.log(`Events from contract ${contractEventsCounter}, number of events seen ${eventCounterSaved}`);
 
   setKeyValue(KEY_NAME_COUNTER_EVENT, contractEventsCounter.toString());
 
