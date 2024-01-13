@@ -36,6 +36,7 @@ import {
   createAndGetNewAddress,
   createAndGetNewParticipation,
   createAndGetNewRound,
+  initDb,
 } from "./database/db";
 import { Sequelize, where } from "sequelize";
 import { exit } from "process";
@@ -74,6 +75,9 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
         event.fields.up
       }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
+
+    await redis.incr(KEY_NAME_COUNTER_EVENT)
+
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
     const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
@@ -122,6 +126,8 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
         event.fields.up
       }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
+    await redis.incr(KEY_NAME_COUNTER_EVENT)
+
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
     const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
@@ -168,6 +174,7 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
         event.fields.punterAddress
       }, ${event.fields.amount / ONE_ALPH}, ${event.fields.epoch})`
     );
+    await redis.incr(KEY_NAME_COUNTER_EVENT)
 
     const userAddressEvent = event.fields.punterAddress;
     const epoch = event.fields.epoch;
@@ -181,7 +188,7 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
       false,
       0n,
       true,
-      1000n
+      0n
     );
 
     if (!created) await roundParticipation.update({ claimed: true });
@@ -205,6 +212,7 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
       event: PredictalphTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
+      await redis.incr(KEY_NAME_COUNTER_EVENT)
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch },
@@ -233,7 +241,8 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
       );
-      //setKeyValue("epoch",Number(event.fields.epoch))
+      await redis.incr(KEY_NAME_COUNTER_EVENT)
+
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch },
         defaults: { priceStart: event.fields.price },
@@ -282,6 +291,7 @@ async function getPunterBid(
     if (contractId != predictalphContractId) {
       console.log("Contract changed, flush db");
       await redis.flushdb();
+      await initDb(sequelize, true)
     }
   }
 

@@ -20,7 +20,7 @@ export class RoundParticipation extends Model {
   declare claimedByAnyoneTimestamp: bigint;
 }
 
-export function initDb(sequelize: Sequelize) {
+export function initDb(sequelize: Sequelize, sync: boolean) {
   Address.init(
     {
       id: {
@@ -87,7 +87,7 @@ export function initDb(sequelize: Sequelize) {
   Round.belongsToMany(Address, { through: RoundParticipation });
 
   sequelize
-    .sync()
+    .sync({ force: sync })
     .then(() => {
       console.log("tables created successfully!");
     })
@@ -164,12 +164,12 @@ export function connect(filePath: string) {
     dialect: "sqlite",
     storage: filePath,
     retry: {
-      max: 20,
+      max: 50,
     },
-    logging: console.log,
+    logging: false,
   });
 
-  initDb(sequelize);
+  initDb(sequelize, false);
 
   return sequelize;
 }
