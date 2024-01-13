@@ -31,7 +31,6 @@
     "@alephium/web3-wallet": "0.28.1",
     "@types/redis": "^4.0.11",
     "axios": "^1.6.2",
-    "better-sqlite3": "^9.2.2",
     "body-parser": "^1.20.2",
     "coingecko-api-v3": "^0.0.29",
     "debug": "^4.3.4",

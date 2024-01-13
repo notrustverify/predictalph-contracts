@@ -18,5 +18,5 @@ RUN yarn
 # RUN npm ci --omit=dev
 
 # Bundle app source
-COPY . .
+COPY src/ .
 RUN yarn run build

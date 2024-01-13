@@ -31,6 +31,8 @@ services:
     hostname: events-listener
     build: .
     restart: unless-stopped
+    volumes:
+      - ./data:/data
     command: yarn run eventsListener testnet
     env_file:
       - .env
