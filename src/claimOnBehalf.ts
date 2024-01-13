@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { DestroyRound, End, Predictalph, Start } from "../artifacts/ts";
+import { DestroyRound, End, Predictalph, Start, WithdrawAddress } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
     arrayEpochToBytes,
@@ -31,7 +31,8 @@ import { Address, connect, initDb } from "./database/db";
 async function destroyRound(
   privKey: string,
   contractName: string,
-  arrayRound: number[],
+  addressToClaim: string,
+  arrayEpoch: string[]
 ) {
 
 
@@ -61,7 +62,8 @@ async function destroyRound(
 
 const onlyRoundExists = []
 
-for (const epoch of arrayRound){
+for (const epoch of arrayEpoch){
+
     const roundContractId = getRoundContractId(
         predictalphContractId,
        BigInt(epoch),
@@ -73,35 +75,36 @@ for (const epoch of arrayRound){
       );
 
        
-      if (roundExist && epoch !== Number(predictionStates?.fields.epoch)) {
+      if (roundExist && Number(epoch) !== Number(predictionStates?.fields.epoch)) {
         const getRoundState = await getRoundContractState(predictalphContractId, BigInt(epoch), group)
-        if (getRoundState.fields.counterAttendees <= 0)
+        if (getRoundState.fields.counterAttendees > 0)
           onlyRoundExists.push(epoch)
         else
-          console.log(`Round ${epoch}, ${getRoundState.fields.counterAttendees} attendees left`)
+          console.log(`Round ${epoch}, no attendees left`)
       }
-}
+    }
 
   if(onlyRoundExists.length > 0) {
   try {
-    const tx = await DestroyRound.execute(wallet, {
+    const tx = await WithdrawAddress.execute(wallet, {
       initialFields: {
         predictalph: predictalphContractId,
-        arrayEpoch: arrayEpochToBytes(onlyRoundExists)
+        addressToClaim: addressToClaim,
+        epochParticipation: arrayEpochToBytes(onlyRoundExists)
       },
       attoAlphAmount: ONE_ALPH,
     });
 
     console.log(
-      `Destroy round ${onlyRoundExists} ${tx.txId}`
+      `Claim on behalf round ${onlyRoundExists} ${tx.txId}`
     );
     await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
-    console.log("Destroy rounds done");
+    console.log("Claim rounds done");
   } catch (error) {
     console.error(error);
   }
 }else{
-    console.log("nothing to DESTROY")
+    console.log("nothing to Claim")
 }
 }
 
@@ -127,13 +130,10 @@ let networkToUse = process.argv.slice(2)[0];
 if (networkToUse === undefined) networkToUse = "mainnet";
 //Select our network defined in alephium.config.ts
 
-const roundArrayToDestroyFrom = parseInt(process.argv.slice(2)[1])
-const roundArrayToDestroyTo = parseInt(process.argv.slice(2)[2])
+const addressToClaim = process.argv.slice(2)[1]
+const epochArrayParam = process.argv.slice(2)[2]
+if (addressToClaim == undefined) throw new Error("Missing address to claim")
 
-if (roundArrayToDestroyFrom == undefined) throw new Error("Missing array with round to destroy")
-
-let arrayRound = []
-arrayRound = Array.from({length: roundArrayToDestroyTo-roundArrayToDestroyFrom+1}, (_,index) => roundArrayToDestroyFrom+index )
 
 //NodeProvider is an abstraction of a connection to the Alephium network
 const nodeProvider = new NodeProvider(
@@ -151,7 +151,8 @@ web3.setCurrentNodeProvider(nodeProvider);
 destroyRound(
   configuration.networks[networkToUse].privateKeys[0],
   "Predictalph",
-  arrayRound
+  addressToClaim,
+  epochArrayParam.split(",")
 
 );
 
