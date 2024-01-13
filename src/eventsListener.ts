@@ -363,7 +363,7 @@ const nodeProvider = new NodeProvider(
 web3.setCurrentNodeProvider(nodeProvider);
 
 const redis = new Redis({ host: process.env.REDIS_HOST });
-const sequelize = connect("./data/roundsData.sqlite");
+const sequelize = connect(process.env.DB_PATH === undefined ? "/data/roundsData.sqlite" :  process.env.DB_PATH);
 
 sequelize
   .authenticate()
