@@ -22,6 +22,9 @@ import {
 } from "./utils";
 import { CoinGeckoClient } from "coingecko-api-v3";
 
+
+
+
 async function startRound(
   privKey: string,
   contractName: string
@@ -135,10 +138,13 @@ async function endRound(privKey: string, contractName: string) {
 
       endTimestamp = Number(roundState.fields.bidEndTimestamp);
 
-      const price = await getPrice(cgClient);
-      const priceToStore = BigInt(Math.round(price * intPriceDivision)); //store it as a int
       try {
         if (Date.now() >= endTimestamp) {
+          console.log(`locking for ${TIME_TO_WAIT_NEW_ROUND/(60*1000)} minutes`)
+          await sleep(TIME_TO_WAIT_NEW_ROUND)
+          const price = await getPrice(cgClient);
+          const priceToStore = BigInt(Math.round(price * intPriceDivision)); //store it as a int
+
           const txStart = await End.execute(wallet, {
             initialFields: {
               predictalph: predictalphContractId,
@@ -188,6 +194,7 @@ const cgClient = new CoinGeckoClient({
 });
 
 const intPriceDivision = 10_000;
+const TIME_TO_WAIT_NEW_ROUND = 120*1000
 
 let networkToUse = process.argv.slice(2)[0];
 if (networkToUse === undefined) networkToUse = "mainnet";
