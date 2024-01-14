@@ -374,3 +374,5 @@ getPunterBid(
   "Predictalph",
   sequelize
 );
+
+console.log("dine")

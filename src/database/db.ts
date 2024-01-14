@@ -87,12 +87,12 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
   Round.belongsToMany(Address, { through: RoundParticipation });
 
   sequelize
-    .sync({ force: sync })
+    .sync({force: sync})
     .then(() => {
       console.log("tables created successfully!");
     })
     .catch((error) => {
-      console.error("Unable to create table : ", error);
+      console.error(error);
     });
 }
 
@@ -113,8 +113,7 @@ export async function createAndGetNewRound(
     });
     return [round, created];
   } catch (error) {
-    console.log(error);
-    exit;
+    console.error(error);
   }
 }
 
@@ -128,8 +127,7 @@ export async function createAndGetNewAddress(
     });
     return [addrId, created];
   } catch (error) {
-    console.log(error);
-    exit;
+    console.error(error);
   }
 }
 export async function createAndGetNewParticipation(
@@ -154,8 +152,7 @@ export async function createAndGetNewParticipation(
     });
     return [round, created];
   } catch (error) {
-    console.log(error);
-    exit;
+    console.error(error);
   }
 }
 
