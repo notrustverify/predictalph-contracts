@@ -32,15 +32,8 @@ type RoundParticipation struct {
 }
 
 type RoundParticipationPlayed struct {
-	AddressId                int     `json:"addressId"`
-	RoundId                  int     `json:"roundId"`
-	UpBid                    bool    `json:"upBid"`
-	AmountBid                float64 `json:"amountBid"`
-	Claimed                  bool    `json:"claimed"`
-	ClaimedByAnyoneTimestamp int     `json:"claimedByAnyoneTimestamp"`
-	NumberOfPlays            int     `json:"numberPlayed"`
-
-	Address Address `json:"address"`
+	Address       string `json:"address"`
+	NumberOfPlays int    `json:"numberPlayed"`
 }
 
 func getIdFromAddress(db *sql.DB, addr string) (Address, error) {
@@ -123,7 +116,7 @@ func getRoundParticipation(db *sql.DB, addr string, isClaimedRound int) ([]Round
 }
 
 func getAllPlayer(db *sql.DB, limit int) ([]RoundParticipationPlayed, error) {
-	rows, err := db.Query("SELECT AddressId, RoundId, Claimed, UpBid, AmountBid, ClaimedByAnyoneTimestamp, count(addressId) as numPlay from RoundParticipations GROUP BY AddressId ORDER BY numPlay DESC LIMIT ?", limit)
+	rows, err := db.Query("SELECT Address, count(addressId) as numPlay FROM RoundParticipations  inner join addresses on addresses.id = RoundParticipations.addressid GROUP BY addressId ORDER BY numplay DESC limit ?; ", limit)
 	if err != nil {
 		fmt.Println(err)
 
@@ -135,18 +128,11 @@ func getAllPlayer(db *sql.DB, limit int) ([]RoundParticipationPlayed, error) {
 
 	for rows.Next() {
 		i := RoundParticipationPlayed{}
-		err = rows.Scan(&i.AddressId, &i.RoundId, &i.Claimed, &i.UpBid, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.NumberOfPlays)
+		err = rows.Scan(&i.Address, &i.NumberOfPlays)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
 		}
-
-		userData, err := getAddressFromId(db, i.AddressId)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		i.Address = userData
 
 		roundParticipation = append(roundParticipation, i)
 	}
