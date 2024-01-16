@@ -24,9 +24,7 @@ import {
 } from "./utils";
 import { CoinGeckoClient } from "coingecko-api-v3";
 import { access } from "fs";
-import Redis from "ioredis";
 import { Sequelize } from "sequelize";
-import { Address, connect, initDb } from "./database/db";
 
 async function destroyRound(
   privKey: string,
@@ -118,8 +116,6 @@ const cgClient = new CoinGeckoClient({
 });
 
 const intPriceDivision = 10_000;
-
-const redis = new Redis({ host: process.env.REDIS_HOST });
 
 let networkToUse = process.argv.slice(2)[0];
 if (networkToUse === undefined) networkToUse = "mainnet";
