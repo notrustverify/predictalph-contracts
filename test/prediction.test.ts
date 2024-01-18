@@ -34,7 +34,6 @@ import {
   withdraw,
   destroyRound,
   arrayEpochToBytes,
-  withdrawOnBehalf,
   boostRound,
 } from "./utils";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
@@ -150,11 +149,11 @@ describe("unit tests", () => {
     const arrayEpochBytes = arrayEpochToBytes([0])
 
 
-    await withdraw(bidder1, predictionGame, arrayEpochBytes);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address);
 
     const bidder2Balance = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(bidder2.address)
 
-    await withdraw(bidder2, predictionGame, arrayEpochBytes);
+    await withdraw(bidder2, predictionGame, arrayEpochBytes, bidder2.address);
     const bidder2BalanceAfterWithdraw = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(bidder2.address)
 
     // round amount to get right amount
@@ -223,9 +222,9 @@ describe("unit tests", () => {
     const arrayEpochBytes = arrayEpochToBytes([0,1])
     
 
-    await withdraw(bidder1, predictionGame, arrayEpochBytes)
-    await withdrawOnBehalf(bidder1, predictionGame, arrayEpochBytes, bidder2.address);
-    await withdrawOnBehalf(bidder1, predictionGame, arrayEpochBytes, bidder3.address);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address)
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder2.address);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder3.address);
 
     await destroyRound(operator, predictionGame,  arrayEpochToBytes([0,1]));
     const exists = await contractExists(
@@ -289,11 +288,11 @@ describe("unit tests", () => {
 
     const arrayEpochBytes = arrayEpochToBytes([0])
 
-    await withdraw(bidder1, predictionGame, arrayEpochBytes);
-    await withdraw(bidder2, predictionGame, arrayEpochBytes);
-    await withdraw(bidder3, predictionGame, arrayEpochBytes);
-    await withdraw(bidder4, predictionGame, arrayEpochBytes);
-    await withdraw(bidder5, predictionGame, arrayEpochBytes);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address);
+    await withdraw(bidder2, predictionGame, arrayEpochBytes, bidder2.address);
+    await withdraw(bidder3, predictionGame, arrayEpochBytes, bidder3.address);
+    await withdraw(bidder4, predictionGame, arrayEpochBytes, bidder4.address);
+    await withdraw(bidder5, predictionGame, arrayEpochBytes, bidder5.address);
 
     const roundStateWithdraw = await getRoundState(0n);
 
@@ -358,8 +357,8 @@ describe("unit tests", () => {
 
     const arrayEpochBytes = arrayEpochToBytes([0])
     
-    await withdraw(bidder1, predictionGame, arrayEpochBytes);
-    await withdraw(bidder2, predictionGame, arrayEpochBytes);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address);
+    await withdraw(bidder2, predictionGame, arrayEpochBytes, bidder2.address);
 
     const roundStateWithdraw = await getRoundState(0n);
 
@@ -438,7 +437,7 @@ describe("unit tests", () => {
 
     await endRound(operator, predictionGame, 11n, false);
    
-    await withdraw(bidder2, predictionGame, "00");
+    await withdraw(bidder2, predictionGame, "00", bidder2.address);
 
     const predictionState = await predictionGame.fetchState();
 
@@ -505,8 +504,8 @@ describe("unit tests", () => {
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
     
-    await withdraw(bidder1, predictionGame, arrayEpochBytes );
-    await withdraw(bidder2, predictionGame, arrayEpochBytes);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address);
+    await withdraw(bidder2, predictionGame, arrayEpochBytes, bidder2.address);
 
   });
 
@@ -547,9 +546,9 @@ describe("unit tests", () => {
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
     
-    await withdraw(bidder1, predictionGame, arrayEpochBytes );
-    await withdraw(bidder2, predictionGame, arrayEpochBytes);
-    await withdraw(bidder3, predictionGame, arrayEpochBytes);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address);
+    await withdraw(bidder2, predictionGame, arrayEpochBytes, bidder2.address);
+    await withdraw(bidder3, predictionGame, arrayEpochBytes, bidder3.address);
 
     await destroyRound(operator, predictionGame,  arrayEpochToBytes([0,1]));
     const exists = await contractExists(
@@ -713,11 +712,11 @@ describe("unit tests", () => {
 
     const arrayEpochBytes = arrayEpochToBytes([0])
 
-    await withdraw(bidder1, predictionGame, arrayEpochBytes);
-    await withdraw(bidder2, predictionGame, arrayEpochBytes);
-    await withdraw(bidder3, predictionGame, arrayEpochBytes);
-    await withdraw(bidder4, predictionGame, arrayEpochBytes);
-    await withdraw(bidder5, predictionGame, arrayEpochBytes);
+    await withdraw(bidder1, predictionGame, arrayEpochBytes, bidder1.address);
+    await withdraw(bidder2, predictionGame, arrayEpochBytes, bidder2.address);
+    await withdraw(bidder3, predictionGame, arrayEpochBytes, bidder3.address);
+    await withdraw(bidder4, predictionGame, arrayEpochBytes, bidder4.address);
+    await withdraw(bidder5, predictionGame, arrayEpochBytes, bidder5.address);
 
     const roundStateWithdraw = await getRoundState(0n);
 

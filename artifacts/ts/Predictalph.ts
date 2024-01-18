@@ -131,14 +131,6 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getArrayElem", params);
     },
-    getCurrentRound: async (
-      params: Omit<
-        TestContractParams<PredictalphTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResult<HexString>> => {
-      return testMethod(this, "getCurrentRound", params);
-    },
     getRoundByEpoch: async (
       params: TestContractParams<
         PredictalphTypes.Fields,
@@ -182,18 +174,10 @@ class Factory extends ContractFactory<
     withdraw: async (
       params: TestContractParams<
         PredictalphTypes.Fields,
-        { arrayEpochIn: HexString }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "withdraw", params);
-    },
-    withdrawAddress: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
         { arrayEpochIn: HexString; addressToClaim: Address }
       >
     ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "withdrawAddress", params);
+      return testMethod(this, "withdraw", params);
     },
     destroyRound: async (
       params: TestContractParams<
@@ -247,8 +231,8 @@ class Factory extends ContractFactory<
 export const Predictalph = new Factory(
   Contract.fromJson(
     PredictalphContractJson,
-    "=10-2+54=2-1+8=3-1+9=2-2=1+54=2+a=1-1=1-1+25=1-1=2-1=1-2=1-1=2-2+9e=2-1=1+24401441144214=2-2+1=1-3=1-3=1-3+1=81-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+8=82+16037e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1630",
-    "0ac29513c4719fe384ef331f1fbc66b3804c052ac7764de4483dd28b2bfe6883"
+    "=10+5=1-1=2-1=1-4+e=2-2+23=2-6+75=2-2+33=3-1+6=1+3=1-2+a43494359=2-2+69=2-2+79=2-2+89=81-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+8=82+16037e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1360",
+    "cec41507ee8fccff9fddbd58658b6c2a2776ec4c23116a8fde26438deb9161cf"
   )
 );
 

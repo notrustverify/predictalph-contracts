@@ -1,7 +1,7 @@
 {
   "version": "v2.5.9",
   "name": "BoostRound",
-  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}010a",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}0108",
   "fieldsSig": {
     "names": [
       "predictalph",

@@ -18,7 +18,6 @@ import {
   Bid,
   Withdraw,
   DestroyRound,
-  WithdrawAddress,
   BoostRound,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
@@ -106,7 +105,11 @@ export async function endRound(
   immediatelyStart: boolean
 ) {
   return await End.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, price: price, immediatelyStart: immediatelyStart },
+    initialFields: {
+      predictalph: predictalph.contractId,
+      price: price,
+      immediatelyStart: immediatelyStart,
+    },
     attoAlphAmount: ONE_ALPH,
   });
 }
@@ -130,21 +133,10 @@ export async function bid(
 export async function withdraw(
   signer: SignerProvider,
   predictalph: PredictalphInstance,
-  epochParticipation: string
-) {
-  return await Withdraw.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, epochParticipation },
-    attoAlphAmount: DUST_AMOUNT,
-  });
-}
-
-export async function withdrawOnBehalf(
-  signer: SignerProvider,
-  predictalph: PredictalphInstance,
   epochParticipation: string,
   addressToClaim: string
 ) {
-  return await WithdrawAddress.execute(signer, {
+  return await Withdraw.execute(signer, {
     initialFields: {
       predictalph: predictalph.contractId,
       epochParticipation,
