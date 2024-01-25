@@ -7,10 +7,9 @@ import {
   web3,
 } from "@alephium/web3";
 import {
-  Predictalph,
   Round,
   Punter,
-  PredictalphInstance,
+  PredictInstance,
   RoundInstance,
   PunterInstance,
   Start,
@@ -19,6 +18,8 @@ import {
   Withdraw,
   DestroyRound,
   BoostRound,
+  Predict,
+  Game,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -30,6 +31,31 @@ export const defaultSigner = new PrivateKeyWallet({
   privateKey: testPrivateKey,
 });
 
+
+
+export async function deployGame(
+   operator: Address,
+   repeatEverySecond: number,
+   epoch: bigint
+ ) {
+   const punterTemplateId = await deployPunterTemplate();
+   const roundTemplateId = await deployRoundTemplate();
+   const predictTemplateId = await deployPrediction(operator, repeatEverySecond, epoch);
+
+   return await Game.deploy(defaultSigner, {
+     initialFields: {
+        operator: operator,
+        feesBasisPts: 100n,
+        repeatEvery: BigInt(repeatEverySecond * 1000),
+        claimedByAnyoneDelay: BigInt(1 * 1000),
+        predictTemplateId: predictTemplateId.contractInstance.contractId,
+        punterTemplateId: punterTemplateId.contractInstance.contractId,
+        roundTemplateId: roundTemplateId.contractInstance.contractId,
+        gameCounter: 0n
+     },
+   });
+ }
+
 export async function deployPrediction(
   operator: Address,
   repeatEverySecond: number,
@@ -38,18 +64,21 @@ export async function deployPrediction(
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
 
-  return await Predictalph.deploy(defaultSigner, {
+  return await Predict.deploy(defaultSigner, {
     initialFields: {
-      punterTemplateId: punterTemplateId.contractInstance.contractId,
-      roundTemplateId: roundTemplateId.contractInstance.contractId,
-      epoch: epoch,
-      operator: operator,
-      feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: BigInt(1 * 1000),
+       punterTemplateId: punterTemplateId.contractInstance.contractId,
+       roundTemplateId: roundTemplateId.contractInstance.contractId,
+       epoch: epoch,
+       operator: operator,
+       feesBasisPts: 100n,
+       repeatEvery: BigInt(repeatEverySecond * 1000),
+       claimedByAnyoneDelay: BigInt(1 * 1000),
+       gameContract: "00",
+       playerCounter: 0n
     },
   });
 }
+
 
 export async function deployPunterTemplate() {
   return await Punter.deploy(defaultSigner, {

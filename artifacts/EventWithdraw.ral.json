@@ -1,17 +1,23 @@
 {
   "version": "v2.8.0",
-  "name": "Start",
-  "bytecodeTemplate": "0101030001000cb41700b413c40de0b6b3a7640000a21600{1}0e0d{0}010318",
+  "name": "EventWithdraw",
+  "bytecodeTemplate": "01010300000007{1}{2}{3}0f0c{0}0106",
   "fieldsSig": {
     "names": [
-      "predict",
-      "price"
+      "game",
+      "gameId",
+      "epochParticipation",
+      "addressToClaim"
     ],
     "types": [
       "ByteVec",
-      "U256"
+      "U256",
+      "ByteVec",
+      "Address"
     ],
     "isMutable": [
+      false,
+      false,
       false,
       false
     ]

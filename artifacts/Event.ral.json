@@ -1,0 +1,355 @@
+{
+  "version": "v2.8.0",
+  "name": "Event",
+  "bytecode": "080b1a407c409a40d141084144416541774189419b41ad00000102010c14010316004044cb17011601c513412d7b16010201000005004032b417001600a0004513412c7bb1ce01ce021303640ca000a001a002a0030c13066417021701140103a004404417031603cbc51913412e7b160013c40de0b6b3a7640000a21603ce0016011602c117040a1604a0045fa0040d2aa10401000103000eb417011601a0004513412c7b1600000017020c0c16020108010303060018160000001703b417041604a0004513412c7b160413c40de0b6b3a7640000a2160116020e0d16030103170508160516025f010303060018160000001703b417041604a0004513412c7b160413c40de0b6b3a7640000a2160116020e0d16030104170507160516015f01030306001f160000001703b4170416041601a21601160216040f0d16030105170516024c07051604160516011602614a0606160416051601160261010003050010160000001703b41704160116020e0c160301060916021604160160010001010007b4a0004513412c7b1600a102010001010007b4a0004513412c7b1600a101010001010007b4a0004513412c7b1600a100010001010007b4a0004513412c7b1600a103",
+  "codeHash": "53f62dc5561d77b20f764374d9093db92d4a009fa0a6f8868968fbce41e67719",
+  "fieldsSig": {
+    "names": [
+      "predictTemplateId",
+      "punterTemplateId",
+      "roundTemplateId",
+      "operator",
+      "feesBasisPts",
+      "repeatEvery",
+      "claimedByAnyoneDelay",
+      "eventCounter"
+    ],
+    "types": [
+      "ByteVec",
+      "ByteVec",
+      "ByteVec",
+      "Address",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "BetBull",
+      "fieldNames": [
+        "from",
+        "epoch",
+        "amount",
+        "up"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "Bool"
+      ]
+    },
+    {
+      "name": "BetBear",
+      "fieldNames": [
+        "from",
+        "epoch",
+        "amount",
+        "up"
+      ],
+      "fieldTypes": [
+        "Address",
+        "U256",
+        "U256",
+        "Bool"
+      ]
+    },
+    {
+      "name": "RoundEnded",
+      "fieldNames": [
+        "epoch",
+        "price"
+      ],
+      "fieldTypes": [
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "RoundStarted",
+      "fieldNames": [
+        "epoch",
+        "price"
+      ],
+      "fieldTypes": [
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "Claimed",
+      "fieldNames": [
+        "addressToClaim",
+        "from",
+        "epochs"
+      ],
+      "fieldTypes": [
+        "Address",
+        "Address",
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "EventCreated",
+      "fieldNames": [
+        "contractId",
+        "eventId"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "U256"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "getEvent",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": false,
+      "paramNames": [
+        "eventId"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "createEvent",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "destroyPredict",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "eventId"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "startRound",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "eventId",
+        "from",
+        "price"
+      ],
+      "paramTypes": [
+        "U256",
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "endRound",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "eventId",
+        "actualPrice",
+        "immediatelyStart"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "Bool"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "bid",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "eventId",
+        "amount",
+        "up"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256",
+        "Bool"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "withdraw",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "eventId",
+        "arrayEpochIn",
+        "addressToClaim"
+      ],
+      "paramTypes": [
+        "U256",
+        "ByteVec",
+        "Address"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "setNewRepeatEvery",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "newRecurrence"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "setNewFees",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "basisPts"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "setNewOperator",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "newOperator"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "setNewClaimedByAnyone",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "newClaimedByAnyoneDelay"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "InvalidCaller",
+          "value": {
+            "type": "U256",
+            "value": "300"
+          }
+        },
+        {
+          "name": "EventNotExists",
+          "value": {
+            "type": "U256",
+            "value": "301"
+          }
+        },
+        {
+          "name": "EventAlreadyExists",
+          "value": {
+            "type": "U256",
+            "value": "302"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SubContractTypes",
+      "fields": [
+        {
+          "name": "Event",
+          "value": {
+            "type": "ByteVec",
+            "value": "03"
+          }
+        }
+      ]
+    }
+  ]
+}

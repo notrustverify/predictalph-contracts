@@ -1,3 +1,7 @@
-TxScript Withdraw(predictalph: Predictalph, epochParticipation: ByteVec, addressToClaim: Address) {
-    predictalph.withdraw(epochParticipation, addressToClaim)
+TxScript Withdraw(predict: Predict, epochParticipation: ByteVec, addressToClaim: Address) {
+   predict.withdraw(epochParticipation, addressToClaim)
+}
+
+TxScript EventWithdraw(game: Game, gameId: U256 ,epochParticipation: ByteVec, addressToClaim: Address) {
+   game.withdraw(gameId,epochParticipation, addressToClaim)
 }

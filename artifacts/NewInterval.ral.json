@@ -1,10 +1,10 @@
 {
-  "version": "v2.5.9",
+  "version": "v2.8.0",
   "name": "NewInterval",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0109",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}010a",
   "fieldsSig": {
     "names": [
-      "predictalph",
+      "predict",
       "newRecurrence"
     ],
     "types": [

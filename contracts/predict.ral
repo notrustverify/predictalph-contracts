@@ -1,11 +1,13 @@
-Contract Predictalph (
+Contract Predict (
+   gameContract: Game,
    punterTemplateId: ByteVec,
    roundTemplateId: ByteVec,
    mut epoch: U256,
    mut operator: Address,
    mut feesBasisPts: U256,
    mut repeatEvery: U256,
-   mut claimedByAnyoneDelay: U256     
+   mut claimedByAnyoneDelay: U256,
+   mut playerCounter: U256 
 ) extends DynamicArrayForInt() {
 
    event BetBull(from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
@@ -25,6 +27,7 @@ Contract Predictalph (
       AlreadyPlayed = 8
       NotEnoughAlph = 9
       CannotBeClaimedYet = 10
+      NotAllPlayerClaimed  = 11
    }
 
    enum SubContractTypes {
@@ -50,9 +53,10 @@ Contract Predictalph (
 
 
    @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
-   pub fn startRound(from: Address, price: U256) -> (){
+   pub fn startRound(from: Address, price: U256) -> (U256){
       let mut caller = callerAddress!()
-      checkCaller!(caller == operator || caller == selfAddress!(), ErrorCodes.InvalidCaller)
+      let callerContract = callerContractId!()
+      checkCaller!(caller == operator || caller == selfAddress!() || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
 
       if (caller == selfAddress!()){
          caller = from
@@ -66,18 +70,21 @@ Contract Predictalph (
       emit Debug(`Actual epoch is ${epoch} with start price ${price}`)
 
       let bidTimestampEnd = blockTimeStamp!() + repeatEvery
-      let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false, 0, 0,0,0,0,0, 0, 0, 0)
+      let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0)
 
 
       copyCreateSubContract!{caller -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
       emit RoundStarted(epoch, price)
+
+      return epoch
    }
 
    @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
-   pub fn endRound(actualPrice: U256, immediatelyStart: Bool) -> () {
+   pub fn endRound(actualPrice: U256, immediatelyStart: Bool) -> (U256) {
       let caller = callerAddress!()
+      let callerContract = callerContractId!()
 
-      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+      checkCaller!(caller == operator || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
 
       let round = getRoundByEpoch(u256To4Byte!(epoch))
       let endRoundTimestamp = round.getEndRoundTime()
@@ -92,11 +99,12 @@ Contract Predictalph (
       if (immediatelyStart){
          startRound{ caller -> ALPH: 1 alph}(caller, actualPrice)
       }
+      return epoch
     }
 
-   @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = false)
-   pub fn bid(amount: U256, up: Bool) -> (){
-      let caller = callerAddress!()
+   @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = true)
+   pub fn bid(amount: U256, up: Bool, from: Address) -> (U256){
+      let caller = from
 
       let round = getRoundByEpoch(u256To4Byte!(epoch))
       let endRoundTimestamp = round.getEndRoundTime()
@@ -116,17 +124,18 @@ Contract Predictalph (
       copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
       round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, up)
         
-
+      playerCounter = playerCounter + 1
       if (up){
          emit BetBull(caller, epoch, amount, up, claimedByAnyoneTimestamp)
       } else {
          emit BetBear(caller, epoch, amount, up, claimedByAnyoneTimestamp)
       }
-        
+      
+      return epoch
     }
 
    
-   @using(checkExternalCaller = false)
+   @using(checkExternalCaller = false, updateFields = true)
    pub fn withdraw(arrayEpochIn: ByteVec, addressToClaim: Address) -> () {
       let caller = callerAddress!()
       let timestampNow = blockTimeStamp!()
@@ -156,13 +165,15 @@ Contract Predictalph (
             // cannot claim if the round didnt end 
 
             round.userClaimRewards(addressToClaim, amountPunter, upBid)
-            betInfoCaller.destroyByOther(caller)
+            betInfoCaller.destroy(caller)
 
+            playerCounter = playerCounter - 1 
             // emit who call and with and which punter it concerned
-            emit Claimed(addressPunter,caller,amountPunter, u256From4Byte!(epochNumber))
+            emit Claimed(addressPunter, caller, amountPunter, u256From4Byte!(epochNumber))
          }
       }
-    }
+
+   }
 
 
    pub fn destroyRound(epochArray: ByteVec) -> (){
@@ -178,7 +189,18 @@ Contract Predictalph (
          }
       }
    }
+   
+   
+   @using(assetsInContract = true)
+   pub fn destroy() -> (){
+      let caller = callerAddress!()
+      let callerContract = callerContractId!()
+      checkCaller!(caller == operator || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
 
+      assert!(playerCounter <= 0, ErrorCodes.NotAllPlayerClaimed)
+
+      destroySelf!(operator)
+   }
 
    @using(preapprovedAssets = true, checkExternalCaller = false)
    pub fn boostRound(amount: U256, epochToBoost: U256) -> (){

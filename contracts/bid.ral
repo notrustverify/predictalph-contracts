@@ -1,3 +1,9 @@
-TxScript Bid(predictalph: Predictalph, amount: U256, up: Bool) {
-    predictalph.bid{callerAddress!() -> ALPH : amount}(amount, up)
+TxScript Bid(predict: Predict, amount: U256, up: Bool) {
+   let caller = callerAddress!()
+   predict.bid{caller -> ALPH : amount}(amount, up, caller)
+}
+
+TxScript GameBid(game: Game, gameId: U256, amount: U256, up: Bool) {
+   let caller = callerAddress!()
+   game.bid{caller -> ALPH : amount}(gameId, amount, up)
 }

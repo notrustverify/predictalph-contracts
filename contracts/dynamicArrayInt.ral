@@ -1,11 +1,13 @@
 // Each element in the array is a 4 bytes integer
 // It's easy to adapt this for 8 bytes integer
 Abstract Contract DynamicArrayForInt() {
-    pub fn getArrayElem(array: ByteVec, index: U256) -> ByteVec {
-        assert!(size!(array) % 4 == 0, 0)
 
-        let offset = index * 4
-        let bytes = byteVecSlice!(array, offset, offset + 4)
-        return bytes
-    }
+   pub fn getArrayElem(array: ByteVec, index: U256) -> ByteVec {
+      assert!(size!(array) % 4 == 0, 0)
+
+      let offset = index * 4
+      let bytes = byteVecSlice!(array, offset, offset + 4)
+      return bytes
+   }
+
 }

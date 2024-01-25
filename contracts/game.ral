@@ -1,0 +1,144 @@
+Contract Game(
+   predictTemplateId: ByteVec,
+   punterTemplateId: ByteVec,
+   roundTemplateId: ByteVec,
+   mut operator: Address,
+   mut feesBasisPts: U256,
+   mut repeatEvery: U256,
+   mut claimedByAnyoneDelay: U256,
+   mut gameCounter: U256
+){
+
+   event BetBull(from: Address, epoch: U256, amount: U256, up: Bool)
+   event BetBear(from: Address, epoch: U256, amount: U256, up: Bool)
+   event RoundEnded(epoch: U256, price: U256)
+   event RoundStarted(epoch: U256, price: U256)
+   event Claimed(addressToClaim: Address, from: Address, epochs: ByteVec)
+   event GameCreated(contractId: ByteVec, gameId: U256)
+
+
+   enum ErrorCodes {
+      InvalidCaller = 300
+      GameNotExists = 301
+      GameAlreadyExists = 302
+   }
+
+   enum SubContractTypes {
+      Game = #03
+   }
+
+   
+   fn getGame(gameId: U256) -> (Predict) {
+      let gameContractId = subContractId!(SubContractTypes.Game ++ toByteVec!(gameId))
+      assert!(contractExists!(gameContractId), ErrorCodes.GameNotExists)
+    
+      return Predict(gameContractId)
+   }
+
+   @using(checkExternalCaller = true, updateFields = true)
+   pub fn createGame() -> (){
+      let caller = callerAddress!()
+
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+
+      let (encodedImmFields, encodedMutFields) = Predict.encodeFields!(selfContract!(), punterTemplateId, roundTemplateId,0,operator,feesBasisPts, repeatEvery, claimedByAnyoneDelay, 0)
+
+      let gameContractPath = SubContractTypes.Game ++ toByteVec!(gameCounter)
+      assert!(!contractExists!(subContractId!(gameContractPath)), ErrorCodes.GameAlreadyExists)
+
+      let contractId = copyCreateSubContract!{caller -> ALPH: 1 alph}(gameContractPath, predictTemplateId, encodedImmFields, encodedMutFields)
+
+      emit GameCreated(contractId, gameCounter)
+      gameCounter = gameCounter + 1
+
+   }
+
+   pub fn destroyPredict(gameId: U256) -> (){
+      let caller = callerAddress!()
+
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+      
+      let predict = getGame(gameId)
+      predict.destroy()
+
+   }
+
+
+   @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
+   pub fn startRound(gameId: U256, from: Address, price: U256) -> (){
+      let predict = getGame(gameId)
+      let caller = callerAddress!()
+
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+
+      let epoch = predict.startRound{caller -> ALPH: 1 alph}(from, price)
+
+      emit RoundStarted(epoch, price)
+   }
+
+   @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
+   pub fn endRound(gameId: U256, actualPrice: U256, immediatelyStart: Bool) -> (){
+      let predict = getGame(gameId)
+      let caller = callerAddress!()
+
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+
+
+      let epoch = predict.endRound{caller -> ALPH: 1 alph}(actualPrice, immediatelyStart)
+
+      emit RoundEnded(epoch, actualPrice)
+
+   }
+
+   @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = false)
+   pub fn bid(gameId: U256, amount: U256, up: Bool) ->(){
+      let predict = getGame(gameId)
+      let caller = callerAddress!()
+
+      let epoch = predict.bid{caller -> ALPH: amount}(amount, up, caller)
+
+      if (up){
+         emit BetBull(caller, epoch, amount, up)
+      } else {
+         emit BetBear(caller, epoch, amount, up)
+      }
+      
+   }
+
+   @using(checkExternalCaller = false)
+   pub fn withdraw(gameId: U256, arrayEpochIn: ByteVec, addressToClaim: Address) -> (){
+      let predict = getGame(gameId)
+      let caller = callerAddress!()
+
+      predict.withdraw(arrayEpochIn, addressToClaim)
+      
+      emit Claimed(addressToClaim, caller, arrayEpochIn)
+   }
+
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewRepeatEvery(newRecurrence: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      repeatEvery = newRecurrence
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewFees(basisPts: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      feesBasisPts = basisPts
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewOperator(newOperator: Address) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      operator = newOperator
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewClaimedByAnyone(newClaimedByAnyoneDelay: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      claimedByAnyoneDelay = newClaimedByAnyoneDelay
+   }
+
+
+}

@@ -140,10 +140,11 @@ export async function bid(
 export async function withdraw(
   signer: SignerProvider,
   predictalph: PredictalphInstance,
-  epochParticipation: string
+  epochParticipation: string,
+  addressToClaim: string
 ) {
   return await Withdraw.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, epochParticipation },
+    initialFields: { predictalph: predictalph.contractId, epochParticipation, addressToClaim: addressToClaim },
     attoAlphAmount: DUST_AMOUNT,
   });
 }

@@ -1,19 +1,19 @@
-TxScript Start(predictalph: Predictalph, price: U256) {
+TxScript Start(predict: Predict, price: U256) {
   let caller = callerAddress!() 
-    predictalph.startRound{callerAddress!() -> ALPH : 1 alph}(caller, price)
+  predict.startRound{callerAddress!() -> ALPH : 1 alph}(caller, price)
   }
 
-TxScript End(predictalph: Predictalph, price: U256, immediatelyStart: Bool) {
-  predictalph.endRound{callerAddress!() -> ALPH : 1 alph}(price, immediatelyStart)
+TxScript End(predict: Predict, price: U256, immediatelyStart: Bool) {
+   predict.endRound{callerAddress!() -> ALPH : 1 alph}(price, immediatelyStart)
 }
 
-TxScript DestroyRound(predictalph: Predictalph, arrayEpoch: ByteVec) {
-  predictalph.destroyRound(arrayEpoch)
+TxScript DestroyRound(predict: Predict, arrayEpoch: ByteVec) {
+   predict.destroyRound(arrayEpoch)
 }
 
-TxScript BoostRound(predictalph: Predictalph, amount: U256, epochToBoost: U256){
+TxScript BoostRound(predict: Predict, amount: U256, epochToBoost: U256){
   let caller = callerAddress!()
-  predictalph.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
+  predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
 }
 
 
