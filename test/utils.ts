@@ -20,6 +20,13 @@ import {
   BoostRound,
   Predict,
   Game,
+  CreateGame,
+  GameInstance,
+  GameStart,
+  GameBid,
+  GameBoost,
+  GameEnd,
+  GameWithdraw,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -36,11 +43,10 @@ export const defaultSigner = new PrivateKeyWallet({
 export async function deployGame(
    operator: Address,
    repeatEverySecond: number,
-   epoch: bigint
  ) {
    const punterTemplateId = await deployPunterTemplate();
    const roundTemplateId = await deployRoundTemplate();
-   const predictTemplateId = await deployPrediction(operator, repeatEverySecond, epoch);
+   const predictTemplateId = await deployPrediction();
 
    return await Game.deploy(defaultSigner, {
      initialFields: {
@@ -57,9 +63,6 @@ export async function deployGame(
  }
 
 export async function deployPrediction(
-  operator: Address,
-  repeatEverySecond: number,
-  epoch: bigint
 ) {
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
@@ -68,10 +71,10 @@ export async function deployPrediction(
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
        roundTemplateId: roundTemplateId.contractInstance.contractId,
-       epoch: epoch,
-       operator: operator,
+       epoch: 0n,
+       operator: ZERO_ADDRESS,
        feesBasisPts: 100n,
-       repeatEvery: BigInt(repeatEverySecond * 1000),
+       repeatEvery: BigInt(0 * 1000),
        claimedByAnyoneDelay: BigInt(1 * 1000),
        gameContract: "00",
        playerCounter: 0n
@@ -118,24 +121,41 @@ export async function deployRoundTemplate() {
 
 export async function startRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   price: bigint
 ) {
   return await Start.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, price: price },
+    initialFields: { predict: predictalph.contractId, price: price },
     attoAlphAmount: ONE_ALPH,
   });
 }
 
+
+export async function gameStartRound(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+   price: bigint
+ ) {
+   return await GameStart.execute(signer, {
+     initialFields: {
+        game: game.contractId,
+        gameId: gameId,
+        price: price,
+     },
+     attoAlphAmount: ONE_ALPH + DUST_AMOUNT,
+   });
+ }
+
 export async function endRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   price: bigint,
   immediatelyStart: boolean
 ) {
   return await End.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       price: price,
       immediatelyStart: immediatelyStart,
     },
@@ -143,15 +163,33 @@ export async function endRound(
   });
 }
 
+export async function gameEndRound(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+   price: bigint,
+   immediatelyStart: boolean
+ ) {
+   return await GameEnd.execute(signer, {
+     initialFields: {
+        game: game.contractId,
+        price: price,
+        immediatelyStart: immediatelyStart,
+        gameId: gameId
+     },
+     attoAlphAmount: ONE_ALPH,
+   });
+ }
+
 export async function bid(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   amount: bigint,
   up: boolean
 ) {
   return await Bid.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       amount: amount,
       up: up,
     },
@@ -159,15 +197,33 @@ export async function bid(
   });
 }
 
+export async function gameBid(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+   amount: bigint,
+   up: boolean
+ ) {
+   return await GameBid.execute(signer, {
+     initialFields: {
+        game: game.contractId,
+        amount: amount,
+        up: up,
+        gameId: 0n
+     },
+     attoAlphAmount: amount + 2n * DUST_AMOUNT,
+   });
+ }
+
 export async function withdraw(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   epochParticipation: string,
   addressToClaim: string
 ) {
   return await Withdraw.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       epochParticipation,
       addressToClaim,
     },
@@ -175,35 +231,100 @@ export async function withdraw(
   });
 }
 
+export async function gameWithdraw(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+   epochParticipation: string,
+   addressToClaim: string
+ ) {
+   return await GameWithdraw.execute(signer, {
+     initialFields: {
+        game: game.contractId,
+        gameId: gameId,
+        epochParticipation,
+        addressToClaim
+     },
+     attoAlphAmount: DUST_AMOUNT,
+   });
+ }
+
 export async function destroyRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   epochArray
 ) {
   return await DestroyRound.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       arrayEpoch: epochArray,
     },
     attoAlphAmount: DUST_AMOUNT,
   });
 }
 
+
+export async function gameDestroyRound(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+   epochArray,
+ ) {
+   return await GameDestroyRound.execute(signer, {
+     initialFields: {
+       game: game.contractId,
+       arrayEpoch: epochArray,
+     },
+     attoAlphAmount: DUST_AMOUNT,
+   });
+ }
+
 export async function boostRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   epoch: bigint,
   amount: bigint,
-  up: boolean
 ) {
   return await BoostRound.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       amount: amount,
       epochToBoost: epoch,
     },
     attoAlphAmount: amount + DUST_AMOUNT,
   });
+}
+
+export async function gameBoostRound(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+   epoch: bigint,
+   amount: bigint,
+ ) {
+   return await GameBoost.execute(signer, {
+     initialFields: {
+        game: game.contractId,
+        amount: amount,
+        epochToBoost: epoch,
+        gameId: gameId
+     },
+     attoAlphAmount: amount + DUST_AMOUNT,
+   });
+ }
+
+
+export async function createGame(
+   signer: SignerProvider,
+   game: GameInstance
+){
+   return await CreateGame.execute(signer, {
+      initialFields : {
+         game: game.contractId,
+
+      },
+      attoAlphAmount: ONE_ALPH + DUST_AMOUNT
+   })
 }
 
 async function waitTxConfirmed<T extends { txId: string }>(

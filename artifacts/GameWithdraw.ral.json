@@ -1,17 +1,23 @@
 {
   "version": "v2.8.0",
-  "name": "DestroyRound",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0108",
+  "name": "GameWithdraw",
+  "bytecodeTemplate": "01010300000007{1}{2}{3}0f0c{0}0107",
   "fieldsSig": {
     "names": [
-      "predict",
-      "arrayEpoch"
+      "game",
+      "gameId",
+      "epochParticipation",
+      "addressToClaim"
     ],
     "types": [
       "ByteVec",
-      "ByteVec"
+      "U256",
+      "ByteVec",
+      "Address"
     ],
     "isMutable": [
+      false,
+      false,
       false,
       false
     ]

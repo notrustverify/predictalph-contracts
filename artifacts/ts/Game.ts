@@ -68,6 +68,25 @@ export namespace GameTypes {
     contractId: HexString;
     gameId: bigint;
   }>;
+
+  export interface CallMethodTable {
+    getActualGameId: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<bigint>;
+    };
+  }
+  export type CallMethodParams<T extends keyof CallMethodTable> =
+    CallMethodTable[T]["params"];
+  export type CallMethodResult<T extends keyof CallMethodTable> =
+    CallMethodTable[T]["result"];
+  export type MultiCallParams = Partial<{
+    [Name in keyof CallMethodTable]: CallMethodTable[Name]["params"];
+  }>;
+  export type MultiCallResults<T extends MultiCallParams> = {
+    [MaybeName in keyof T]: MaybeName extends keyof CallMethodTable
+      ? CallMethodTable[MaybeName]["result"]
+      : undefined;
+  };
 }
 
 class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
@@ -102,6 +121,11 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getGame", params);
     },
+    getActualGameId: async (
+      params: Omit<TestContractParams<GameTypes.Fields, never>, "testArgs">
+    ): Promise<TestContractResult<bigint>> => {
+      return testMethod(this, "getActualGameId", params);
+    },
     createGame: async (
       params: Omit<TestContractParams<GameTypes.Fields, never>, "testArgs">
     ): Promise<TestContractResult<null>> => {
@@ -115,7 +139,7 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
     startRound: async (
       params: TestContractParams<
         GameTypes.Fields,
-        { gameId: bigint; from: Address; price: bigint }
+        { gameId: bigint; price: bigint }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "startRound", params);
@@ -143,6 +167,14 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdraw", params);
+    },
+    boostRound: async (
+      params: TestContractParams<
+        GameTypes.Fields,
+        { gameId: bigint; amount: bigint; epochToBoost: bigint }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "boostRound", params);
     },
     setNewRepeatEvery: async (
       params: TestContractParams<GameTypes.Fields, { newRecurrence: bigint }>
@@ -175,7 +207,7 @@ export const Game = new Factory(
   Contract.fromJson(
     GameContractJson,
     "",
-    "53f62dc5561d77b20f764374d9093db92d4a009fa0a6f8868968fbce41e67719"
+    "73c69c1b167c554f8db3aaaefe1b0db807112d5bc048ae73f0aca74e0f3cd72f"
   )
 );
 
@@ -283,5 +315,30 @@ export class GameInstance extends ContractInstance {
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvents(Game.contract, this, options, fromCount);
+  }
+
+  methods = {
+    getActualGameId: async (
+      params?: GameTypes.CallMethodParams<"getActualGameId">
+    ): Promise<GameTypes.CallMethodResult<"getActualGameId">> => {
+      return callMethod(
+        Game,
+        this,
+        "getActualGameId",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+  };
+
+  async multicall<Calls extends GameTypes.MultiCallParams>(
+    calls: Calls
+  ): Promise<GameTypes.MultiCallResults<Calls>> {
+    return (await multicallMethods(
+      Game,
+      this,
+      calls,
+      getContractByCodeHash
+    )) as GameTypes.MultiCallResults<Calls>;
   }
 }

@@ -36,7 +36,15 @@ Contract Predict (
    }
 
 
-   fn getRoundByEpoch(epochToGet: ByteVec) -> (Round) {
+   fn getRoundByEpoch(epochToGet: U256) -> (Round) {
+      let roundContractId = subContractId!(SubContractTypes.Round ++ u256To4Byte!(epochToGet))
+      emit Debug(`Round contract id ${roundContractId}`)
+      assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
+
+      return Round(roundContractId)
+   }
+
+   fn getRoundByEpochByteVec(epochToGet: ByteVec) -> (Round) {
       let roundContractId = subContractId!(SubContractTypes.Round ++ epochToGet)
       emit Debug(`Round contract id ${roundContractId}`)
       assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
@@ -58,10 +66,9 @@ Contract Predict (
       let callerContract = callerContractId!()
       checkCaller!(caller == operator || caller == selfAddress!() || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
 
-      if (caller == selfAddress!()){
+      if (caller == selfAddress!() || callerContract == contractId!(gameContract) ){
          caller = from
       }
-
 
       let roundContractPath = SubContractTypes.Round ++ u256To4Byte!(epoch)
 
@@ -80,13 +87,17 @@ Contract Predict (
    }
 
    @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
-   pub fn endRound(actualPrice: U256, immediatelyStart: Bool) -> (U256) {
-      let caller = callerAddress!()
+   pub fn endRound(from: Address, actualPrice: U256, immediatelyStart: Bool) -> (U256) {
+      let mut caller = callerAddress!()
       let callerContract = callerContractId!()
 
       checkCaller!(caller == operator || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
 
-      let round = getRoundByEpoch(u256To4Byte!(epoch))
+      if (caller == selfAddress!() || callerContract == contractId!(gameContract) ){
+         caller = from
+      }
+
+      let round = getRoundByEpoch(epoch)
       let endRoundTimestamp = round.getEndRoundTime()
 
       assert!(endRoundTimestamp <= blockTimeStamp!(), ErrorCodes.RoundDidntEnd)
@@ -106,7 +117,7 @@ Contract Predict (
    pub fn bid(amount: U256, up: Bool, from: Address) -> (U256){
       let caller = from
 
-      let round = getRoundByEpoch(u256To4Byte!(epoch))
+      let round = getRoundByEpoch(epoch)
       let endRoundTimestamp = round.getEndRoundTime()
       let timestampNow = blockTimeStamp!()
       assert!(timestampNow < endRoundTimestamp, ErrorCodes.BidTimestampReached)
@@ -135,9 +146,13 @@ Contract Predict (
     }
 
    
-   @using(checkExternalCaller = false, updateFields = true)
-   pub fn withdraw(arrayEpochIn: ByteVec, addressToClaim: Address) -> () {
-      let caller = callerAddress!()
+   @using(checkExternalCaller = true, updateFields = true)
+   pub fn withdraw(from: Address, arrayEpochIn: ByteVec, addressToClaim: Address) -> () {
+      let callerContract = callerContractId!()
+      let caller = from
+
+      checkCaller!(from == callerAddress!() || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
+
       let timestampNow = blockTimeStamp!()
 
       for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
@@ -160,7 +175,7 @@ Contract Predict (
             let amountPunter = betInfoCaller.getAmountBid()
             let upBid = betInfoCaller.getBid()
 
-            let round = getRoundByEpoch(epochNumber)
+            let round = getRoundByEpochByteVec(epochNumber)
 
             // cannot claim if the round didnt end 
 
@@ -184,7 +199,7 @@ Contract Predict (
 
          let epochContractId = subContractId!(#00 ++ epochNumber)
          if (contractExists!(epochContractId)){
-            let round = getRoundByEpoch(epochNumber)
+            let round = getRoundByEpochByteVec(epochNumber)
             round.destroy()
          }
       }
@@ -203,11 +218,10 @@ Contract Predict (
    }
 
    @using(preapprovedAssets = true, checkExternalCaller = false)
-   pub fn boostRound(amount: U256, epochToBoost: U256) -> (){
-      let caller = callerAddress!()
-      let roundToBoost = getRoundByEpoch(u256To4Byte!(epochToBoost))
+   pub fn boostRound(from: Address, amount: U256, epochToBoost: U256) -> (){
+      let roundToBoost = getRoundByEpoch(epochToBoost)
 
-      roundToBoost.boost{caller -> ALPH: amount}(caller, amount)
+      roundToBoost.boost{from -> ALPH: amount}(from, amount)
    }
 
    @using(updateFields = true, checkExternalCaller = false)

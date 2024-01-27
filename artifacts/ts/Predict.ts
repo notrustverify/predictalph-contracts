@@ -80,6 +80,7 @@ export namespace PredictTypes {
     };
     endRound: {
       params: CallContractParams<{
+        from: Address;
         actualPrice: bigint;
         immediatelyStart: boolean;
       }>;
@@ -151,9 +152,14 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
       return testMethod(this, "getArrayElem", params);
     },
     getRoundByEpoch: async (
-      params: TestContractParams<PredictTypes.Fields, { epochToGet: HexString }>
+      params: TestContractParams<PredictTypes.Fields, { epochToGet: bigint }>
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getRoundByEpoch", params);
+    },
+    getRoundByEpochByteVec: async (
+      params: TestContractParams<PredictTypes.Fields, { epochToGet: HexString }>
+    ): Promise<TestContractResult<HexString>> => {
+      return testMethod(this, "getRoundByEpochByteVec", params);
     },
     getBetInfoByEpoch: async (
       params: TestContractParams<
@@ -174,7 +180,7 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
     endRound: async (
       params: TestContractParams<
         PredictTypes.Fields,
-        { actualPrice: bigint; immediatelyStart: boolean }
+        { from: Address; actualPrice: bigint; immediatelyStart: boolean }
       >
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "endRound", params);
@@ -190,7 +196,7 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
     withdraw: async (
       params: TestContractParams<
         PredictTypes.Fields,
-        { arrayEpochIn: HexString; addressToClaim: Address }
+        { from: Address; arrayEpochIn: HexString; addressToClaim: Address }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "withdraw", params);
@@ -208,7 +214,7 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
     boostRound: async (
       params: TestContractParams<
         PredictTypes.Fields,
-        { amount: bigint; epochToBoost: bigint }
+        { from: Address; amount: bigint; epochToBoost: bigint }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "boostRound", params);
@@ -243,8 +249,8 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
 export const Predict = new Factory(
   Contract.fromJson(
     PredictContractJson,
-    "=10+5=1-1=2-1=1-4+e=2-2+2f=2-2+8e=2-2+56=1-1+30=1-1=2-2+53=2-2+76=2+95=1+3=1+5=2+b=1-1=2-2+c5=2-2+d5=81-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=80-2+50=100+16047e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1494",
-    "806f2461b87aa0d552603ea5e6961a4317e29695599a288dc7e30bb383214a06"
+    "=10-4=4-2+84=2+9=1-1=3+64=1+d=1-3=2-2+9b=2-2+64=2-1+a=3-1+cb4=1+e6=2-2+f644064=1-3+16=1-3=1-3+26=81-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=80+5=1-1=112+16047e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1546",
+    "6a811bf2e7475006cb872be87b0c03dee8c4eeebbb579e1b9a9e6e766d27b950"
   )
 );
 

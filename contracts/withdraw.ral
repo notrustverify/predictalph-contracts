@@ -1,7 +1,8 @@
 TxScript Withdraw(predict: Predict, epochParticipation: ByteVec, addressToClaim: Address) {
-   predict.withdraw(epochParticipation, addressToClaim)
+   let caller = callerAddress!()
+   predict.withdraw(caller, epochParticipation, addressToClaim)
 }
 
-TxScript EventWithdraw(game: Game, gameId: U256 ,epochParticipation: ByteVec, addressToClaim: Address) {
+TxScript GameWithdraw(game: Game, gameId: U256, epochParticipation: ByteVec, addressToClaim: Address) {
    game.withdraw(gameId,epochParticipation, addressToClaim)
 }

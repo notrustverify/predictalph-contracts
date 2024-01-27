@@ -1,0 +1,20 @@
+TxScript CreateGame(game: Game) {
+   let caller = callerAddress!()
+   game.createGame{caller -> ALPH : 1 alph}()
+}
+
+TxScript GameDestroyRound(game: Game, gameId: U256) {
+   game.destroyPredict(gameId)
+}
+
+TxScript GameStart(game: Game, gameId: U256, price: U256) {
+   game.startRound{callerAddress!() -> ALPH : 1 alph}(gameId, price)
+}
+
+TxScript GameEnd(game: Game, gameId: U256, price: U256, immediatelyStart: Bool) {
+   game.endRound{callerAddress!() -> ALPH : 1 alph}(gameId, price, immediatelyStart)
+}
+
+TxScript GameBoost(game: Game, gameId: U256, amount: U256, epochToBoost: U256) {
+   game.boostRound{callerAddress!() -> ALPH : amount}(gameId, amount, epochToBoost)
+}

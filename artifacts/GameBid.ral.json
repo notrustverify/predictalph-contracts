@@ -1,7 +1,7 @@
 {
   "version": "v2.8.0",
   "name": "GameBid",
-  "bytecodeTemplate": "0101030001000cb417001600{2}a2{1}{2}{3}0f0c{0}0105",
+  "bytecodeTemplate": "0101030001000cb417001600{2}a2{1}{2}{3}0f0c{0}0106",
   "fieldsSig": {
     "names": [
       "game",

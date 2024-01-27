@@ -1,18 +1,15 @@
 {
   "version": "v2.8.0",
-  "name": "DestroyRound",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0108",
+  "name": "CreateGame",
+  "bytecodeTemplate": "01010300010009b41700160013c40de0b6b3a7640000a20c0c{0}0102",
   "fieldsSig": {
     "names": [
-      "predict",
-      "arrayEpoch"
+      "game"
     ],
     "types": [
-      "ByteVec",
       "ByteVec"
     ],
     "isMutable": [
-      false,
       false
     ]
   },

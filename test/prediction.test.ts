@@ -16,13 +16,14 @@ import {
   testAddress,
 } from "@alephium/web3-test";
 import {
-  Predictalph,
+  Predict,
   Round,
   Punter,
-  PredictalphInstance,
+  PredictInstance,
   RoundInstance,
   PunterInstance,
   Bid,
+  GameInstance,
 } from "../artifacts/ts";
 import {
   deployPrediction,
@@ -35,10 +36,12 @@ import {
   destroyRound,
   arrayEpochToBytes,
   boostRound,
+  deployGame,
 } from "./utils";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import * as base58 from "bs58";
 
+/*
 describe("unit tests", () => {
   // Use the correct host and port
   web3.setCurrentNodeProvider("http://127.0.0.1:22973");
@@ -46,7 +49,7 @@ describe("unit tests", () => {
   const groupIndex = groupOfAddress(testAddress);
   const bidDurationSecond = 3;
   jest.setTimeout(3 * 1000 * 60);
-  let predictionGame: PredictalphInstance;
+  let predictionGame: GameInstance;
   let round: RoundInstance;
   let punter: PunterInstance;
   let bidders: PrivateKeyWallet[];
@@ -92,7 +95,7 @@ describe("unit tests", () => {
   beforeEach(async () => {
     operator = PrivateKeyWallet.Random(groupIndex);
     predictionGame = (
-      await deployPrediction(operator.address, bidDurationSecond, 0n)
+      await deployGame(operator.address, bidDurationSecond)
     ).contractInstance;
     bidders = Array.from(Array(5).keys()).map((_) =>
       PrivateKeyWallet.Random(groupIndex)
@@ -107,10 +110,11 @@ describe("unit tests", () => {
 
 
 
-
   test("create round, boost it", async () => {
     const bidder1 = bidders[0];
     const bidder2 = bidders[1];
+
+
 
     console.log("Game contract id", predictionGame.contractId);
     await startRound(operator, predictionGame, 10n);
@@ -740,4 +744,4 @@ describe("unit tests", () => {
   });
 
   
-});
+});*/

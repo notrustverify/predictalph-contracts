@@ -13,10 +13,15 @@ import {
 } from "@alephium/web3";
 import { default as BidScriptJson } from "../Bid.ral.json";
 import { default as BoostRoundScriptJson } from "../BoostRound.ral.json";
+import { default as CreateGameScriptJson } from "../CreateGame.ral.json";
 import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
-import { default as EventWithdrawScriptJson } from "../EventWithdraw.ral.json";
 import { default as GameBidScriptJson } from "../GameBid.ral.json";
+import { default as GameBoostScriptJson } from "../GameBoost.ral.json";
+import { default as GameDestroyRoundScriptJson } from "../GameDestroyRound.ral.json";
+import { default as GameEndScriptJson } from "../GameEnd.ral.json";
+import { default as GameStartScriptJson } from "../GameStart.ral.json";
+import { default as GameWithdrawScriptJson } from "../GameWithdraw.ral.json";
 import { default as NewIntervalScriptJson } from "../NewInterval.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
 import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
@@ -31,6 +36,9 @@ export const BoostRound = new ExecutableScript<{
   amount: bigint;
   epochToBoost: bigint;
 }>(Script.fromJson(BoostRoundScriptJson));
+export const CreateGame = new ExecutableScript<{ game: HexString }>(
+  Script.fromJson(CreateGameScriptJson)
+);
 export const DestroyRound = new ExecutableScript<{
   predict: HexString;
   arrayEpoch: HexString;
@@ -40,18 +48,39 @@ export const End = new ExecutableScript<{
   price: bigint;
   immediatelyStart: boolean;
 }>(Script.fromJson(EndScriptJson));
-export const EventWithdraw = new ExecutableScript<{
-  game: HexString;
-  gameId: bigint;
-  epochParticipation: HexString;
-  addressToClaim: Address;
-}>(Script.fromJson(EventWithdrawScriptJson));
 export const GameBid = new ExecutableScript<{
   game: HexString;
   gameId: bigint;
   amount: bigint;
   up: boolean;
 }>(Script.fromJson(GameBidScriptJson));
+export const GameBoost = new ExecutableScript<{
+  game: HexString;
+  gameId: bigint;
+  amount: bigint;
+  epochToBoost: bigint;
+}>(Script.fromJson(GameBoostScriptJson));
+export const GameDestroyRound = new ExecutableScript<{
+  game: HexString;
+  gameId: bigint;
+}>(Script.fromJson(GameDestroyRoundScriptJson));
+export const GameEnd = new ExecutableScript<{
+  game: HexString;
+  gameId: bigint;
+  price: bigint;
+  immediatelyStart: boolean;
+}>(Script.fromJson(GameEndScriptJson));
+export const GameStart = new ExecutableScript<{
+  game: HexString;
+  gameId: bigint;
+  price: bigint;
+}>(Script.fromJson(GameStartScriptJson));
+export const GameWithdraw = new ExecutableScript<{
+  game: HexString;
+  gameId: bigint;
+  epochParticipation: HexString;
+  addressToClaim: Address;
+}>(Script.fromJson(GameWithdrawScriptJson));
 export const NewInterval = new ExecutableScript<{
   predict: HexString;
   newRecurrence: bigint;

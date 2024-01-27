@@ -1,7 +1,7 @@
 {
   "version": "v2.8.0",
   "name": "Bid",
-  "bytecodeTemplate": "0101030001000db417001600{1}a2{1}{2}16000f0d{0}010518",
+  "bytecodeTemplate": "0101030001000db417001600{1}a2{1}{2}16000f0d{0}010618",
   "fieldsSig": {
     "names": [
       "predict",

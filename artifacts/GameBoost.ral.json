@@ -1,17 +1,23 @@
 {
   "version": "v2.8.0",
-  "name": "DestroyRound",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0108",
+  "name": "GameBoost",
+  "bytecodeTemplate": "0101030000000ab4{2}a2{1}{2}{3}0f0c{0}0108",
   "fieldsSig": {
     "names": [
-      "predict",
-      "arrayEpoch"
+      "game",
+      "gameId",
+      "amount",
+      "epochToBoost"
     ],
     "types": [
       "ByteVec",
-      "ByteVec"
+      "U256",
+      "U256",
+      "U256"
     ],
     "isMutable": [
+      false,
+      false,
       false,
       false
     ]

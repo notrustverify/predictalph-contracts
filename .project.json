@@ -18,14 +18,21 @@
     },
     "BoostRound": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "308e6e3b9871e0bbb312f9024f826460d86e80e62b12ba8a4e52d3a4df2a2029",
+      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "CreateGame": {
+      "sourceFile": "actions.ral",
+      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "DestroyRound": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "308e6e3b9871e0bbb312f9024f826460d86e80e62b12ba8a4e52d3a4df2a2029",
+      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -39,28 +46,56 @@
     },
     "End": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "308e6e3b9871e0bbb312f9024f826460d86e80e62b12ba8a4e52d3a4df2a2029",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "EventWithdraw": {
-      "sourceFile": "withdraw.ral",
-      "sourceCodeHash": "7c4697792d7a3f682cd5c6c0f7dfe13e9dfa094eabe2e612f2d059d75aea1466",
+      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Game": {
       "sourceFile": "game.ral",
-      "sourceCodeHash": "1cdcafe01e17c4214492b34cbfeb5fc365707205dbbee20e4fdb1df7eabb716a",
+      "sourceCodeHash": "e7549c0bb052293cac73ad53e2a0fbe6e78df50f4e20b72e3b97010bda213fc6",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "53f62dc5561d77b20f764374d9093db92d4a009fa0a6f8868968fbce41e67719",
+      "codeHashDebug": "73c69c1b167c554f8db3aaaefe1b0db807112d5bc048ae73f0aca74e0f3cd72f",
       "warnings": []
     },
     "GameBid": {
       "sourceFile": "bid.ral",
       "sourceCodeHash": "76447d643755d9faf068793cdcf63eb29944ab84f05ceafbf1d3b33e33014ad7",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "GameBoost": {
+      "sourceFile": "actions.ral",
+      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "GameDestroyRound": {
+      "sourceFile": "actions.ral",
+      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "GameEnd": {
+      "sourceFile": "actions.ral",
+      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "GameStart": {
+      "sourceFile": "actions.ral",
+      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "GameWithdraw": {
+      "sourceFile": "withdraw.ral",
+      "sourceCodeHash": "774a2cff1ef6c220d5c0d951fc52dd2a68878b8f45cfed5eba8c0676b1d23241",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -74,9 +109,9 @@
     },
     "Predict": {
       "sourceFile": "predict.ral",
-      "sourceCodeHash": "c0487317af726b21862f5fd48450efbaae5c09c72f3a0016a74ea0836cd603d9",
-      "bytecodeDebugPatch": "=10+5=1-1=2-1=1-4+e=2-2+2f=2-2+8e=2-2+56=1-1+30=1-1=2-2+53=2-2+76=2+95=1+3=1+5=2+b=1-1=2-2+c5=2-2+d5=81-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=80-2+50=100+16047e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1494",
-      "codeHashDebug": "806f2461b87aa0d552603ea5e6961a4317e29695599a288dc7e30bb383214a06",
+      "sourceCodeHash": "21ac2623690db64fa157416ae00c26aecfa3c88ddec380f3b52778b7339a1cd0",
+      "bytecodeDebugPatch": "=10-4=4-2+84=2+9=1-1=3+64=1+d=1-3=2-2+9b=2-2+64=2-1+a=3-1+cb4=1+e6=2-2+f644064=1-3+16=1-3=1-3+26=81-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=80+5=1-1=112+16047e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1546",
+      "codeHashDebug": "6a811bf2e7475006cb872be87b0c03dee8c4eeebbb579e1b9a9e6e766d27b950",
       "warnings": []
     },
     "Punter": {
@@ -95,14 +130,14 @@
     },
     "Start": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "308e6e3b9871e0bbb312f9024f826460d86e80e62b12ba8a4e52d3a4df2a2029",
+      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Withdraw": {
       "sourceFile": "withdraw.ral",
-      "sourceCodeHash": "7c4697792d7a3f682cd5c6c0f7dfe13e9dfa094eabe2e612f2d059d75aea1466",
+      "sourceCodeHash": "774a2cff1ef6c220d5c0d951fc52dd2a68878b8f45cfed5eba8c0676b1d23241",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
