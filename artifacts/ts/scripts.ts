@@ -18,11 +18,13 @@ import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
 import { default as GameBidScriptJson } from "../GameBid.ral.json";
 import { default as GameBoostScriptJson } from "../GameBoost.ral.json";
+import { default as GameDestroyPredictionScriptJson } from "../GameDestroyPrediction.ral.json";
 import { default as GameDestroyRoundScriptJson } from "../GameDestroyRound.ral.json";
 import { default as GameEndScriptJson } from "../GameEnd.ral.json";
 import { default as GameStartScriptJson } from "../GameStart.ral.json";
 import { default as GameWithdrawScriptJson } from "../GameWithdraw.ral.json";
 import { default as NewIntervalScriptJson } from "../NewInterval.ral.json";
+import { default as NewOperatorScriptJson } from "../NewOperator.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
 import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
 
@@ -36,9 +38,12 @@ export const BoostRound = new ExecutableScript<{
   amount: bigint;
   epochToBoost: bigint;
 }>(Script.fromJson(BoostRoundScriptJson));
-export const CreateGame = new ExecutableScript<{ game: HexString }>(
-  Script.fromJson(CreateGameScriptJson)
-);
+export const CreateGame = new ExecutableScript<{
+  game: HexString;
+  feesBasisPts: bigint;
+  repeatEvery: bigint;
+  claimedByAnyoneDelay: bigint;
+}>(Script.fromJson(CreateGameScriptJson));
 export const DestroyRound = new ExecutableScript<{
   predict: HexString;
   arrayEpoch: HexString;
@@ -60,9 +65,14 @@ export const GameBoost = new ExecutableScript<{
   amount: bigint;
   epochToBoost: bigint;
 }>(Script.fromJson(GameBoostScriptJson));
+export const GameDestroyPrediction = new ExecutableScript<{
+  game: HexString;
+  gameId: bigint;
+}>(Script.fromJson(GameDestroyPredictionScriptJson));
 export const GameDestroyRound = new ExecutableScript<{
   game: HexString;
   gameId: bigint;
+  arrayEpoch: HexString;
 }>(Script.fromJson(GameDestroyRoundScriptJson));
 export const GameEnd = new ExecutableScript<{
   game: HexString;
@@ -85,6 +95,10 @@ export const NewInterval = new ExecutableScript<{
   predict: HexString;
   newRecurrence: bigint;
 }>(Script.fromJson(NewIntervalScriptJson));
+export const NewOperator = new ExecutableScript<{
+  predict: HexString;
+  newOperatorAddress: Address;
+}>(Script.fromJson(NewOperatorScriptJson));
 export const Start = new ExecutableScript<{
   predict: HexString;
   price: bigint;

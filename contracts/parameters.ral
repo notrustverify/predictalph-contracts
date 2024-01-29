@@ -1,3 +1,7 @@
 TxScript NewInterval(predict: Predict, newRecurrence: U256){
    predict.setNewRepeatEvery(newRecurrence)
 }
+
+TxScript NewOperator(predict: Predict, newOperatorAddress: Address){
+   predict.setNewOperator(newOperatorAddress)
+}

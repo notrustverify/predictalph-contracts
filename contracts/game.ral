@@ -3,9 +3,6 @@ Contract Game(
    punterTemplateId: ByteVec,
    roundTemplateId: ByteVec,
    mut operator: Address,
-   mut feesBasisPts: U256,
-   mut repeatEvery: U256,
-   mut claimedByAnyoneDelay: U256,
    mut gameCounter: U256
 ){
 
@@ -41,7 +38,7 @@ Contract Game(
    }
 
    @using(checkExternalCaller = true, updateFields = true, preapprovedAssets = true)
-   pub fn createGame() -> (){
+   pub fn createGame(feesBasisPts: U256, repeatEvery: U256, claimedByAnyoneDelay: U256) -> (){
       let caller = callerAddress!()
 
       checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
@@ -65,6 +62,16 @@ Contract Game(
       
       let predict = getGame(gameId)
       predict.destroy()
+
+   }
+
+   pub fn destroyRound(gameId: U256, epochArray: ByteVec) -> (){
+      let caller = callerAddress!()
+
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+      
+      let predict = getGame(gameId)
+      predict.destroyRound(epochArray)
 
    }
 
@@ -130,28 +137,10 @@ Contract Game(
    }
 
    @using(updateFields = true, checkExternalCaller = false)
-   pub fn setNewRepeatEvery(newRecurrence: U256) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
-      repeatEvery = newRecurrence
-   }
-
-   @using(updateFields = true, checkExternalCaller = false)
-   pub fn setNewFees(basisPts: U256) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
-      feesBasisPts = basisPts
-   }
-
-   @using(updateFields = true, checkExternalCaller = false)
    pub fn setNewOperator(newOperator: Address) -> (){
       checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
       operator = newOperator
+   
+
    }
-
-   @using(updateFields = true, checkExternalCaller = false)
-   pub fn setNewClaimedByAnyone(newClaimedByAnyoneDelay: U256) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
-      claimedByAnyoneDelay = newClaimedByAnyoneDelay
-   }
-
-
 }

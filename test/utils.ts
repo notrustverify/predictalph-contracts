@@ -4,6 +4,7 @@ import {
   ONE_ALPH,
   SignerProvider,
   groupOfAddress,
+  subContractId,
   web3,
 } from "@alephium/web3";
 import {
@@ -27,6 +28,10 @@ import {
   GameBoost,
   GameEnd,
   GameWithdraw,
+  GameDestroyRound,
+  NewOperator,
+  NewInterval,
+  GameDestroyPrediction,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -42,7 +47,6 @@ export const defaultSigner = new PrivateKeyWallet({
 
 export async function deployGame(
    operator: Address,
-   repeatEverySecond: number,
  ) {
    const punterTemplateId = await deployPunterTemplate();
    const roundTemplateId = await deployRoundTemplate();
@@ -51,9 +55,6 @@ export async function deployGame(
    return await Game.deploy(defaultSigner, {
      initialFields: {
         operator: operator,
-        feesBasisPts: 100n,
-        repeatEvery: BigInt(repeatEverySecond * 1000),
-        claimedByAnyoneDelay: BigInt(1 * 1000),
         predictTemplateId: predictTemplateId.contractInstance.contractId,
         punterTemplateId: punterTemplateId.contractInstance.contractId,
         roundTemplateId: roundTemplateId.contractInstance.contractId,
@@ -73,9 +74,9 @@ export async function deployPrediction(
        roundTemplateId: roundTemplateId.contractInstance.contractId,
        epoch: 0n,
        operator: ZERO_ADDRESS,
-       feesBasisPts: 100n,
-       repeatEvery: BigInt(0 * 1000),
-       claimedByAnyoneDelay: BigInt(1 * 1000),
+       feesBasisPts: 0n,
+       repeatEvery: 0n,
+       claimedByAnyoneDelay: 0n,
        gameContract: "00",
        playerCounter: 0n
     },
@@ -268,16 +269,32 @@ export async function gameDestroyRound(
    signer: SignerProvider,
    game: GameInstance,
    gameId: bigint,
-   epochArray,
+   epochArray
  ) {
    return await GameDestroyRound.execute(signer, {
      initialFields: {
        game: game.contractId,
+       gameId: gameId,
        arrayEpoch: epochArray,
+      },
+     attoAlphAmount: DUST_AMOUNT,
+   });
+}
+
+export async function gameDestroyPrediction(
+   signer: SignerProvider,
+   game: GameInstance,
+   gameId: bigint,
+ ) {
+   return await GameDestroyPrediction.execute(signer, {
+     initialFields: {
+       game: game.contractId,
+       gameId: gameId
      },
      attoAlphAmount: DUST_AMOUNT,
    });
  }
+
 
 export async function boostRound(
   signer: SignerProvider,
@@ -314,14 +331,51 @@ export async function gameBoostRound(
  }
 
 
+export async function changeOperator(
+   signer: SignerProvider,
+   predict: PredictInstance,
+   newOperator: string
+
+){
+   return await NewOperator.execute(signer, {
+      initialFields : {
+         predict: predict.contractId,
+         newOperatorAddress: newOperator
+      },
+      attoAlphAmount: DUST_AMOUNT
+   })
+}
+
+
+export async function changeInterval(
+   signer: SignerProvider,
+   predict: PredictInstance,
+   newRecurrence: bigint
+
+){
+   return await NewInterval.execute(signer, {
+      initialFields : {
+         predict: predict.contractId,
+         newRecurrence: newRecurrence
+      },
+      attoAlphAmount: DUST_AMOUNT
+   })
+}
+
+
 export async function createGame(
    signer: SignerProvider,
-   game: GameInstance
+   game: GameInstance,
+   feesBasisPts: bigint,
+   repeatEvery: bigint,
+   claimedByAnyoneDelay: bigint
 ){
    return await CreateGame.execute(signer, {
       initialFields : {
          game: game.contractId,
-
+         feesBasisPts: feesBasisPts,
+         repeatEvery: repeatEvery,
+         claimedByAnyoneDelay: claimedByAnyoneDelay
       },
       attoAlphAmount: ONE_ALPH + DUST_AMOUNT
    })

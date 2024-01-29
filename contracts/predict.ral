@@ -62,25 +62,18 @@ Contract Predict (
 
    @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
    pub fn startRound(from: Address, price: U256) -> (U256){
-      let mut caller = callerAddress!()
-      let callerContract = callerContractId!()
-      checkCaller!(caller == operator || caller == selfAddress!() || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
-
-      if (caller == selfAddress!() || callerContract == contractId!(gameContract) ){
-         caller = from
-      }
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)) || caller == selfAddress!() , ErrorCodes.InvalidCaller)
 
       let roundContractPath = SubContractTypes.Round ++ u256To4Byte!(epoch)
 
       assert!(!contractExists!(subContractId!(roundContractPath)), ErrorCodes.RoundAlreadyRunning)
-      emit Debug(`Round contract id ${roundContractPath}`)
-      emit Debug(`Actual epoch is ${epoch} with start price ${price}`)
 
       let bidTimestampEnd = blockTimeStamp!() + repeatEvery
       let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price,feesBasisPts,bidTimestampEnd, operator,false, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0)
 
 
-      copyCreateSubContract!{caller -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
+      copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
       emit RoundStarted(epoch, price)
 
       return epoch
@@ -88,14 +81,8 @@ Contract Predict (
 
    @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
    pub fn endRound(from: Address, actualPrice: U256, immediatelyStart: Bool) -> (U256) {
-      let mut caller = callerAddress!()
-      let callerContract = callerContractId!()
-
-      checkCaller!(caller == operator || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
-
-      if (caller == selfAddress!() || callerContract == contractId!(gameContract) ){
-         caller = from
-      }
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
 
       let round = getRoundByEpoch(epoch)
       let endRoundTimestamp = round.getEndRoundTime()
@@ -108,8 +95,9 @@ Contract Predict (
       epoch = epoch + 1
 
       if (immediatelyStart){
-         startRound{ caller -> ALPH: 1 alph}(caller, actualPrice)
+         startRound{from -> ALPH: 1 alph}(from, actualPrice)
       }
+
       return epoch
     }
 
@@ -148,10 +136,7 @@ Contract Predict (
    
    @using(checkExternalCaller = true, updateFields = true)
    pub fn withdraw(from: Address, arrayEpochIn: ByteVec, addressToClaim: Address) -> () {
-      let callerContract = callerContractId!()
-      let caller = from
-
-      checkCaller!(from == callerAddress!() || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
+      checkCaller!(from == callerAddress!() || callerAddress!() == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
 
       let timestampNow = blockTimeStamp!()
 
@@ -168,7 +153,7 @@ Contract Predict (
             let addressPunter = betInfoCaller.getAddress()
             let canBeClaimedAt = betInfoCaller.getClaimedByAnyone()
             
-            if(addressToClaim != caller){
+            if(addressToClaim != from){
                assert!(timestampNow > canBeClaimedAt, ErrorCodes.CannotBeClaimedYet)
             }
 
@@ -180,11 +165,11 @@ Contract Predict (
             // cannot claim if the round didnt end 
 
             round.userClaimRewards(addressToClaim, amountPunter, upBid)
-            betInfoCaller.destroy(caller)
+            betInfoCaller.destroy(from)
 
             playerCounter = playerCounter - 1 
             // emit who call and with and which punter it concerned
-            emit Claimed(addressPunter, caller, amountPunter, u256From4Byte!(epochNumber))
+            emit Claimed(addressPunter, from, amountPunter, u256From4Byte!(epochNumber))
          }
       }
 
@@ -192,7 +177,8 @@ Contract Predict (
 
 
    pub fn destroyRound(epochArray: ByteVec) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
 
       for (let mut index = 0; index < size!(epochArray)/4; index = index + 1) {
          let epochNumber = getArrayElem(epochArray, index)
@@ -209,8 +195,7 @@ Contract Predict (
    @using(assetsInContract = true)
    pub fn destroy() -> (){
       let caller = callerAddress!()
-      let callerContract = callerContractId!()
-      checkCaller!(caller == operator || callerContract == contractId!(gameContract), ErrorCodes.InvalidCaller)
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
 
       assert!(playerCounter <= 0, ErrorCodes.NotAllPlayerClaimed)
 
@@ -226,25 +211,33 @@ Contract Predict (
 
    @using(updateFields = true, checkExternalCaller = false)
    pub fn setNewRepeatEvery(newRecurrence: U256) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
+
       repeatEvery = newRecurrence
    }
 
    @using(updateFields = true, checkExternalCaller = false)
    pub fn setNewFees(basisPts: U256) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
+      
       feesBasisPts = basisPts
    }
 
    @using(updateFields = true, checkExternalCaller = false)
    pub fn setNewOperator(newOperator: Address) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
+
       operator = newOperator
    }
 
    @using(updateFields = true, checkExternalCaller = false)
    pub fn setNewClaimedByAnyone(newClaimedByAnyoneDelay: U256) -> (){
-      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == contractIdToAddress!(contractId!(gameContract)), ErrorCodes.InvalidCaller)
+
       claimedByAnyoneDelay = newClaimedByAnyoneDelay
    }
 

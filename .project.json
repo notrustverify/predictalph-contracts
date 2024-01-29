@@ -18,21 +18,21 @@
     },
     "BoostRound": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
+      "sourceCodeHash": "1d89ce7f9903a288bdbd1ba88d9aa73f48225c58300c032d0a701a98a8c38ad6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "CreateGame": {
       "sourceFile": "actions.ral",
-      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "sourceCodeHash": "c67e9c01b5b7e14d88d4511ab03d680986ca6adaa5311f3a4f9c3eff3249239c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "DestroyRound": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
+      "sourceCodeHash": "1d89ce7f9903a288bdbd1ba88d9aa73f48225c58300c032d0a701a98a8c38ad6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -46,16 +46,16 @@
     },
     "End": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
+      "sourceCodeHash": "1d89ce7f9903a288bdbd1ba88d9aa73f48225c58300c032d0a701a98a8c38ad6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Game": {
       "sourceFile": "game.ral",
-      "sourceCodeHash": "e7549c0bb052293cac73ad53e2a0fbe6e78df50f4e20b72e3b97010bda213fc6",
+      "sourceCodeHash": "2723421ce187430ee406562a50d73f9dd87483c8471ad57d08d287f15ea2496e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "73c69c1b167c554f8db3aaaefe1b0db807112d5bc048ae73f0aca74e0f3cd72f",
+      "codeHashDebug": "9afab44a232ba739983bd6187de993f021d3fa1e7ba8bde336980e69cb7f0daa",
       "warnings": []
     },
     "GameBid": {
@@ -67,28 +67,35 @@
     },
     "GameBoost": {
       "sourceFile": "actions.ral",
-      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "sourceCodeHash": "c67e9c01b5b7e14d88d4511ab03d680986ca6adaa5311f3a4f9c3eff3249239c",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "GameDestroyPrediction": {
+      "sourceFile": "actions.ral",
+      "sourceCodeHash": "c67e9c01b5b7e14d88d4511ab03d680986ca6adaa5311f3a4f9c3eff3249239c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "GameDestroyRound": {
       "sourceFile": "actions.ral",
-      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "sourceCodeHash": "c67e9c01b5b7e14d88d4511ab03d680986ca6adaa5311f3a4f9c3eff3249239c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "GameEnd": {
       "sourceFile": "actions.ral",
-      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "sourceCodeHash": "c67e9c01b5b7e14d88d4511ab03d680986ca6adaa5311f3a4f9c3eff3249239c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "GameStart": {
       "sourceFile": "actions.ral",
-      "sourceCodeHash": "07b0d0bfc904f364d1102576ac26e1970f38f691980f32f387cfa5546629e8c5",
+      "sourceCodeHash": "c67e9c01b5b7e14d88d4511ab03d680986ca6adaa5311f3a4f9c3eff3249239c",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -102,16 +109,23 @@
     },
     "NewInterval": {
       "sourceFile": "parameters.ral",
-      "sourceCodeHash": "b063945570ffc351c13b96e8ca6939c58b844133f07b63170da688e0fb6e30a0",
+      "sourceCodeHash": "31e647cc342571772f98290ccd37017ff0d23adcec4805fd1a3cfa26a77deec2",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "NewOperator": {
+      "sourceFile": "parameters.ral",
+      "sourceCodeHash": "31e647cc342571772f98290ccd37017ff0d23adcec4805fd1a3cfa26a77deec2",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "Predict": {
       "sourceFile": "predict.ral",
-      "sourceCodeHash": "21ac2623690db64fa157416ae00c26aecfa3c88ddec380f3b52778b7339a1cd0",
-      "bytecodeDebugPatch": "=10-4=4-2+84=2+9=1-1=3+64=1+d=1-3=2-2+9b=2-2+64=2-1+a=3-1+cb4=1+e6=2-2+f644064=1-3+16=1-3=1-3+26=81-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=80+5=1-1=112+16047e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1546",
-      "codeHashDebug": "6a811bf2e7475006cb872be87b0c03dee8c4eeebbb579e1b9a9e6e766d27b950",
+      "sourceCodeHash": "361f6b2561de2b59b87ac1b244b4fb7446052e35f4366a77f2d9f7533b05d885",
+      "bytecodeDebugPatch": "=10-2+54=2-1+8=3-1+9=2-2+11=3-1+6=3-1+3=3-1+f=3-1+4=3-1+6=3-1+8=3-1+9=3-1+b=3-1+d=3-1+e=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1764",
+      "codeHashDebug": "6a263f11a1b9d725c3bb9bc3edca80a06441127abfb70da4261cc242cba9871f",
       "warnings": []
     },
     "Punter": {
@@ -130,7 +144,7 @@
     },
     "Start": {
       "sourceFile": "roundState.ral",
-      "sourceCodeHash": "4312453a253a0d09d091a773b6a217688aa374c9ac3873836d7f7d345a04a86e",
+      "sourceCodeHash": "1d89ce7f9903a288bdbd1ba88d9aa73f48225c58300c032d0a701a98a8c38ad6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

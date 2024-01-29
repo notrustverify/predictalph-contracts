@@ -1,10 +1,14 @@
-TxScript CreateGame(game: Game) {
+TxScript CreateGame(game: Game,feesBasisPts: U256, repeatEvery: U256, claimedByAnyoneDelay: U256 ) {
    let caller = callerAddress!()
-   game.createGame{caller -> ALPH : 1 alph}()
+   game.createGame{caller -> ALPH : 1 alph}(feesBasisPts, repeatEvery, claimedByAnyoneDelay)
 }
 
-TxScript GameDestroyRound(game: Game, gameId: U256) {
+TxScript GameDestroyPrediction(game: Game, gameId: U256) {
    game.destroyPredict(gameId)
+}
+
+TxScript GameDestroyRound(game: Game, gameId: U256, arrayEpoch: ByteVec) {
+   game.destroyRound(gameId, arrayEpoch)
 }
 
 TxScript GameStart(game: Game, gameId: U256, price: U256) {

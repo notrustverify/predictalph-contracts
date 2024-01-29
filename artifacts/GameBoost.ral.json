@@ -1,7 +1,7 @@
 {
   "version": "v2.8.0",
   "name": "GameBoost",
-  "bytecodeTemplate": "0101030000000ab4{2}a2{1}{2}{3}0f0c{0}0108",
+  "bytecodeTemplate": "0101030000000ab4{2}a2{1}{2}{3}0f0c{0}0109",
   "fieldsSig": {
     "names": [
       "game",

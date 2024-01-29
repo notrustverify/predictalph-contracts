@@ -9,6 +9,7 @@ import {
   subContractId,
   fetchContractState,
   DUST_AMOUNT,
+  ZERO_ADDRESS,
 } from "@alephium/web3";
 import {
   expectAssertionError,
@@ -22,9 +23,7 @@ import {
   PredictInstance,
   RoundInstance,
   PunterInstance,
-  Bid,
   GameInstance,
-  GameBid,
 } from "../artifacts/ts";
 import {
   deployPrediction,
@@ -44,9 +43,14 @@ import {
   gameBoostRound,
   gameEndRound,
   gameWithdraw,
+  gameDestroyRound,
+  changeOperator,
+  changeInterval,
+  gameDestroyPrediction,
 } from "./utils";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import * as base58 from "bs58";
+import { getRoundContractId } from "../src/utils";
 
 describe("unit tests", () => {
   // Use the correct host and port
@@ -76,6 +80,12 @@ describe("unit tests", () => {
 
   function getPredictPath(gameId: bigint) {
     return "03" + gameId.toString(16).padStart(8, "0");
+  }
+
+  function getPredictObject(gameId: bigint) {
+    const contractId = getSubPredictContractId(getPredictPath(gameId));
+
+    return Predict.at(addressFromContractId(contractId));
   }
 
   async function checkRoundState(
@@ -127,8 +137,7 @@ describe("unit tests", () => {
 
   beforeEach(async () => {
     operator = PrivateKeyWallet.Random(groupIndex);
-    game = (await deployGame(operator.address, bidDurationSecond))
-      .contractInstance;
+    game = (await deployGame(operator.address)).contractInstance;
     bidders = Array.from(Array(5).keys()).map((_) =>
       PrivateKeyWallet.Random(groupIndex)
     );
@@ -145,13 +154,17 @@ describe("unit tests", () => {
     const bidder2 = bidders[1];
 
     // create a new prediction
-    await createGame(operator, game);
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(bidDurationSecond * 1000),
+      BigInt(120 * 1000)
+    );
 
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
     expect(numberGame).toEqual(1n);
-
-    console.log(gameState.fields);
 
     await gameStartRound(operator, game, 0n, 10n);
     await gameBid(bidder1, game, 0n, 9n * ONE_ALPH + ONE_ALPH, true);
@@ -173,11 +186,11 @@ describe("unit tests", () => {
     const rewardBaseCalAmount = roundState.fields.rewardBaseCalAmount;
     const rewardAmount = roundState.fields.rewardAmount;
     const priceEnd = roundState.fields.priceEnd;
-    const playerCounter = predictionState.fields.playerCounter
+    const playerCounter = predictionState.fields.playerCounter;
 
     //const bidder1State = getRoundBidder(bidder1.address, 0n);
     //console.log(bidder1State);
-    expect(playerCounter).toEqual(2n)
+    expect(playerCounter).toEqual(2n);
     expect(roundState.fields.feesBasisPts).toEqual(100n);
     expect(amountUp).toEqual(9n * ONE_ALPH);
     expect(amountDown).toEqual(11n * ONE_ALPH);
@@ -211,7 +224,6 @@ describe("unit tests", () => {
     );
 
     const roundStateWithdraw = await getRoundState(predictContractId, 0n);
-    console.log(roundStateWithdraw.fields);
 
     const totalAmountWithdraw = roundStateWithdraw.fields.totalAmount;
     const rewardBaseCalAmountWithdraw =
@@ -223,16 +235,189 @@ describe("unit tests", () => {
       ONE_ALPH + totalAmountWithdraw
     );
 
-    await destroyRound(operator, predictionGame, arrayEpochToBytes([0]));
+    await gameDestroyRound(operator, game, 0n, arrayEpochBytes);
+    await gameDestroyPrediction(operator, game, 0n);
     const exists = await contractExists(
-      addressFromContractId(
-        getSubContractIdByContractId(
-          predictContractId,
-          "00" +
-            (predictionState.fields.epoch - 1n).toString(16).padStart(8, "0")
-        )
-      )
+      addressFromContractId(predictContractId)
     );
     expect(exists).toEqual(false);
+  });
+
+  test("try to create a game not operator", async () => {
+    const bidder1 = bidders[0];
+
+    await expectAssertionError(
+      createGame(
+        bidder1,
+        game,
+        100n,
+        BigInt(bidDurationSecond * 1000),
+        BigInt(10 * 1000)
+      ),
+      game.address,
+      300
+    );
+  });
+
+  test("try to start end round direct call", async () => {
+    const bidder1 = bidders[0];
+
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(0.5 * 1000),
+      BigInt(10 * 1000)
+    );
+    const predictContractId = getSubPredictContractId(getPredictPath(0n));
+
+    await gameStartRound(operator, game, 0n, 10n);
+    await sleep(1 * 1000);
+
+    await expectAssertionError(
+      endRound(bidder1, getPredictObject(0n), 10n, true),
+      addressFromContractId(predictContractId),
+      3
+    );
+
+    
+    await endRound(operator, getPredictObject(0n), 10n, true)
+    const predictionState = await getPredictState(0n)
+
+    expect(predictionState.fields.epoch).toEqual(1n)
+
+  });
+
+  test("try to withdraw by another address, wait and claim", async () => {
+    const bidder1 = bidders[0];
+    const bidder2 = bidders[1];
+
+    // create a new prediction
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(bidDurationSecond * 1000),
+      BigInt((bidDurationSecond + 3) * 1000)
+    );
+
+    const gameState = await game.fetchState();
+    const numberGame = gameState.fields.gameCounter;
+    expect(numberGame).toEqual(1n);
+    const predictContractId = getSubPredictContractId(getPredictPath(0n));
+
+    await gameStartRound(operator, game, 0n, 10n);
+    await gameBid(bidder1, game, 0n, 9n * ONE_ALPH + ONE_ALPH, true);
+
+    await sleep((bidDurationSecond + 1) * 1000);
+    await gameEndRound(operator, game, 0n, 11n, true);
+
+    const arrayEpochBytes = arrayEpochToBytes([0]);
+
+    await expectAssertionError(
+      gameWithdraw(bidder2, game, 0n, arrayEpochBytes, bidder1.address),
+      addressFromContractId(predictContractId),
+      10
+    );
+
+    await sleep((bidDurationSecond + 2) * 1000);
+    await gameWithdraw(bidder2, game, 0n, arrayEpochBytes, bidder1.address);
+  });
+
+  test("try to destroy game not operator", async () => {
+    const bidder1 = bidders[0];
+
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(bidDurationSecond * 1000),
+      BigInt((bidDurationSecond + 3) * 1000)
+    );
+
+    await expectAssertionError(
+      gameDestroyPrediction(bidder1, game, 0n),
+      game.address,
+      300
+    );
+  });
+
+  test("try to destroy game where player still in", async () => {
+    const bidder1 = bidders[0];
+    const bidder2 = bidders[1];
+
+    // create a new prediction
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(bidDurationSecond * 1000),
+      BigInt((bidDurationSecond + 3) * 1000)
+    );
+
+    const gameState = await game.fetchState();
+    const numberGame = gameState.fields.gameCounter;
+    expect(numberGame).toEqual(1n);
+    const predictContractId = getSubPredictContractId(getPredictPath(0n));
+
+    await gameStartRound(operator, game, 0n, 10n);
+    await gameBid(bidder1, game, 0n, 9n * ONE_ALPH + ONE_ALPH, true);
+    await gameBid(bidder2, game, 0n, 9n * ONE_ALPH + ONE_ALPH, true);
+
+    await sleep((bidDurationSecond + 1) * 1000);
+    await gameEndRound(operator, game, 0n, 11n, true);
+
+    const predictionState = await getPredictState(0n);
+    expect(predictionState.fields.playerCounter).toEqual(2n);
+
+    await expectAssertionError(
+      gameDestroyRound(operator, game, 0n, arrayEpochToBytes([0])),
+      addressFromContractId(
+        getSubContractIdByContractId(predictContractId, getEpochPath(0n))
+      ),
+      101
+    );
+
+    await expectAssertionError(
+      gameDestroyPrediction(operator, game, 0n),
+      addressFromContractId(predictContractId),
+      11
+    );
+  });
+
+  test("change operator", async () => {
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(bidDurationSecond * 1000),
+      BigInt((bidDurationSecond + 3) * 1000)
+    );
+    await gameStartRound(operator, game, 0n, 10n);
+    const predictContract = getPredictObject(0n);
+
+    //await changeInterval(operator, predictContract, 1000n)
+    await changeOperator(operator, predictContract, ZERO_ADDRESS);
+    const predictionState = await getPredictState(0n);
+
+    expect(predictionState.fields.operator).toEqual(ZERO_ADDRESS);
+  });
+
+  test("change repeat every", async () => {
+    await createGame(
+      operator,
+      game,
+      100n,
+      BigInt(bidDurationSecond * 1000),
+      BigInt((bidDurationSecond + 3) * 1000)
+    );
+    await gameStartRound(operator, game, 0n, 10n);
+    const predictContract = getPredictObject(0n);
+
+    await changeInterval(operator, predictContract, 1000n);
+
+    const predictionState = await getPredictState(0n);
+
+    expect(predictionState.fields.repeatEvery).toEqual(1000n);
   });
 });

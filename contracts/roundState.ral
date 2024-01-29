@@ -1,11 +1,11 @@
 TxScript Start(predict: Predict, price: U256) {
   let caller = callerAddress!() 
-  predict.startRound{callerAddress!() -> ALPH : 1 alph}(caller, price)
+  predict.startRound{caller -> ALPH : 1 alph}(caller, price)
 }
 
 TxScript End(predict: Predict, price: U256, immediatelyStart: Bool) {
    let caller = callerAddress!()
-   predict.endRound{callerAddress!() -> ALPH : 1 alph}(caller, price, immediatelyStart)
+   predict.endRound{caller -> ALPH : 1 alph}(caller, price, immediatelyStart)
 }
 
 TxScript DestroyRound(predict: Predict, arrayEpoch: ByteVec) {

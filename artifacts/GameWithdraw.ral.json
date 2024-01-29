@@ -1,7 +1,7 @@
 {
   "version": "v2.8.0",
   "name": "GameWithdraw",
-  "bytecodeTemplate": "01010300000007{1}{2}{3}0f0c{0}0107",
+  "bytecodeTemplate": "01010300000007{1}{2}{3}0f0c{0}0108",
   "fieldsSig": {
     "names": [
       "game",

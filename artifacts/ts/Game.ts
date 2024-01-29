@@ -34,9 +34,6 @@ export namespace GameTypes {
     punterTemplateId: HexString;
     roundTemplateId: HexString;
     operator: Address;
-    feesBasisPts: bigint;
-    repeatEvery: bigint;
-    claimedByAnyoneDelay: bigint;
     gameCounter: bigint;
   };
 
@@ -127,7 +124,14 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
       return testMethod(this, "getActualGameId", params);
     },
     createGame: async (
-      params: Omit<TestContractParams<GameTypes.Fields, never>, "testArgs">
+      params: TestContractParams<
+        GameTypes.Fields,
+        {
+          feesBasisPts: bigint;
+          repeatEvery: bigint;
+          claimedByAnyoneDelay: bigint;
+        }
+      >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "createGame", params);
     },
@@ -135,6 +139,14 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
       params: TestContractParams<GameTypes.Fields, { gameId: bigint }>
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "destroyPredict", params);
+    },
+    destroyRound: async (
+      params: TestContractParams<
+        GameTypes.Fields,
+        { gameId: bigint; epochArray: HexString }
+      >
+    ): Promise<TestContractResult<null>> => {
+      return testMethod(this, "destroyRound", params);
     },
     startRound: async (
       params: TestContractParams<
@@ -176,28 +188,10 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "boostRound", params);
     },
-    setNewRepeatEvery: async (
-      params: TestContractParams<GameTypes.Fields, { newRecurrence: bigint }>
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "setNewRepeatEvery", params);
-    },
-    setNewFees: async (
-      params: TestContractParams<GameTypes.Fields, { basisPts: bigint }>
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "setNewFees", params);
-    },
     setNewOperator: async (
       params: TestContractParams<GameTypes.Fields, { newOperator: Address }>
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "setNewOperator", params);
-    },
-    setNewClaimedByAnyone: async (
-      params: TestContractParams<
-        GameTypes.Fields,
-        { newClaimedByAnyoneDelay: bigint }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "setNewClaimedByAnyone", params);
     },
   };
 }
@@ -207,7 +201,7 @@ export const Game = new Factory(
   Contract.fromJson(
     GameContractJson,
     "",
-    "73c69c1b167c554f8db3aaaefe1b0db807112d5bc048ae73f0aca74e0f3cd72f"
+    "9afab44a232ba739983bd6187de993f021d3fa1e7ba8bde336980e69cb7f0daa"
   )
 );
 
