@@ -1,6 +1,6 @@
 import { Deployer, DeployFunction, Network } from '@alephium/cli'
 import { Settings } from '../alephium.config'
-import { Predictalph } from '../artifacts/ts'
+import { Game } from '../artifacts/ts'
 import { ZERO_ADDRESS } from '@alephium/web3'
 
 const deployAuction: DeployFunction<Settings> = async (
@@ -13,23 +13,18 @@ const deployAuction: DeployFunction<Settings> = async (
 
   const punterTemplateId = deployer.getDeployContractResult('Punter')
   const roundTemplateId = deployer.getDeployContractResult('Round')
-
+  const predictTemplateId = deployer.getDeployContractResult('Predict')
 
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
   const settings = network.settings
-  const auction = await deployer.deployContract(Predictalph, {
+  const game = await deployer.deployContract(Game, {
     initialFields: {
-        punterTemplateId: punterTemplateId.contractInstance.contractId,
-        roundTemplateId: roundTemplateId.contractInstance.contractId,
-        epoch: 0n,
-        operator: deployer.account.address,
-        feesBasisPts: 100n,
-        //repeatEvery: BigInt(1800*1000),
-        repeatEvery: BigInt(60*1000),
-        claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC *1000)
-        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
-
+       predictTemplateId: predictTemplateId.contractInstance.contractId,
+       punterTemplateId: punterTemplateId.contractInstance.contractId,
+       roundTemplateId: roundTemplateId.contractInstance.contractId,
+       operator: deployer.account.address,
+       gameCounter: 0n
     },
 
   })
@@ -38,8 +33,10 @@ const deployAuction: DeployFunction<Settings> = async (
   console.log(`Punter contract address: ${punterTemplateId.contractInstance.address}`)
   console.log(`Round contract id: ${roundTemplateId.contractInstance.contractId}`)
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
-  console.log(`Prediction contract id: ${auction.contractInstance.contractId}`)
-  console.log(`Prediction contract address: ${auction.contractInstance.address}`)
+  console.log(`Predict contract id: ${predictTemplateId.contractInstance.contractId}`)
+  console.log(`Predict contract address: ${predictTemplateId.contractInstance.address}`)
+  console.log(`Game contract id: ${game.contractInstance.contractId}`)
+  console.log(`Game contract address: ${game.contractInstance.address}`)
 }
 
 export default deployAuction

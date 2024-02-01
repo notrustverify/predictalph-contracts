@@ -3,6 +3,7 @@ import {
   DUST_AMOUNT,
   ONE_ALPH,
   SignerProvider,
+  binToHex,
   groupOfAddress,
   subContractId,
   web3,
@@ -78,7 +79,8 @@ export async function deployPrediction(
        repeatEvery: 0n,
        claimedByAnyoneDelay: 0n,
        gameContract: "00",
-       playerCounter: 0n
+       playerCounter: 0n,
+       title: ""
     },
   });
 }
@@ -368,14 +370,16 @@ export async function createGame(
    game: GameInstance,
    feesBasisPts: bigint,
    repeatEvery: bigint,
-   claimedByAnyoneDelay: bigint
+   claimedByAnyoneDelay: bigint,
+   title: string
 ){
    return await CreateGame.execute(signer, {
       initialFields : {
          game: game.contractId,
          feesBasisPts: feesBasisPts,
          repeatEvery: repeatEvery,
-         claimedByAnyoneDelay: claimedByAnyoneDelay
+         claimedByAnyoneDelay: claimedByAnyoneDelay,
+         title: binToHex(new TextEncoder().encode(title))
       },
       attoAlphAmount: ONE_ALPH + DUST_AMOUNT
    })

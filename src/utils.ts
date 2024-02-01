@@ -10,10 +10,10 @@ import {
   web3,
 } from "@alephium/web3";
 import {
-  Predictalph,
+  Predict,
   Round,
   Punter,
-  PredictalphInstance,
+  PredictInstance,
   RoundInstance,
   PunterInstance,
   Start,
@@ -21,7 +21,7 @@ import {
   Bid,
   Withdraw,
   DestroyRound,
-  PredictalphTypes,
+  PredictTypes,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -37,83 +37,44 @@ export const defaultSigner = new PrivateKeyWallet({
   privateKey: testPrivateKey,
 });
 
-export async function deployPrediction(
-  operator: Address,
-  repeatEverySecond: number,
-  epoch: bigint
-) {
-  const punterTemplateId = await deployPunterTemplate();
-  const roundTemplateId = await deployRoundTemplate();
+function getSubPredictContractId(rootContractId: string, path: string, groupIndex: number) {
+   return subContractId(rootContractId, path, groupIndex);
+ }
 
-  return await Predictalph.deploy(defaultSigner, {
-    initialFields: {
-      punterTemplateId: punterTemplateId.contractInstance.contractId,
-      roundTemplateId: roundTemplateId.contractInstance.contractId,
-      epoch: epoch,
-      operator: operator,
-      feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: 0n,
-    },
-  });
-}
+function getSubContractIdByContractId(contractId: string, path: string, groupIndex: number) {
+   return subContractId(contractId, path, groupIndex);
+ }
 
-export async function deployPunterTemplate() {
-  return await Punter.deploy(defaultSigner, {
-    initialFields: {
-      prediction: "00",
-      punterAddress: ZERO_ADDRESS,
-      epoch: 0n,
-      upBid: false,
-      amountBid: 0n,
-      claimedByAnyoneAt: 0n,
-    },
-  });
-}
+function getPredictPath(gameId: bigint) {
+   return "03" + gameId.toString(16).padStart(8, "0");
+ }
 
-export async function deployRoundTemplate() {
-  return await Round.deploy(defaultSigner, {
-    initialFields: {
-      prediction: "00",
-      epoch: 0n,
-      priceStart: 0n,
-      feesBasisPts: 0n,
-      bidEndTimestamp: 0n,
-      operator: ZERO_ADDRESS,
-      rewardsComputed: false,
-      priceEnd: 0n,
-      totalAmount: 0n,
-      amountUp: 0n,
-      amountDown: 0n,
-      treasuryAmount: 0n,
-      rewardAmount: 0n,
-      rewardBaseCalAmount: 0n,
-      counterAttendees: 0n,
-      totalAmountBoost: 0n,
-    },
-  });
-}
+ export function getPredictObject(rootContractId: string, gameId: bigint, groupIndex: number) {
+   const contractId = getSubPredictContractId(rootContractId,getPredictPath(gameId), groupIndex);
+
+   return Predict.at(addressFromContractId(contractId));
+ }
 
 export async function startRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   price: bigint
 ) {
   return await Start.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, price: price },
+    initialFields: { predict: predictalph.contractId, price: price },
     attoAlphAmount: ONE_ALPH,
   });
 }
 
 export async function endRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   price: bigint,
   immediatelyStart: boolean
 ) {
   return await End.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       price: price,
       immediatelyStart: immediatelyStart,
     },
@@ -123,13 +84,13 @@ export async function endRound(
 
 export async function bid(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   amount: bigint,
   up: boolean
 ) {
   return await Bid.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       amount: amount,
       up: up,
     },
@@ -139,24 +100,24 @@ export async function bid(
 
 export async function withdraw(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   epochParticipation: string,
   addressToClaim: string
 ) {
   return await Withdraw.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, epochParticipation, addressToClaim: addressToClaim },
+    initialFields: { predict: predictalph.contractId, epochParticipation, addressToClaim: addressToClaim },
     attoAlphAmount: DUST_AMOUNT,
   });
 }
 
 export async function destroyRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictInstance,
   epochArray
 ) {
   return await DestroyRound.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       arrayEpoch: epochArray,
     },
     attoAlphAmount: DUST_AMOUNT,

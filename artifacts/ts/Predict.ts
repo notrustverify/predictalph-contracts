@@ -33,6 +33,7 @@ export namespace PredictTypes {
     gameContract: HexString;
     punterTemplateId: HexString;
     roundTemplateId: HexString;
+    title: HexString;
     epoch: bigint;
     operator: Address;
     feesBasisPts: bigint;
@@ -72,6 +73,10 @@ export namespace PredictTypes {
   export interface CallMethodTable {
     getArrayElem: {
       params: CallContractParams<{ array: HexString; index: bigint }>;
+      result: CallContractResult<HexString>;
+    };
+    getTitle: {
+      params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<HexString>;
     };
     startRound: {
@@ -169,6 +174,11 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
     ): Promise<TestContractResult<HexString>> => {
       return testMethod(this, "getBetInfoByEpoch", params);
     },
+    getTitle: async (
+      params: Omit<TestContractParams<PredictTypes.Fields, never>, "testArgs">
+    ): Promise<TestContractResult<HexString>> => {
+      return testMethod(this, "getTitle", params);
+    },
     startRound: async (
       params: TestContractParams<
         PredictTypes.Fields,
@@ -249,8 +259,8 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
 export const Predict = new Factory(
   Contract.fromJson(
     PredictContractJson,
-    "=10-2+54=2-1+8=3-1+9=2-2+11=3-1+6=3-1+3=3-1+f=3-1+4=3-1+6=3-1+8=3-1+9=3-1+b=3-1+d=3-1+e=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1764",
-    "6a263f11a1b9d725c3bb9bc3edca80a06441127abfb70da4261cc242cba9871f"
+    "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+7=3-1+3=3-1+f=3-1+4=3-1+6=3-1+8=3-1+a=3-1+c=3-1+d=3-1+f=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1782",
+    "edaf1e6b04edfe3993dbb0046a7b24e8131106aeb7c1cbaa02c8249280a02b47"
   )
 );
 
@@ -355,6 +365,17 @@ export class PredictInstance extends ContractInstance {
         this,
         "getArrayElem",
         params,
+        getContractByCodeHash
+      );
+    },
+    getTitle: async (
+      params?: PredictTypes.CallMethodParams<"getTitle">
+    ): Promise<PredictTypes.CallMethodResult<"getTitle">> => {
+      return callMethod(
+        Predict,
+        this,
+        "getTitle",
+        params === undefined ? {} : params,
         getContractByCodeHash
       );
     },

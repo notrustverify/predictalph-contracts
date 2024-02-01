@@ -57,6 +57,8 @@ describe("unit tests", () => {
   let bidders: PrivateKeyWallet[];
   let operator: PrivateKeyWallet;
 
+  const DEFAULT_TITLE = "TEST"
+
   function getSubContractIdByContractId(contractId: string, path: string) {
     return subContractId(contractId, path, groupIndex);
   }
@@ -133,7 +135,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(120 * 1000)
+      BigInt(120 * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -231,7 +234,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      "TEST"
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -296,7 +300,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -383,7 +388,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -464,7 +470,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -508,7 +515,8 @@ describe("unit tests", () => {
          game,
          100n,
          BigInt(bidDurationSecond * 1000),
-         BigInt(bidDurationSecond * 1000)
+         BigInt(bidDurationSecond * 1000),
+         DEFAULT_TITLE
        );
        const gameState = await game.fetchState();
        const numberGame = gameState.fields.gameCounter;
@@ -550,7 +558,8 @@ describe("unit tests", () => {
          game,
          100n,
          BigInt(bidDurationSecond * 1000),
-         BigInt(bidDurationSecond * 1000)
+         BigInt(bidDurationSecond * 1000),
+         DEFAULT_TITLE
        );
        const gameState = await game.fetchState();
        const numberGame = gameState.fields.gameCounter;
@@ -581,7 +590,8 @@ describe("unit tests", () => {
          game,
          100n,
          BigInt(bidDurationSecond * 1000),
-         BigInt(bidDurationSecond * 1000)
+         BigInt(bidDurationSecond * 1000),
+         DEFAULT_TITLE
        );
        const gameState = await game.fetchState();
        const numberGame = gameState.fields.gameCounter;
@@ -637,7 +647,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -704,7 +715,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -732,7 +744,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -759,7 +772,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -775,15 +789,27 @@ describe("unit tests", () => {
     const predictionStateRound1 = await predictionGame.fetchState();
 
     expect(predictionStateRound1.fields.epoch).toEqual(1n)
-    const exists = await contractExists(
+
+    const roundExists = []
+    roundExists.push(await contractExists(
       addressFromContractId(
-        getSubPredictContractId(
-          "00" +
-            (predictionState.fields.epoch).toString(16).padStart(8, "0")
-        )
+         getSubContractIdByContractId(predictionGame.contractId,
+            "00" +
+              (0).toString(16).padStart(8, "0")
+          )
       )
-    );
-    expect(exists).toEqual(true);
+    ))
+
+     roundExists.push(await contractExists(
+      addressFromContractId(
+         getSubContractIdByContractId(predictionGame.contractId,
+            "00" +
+              (1).toString(16).padStart(8, "0")
+          )
+      )
+    ))
+
+    expect(roundExists).toEqual([true, true]);
 
   })
 
@@ -796,7 +822,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -824,7 +851,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
@@ -870,7 +898,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(bidDurationSecond * 1000)
+      BigInt(bidDurationSecond * 1000),
+      DEFAULT_TITLE
     );
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;

@@ -38,12 +38,12 @@ Contract Game(
    }
 
    @using(checkExternalCaller = true, updateFields = true, preapprovedAssets = true)
-   pub fn createGame(feesBasisPts: U256, repeatEvery: U256, claimedByAnyoneDelay: U256) -> (){
+   pub fn createGame(feesBasisPts: U256, repeatEvery: U256, claimedByAnyoneDelay: U256, title: ByteVec) -> (){
       let caller = callerAddress!()
 
       checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
 
-      let (encodedImmFields, encodedMutFields) = Predict.encodeFields!(selfContract!(), punterTemplateId, roundTemplateId,0,operator,feesBasisPts, repeatEvery, claimedByAnyoneDelay, 0)
+      let (encodedImmFields, encodedMutFields) = Predict.encodeFields!(selfContract!(), punterTemplateId, roundTemplateId, title, 0,operator,feesBasisPts, repeatEvery, claimedByAnyoneDelay, 0)
 
       let gameContractPath = SubContractTypes.Game ++ u256To4Byte!(gameCounter)
       assert!(!contractExists!(subContractId!(gameContractPath)), ErrorCodes.GameAlreadyExists)

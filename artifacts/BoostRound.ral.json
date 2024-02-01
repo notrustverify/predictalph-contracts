@@ -1,7 +1,7 @@
 {
   "version": "v2.8.0",
   "name": "BoostRound",
-  "bytecodeTemplate": "0101030001000cb417001600{1}a21600{1}{2}0f0c{0}010a",
+  "bytecodeTemplate": "0101030001000cb417001600{1}a21600{1}{2}0f0c{0}010b",
   "fieldsSig": {
     "names": [
       "predict",

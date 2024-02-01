@@ -9,14 +9,28 @@ import {
   ONE_ALPH,
   sleep,
   addressFromContractId,
+  EventSubscribeOptions,
+  binToHex,
+  hexToString,
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { DestroyRound, End, NewInterval, Predict, Start } from "../artifacts/ts";
+import {
+  DestroyRound,
+  End,
+  NewInterval,
+  Predict,
+  Start,
+  CreateGame,
+  GameInstance,
+  GameTypes,
+  Game,
+} from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
-    arrayEpochToBytes,
+  arrayEpochToBytes,
   contractExists,
+  getPredictObject,
   getPrice,
   getRoundContractId,
   getRoundContractState,
@@ -24,10 +38,12 @@ import {
 import { CoinGeckoClient } from "coingecko-api-v3";
 import { access } from "fs";
 
-async function newInterval(
+async function newPredict(
   privKey: string,
   contractName: string,
-  newIntervalSecond: bigint
+  repeatEvery: bigint,
+  claimedByAnyoneDelay: bigint,
+  title: string
 ) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
@@ -42,37 +58,43 @@ async function newInterval(
   );
   //Make sure it match your address group
   const group = wallet.group;
-  const deployed = deployments.getDeployedContractResult(
-    group,
-    contractName
-  );
-  const predictalphContractId = deployed.contractInstance.contractId;
-  const predictalphContractAddress = deployed.contractInstance.address;
+  const deployed = deployments.getDeployedContractResult(group, contractName);
 
-  const predictionStates = await Predict.at(
-    predictalphContractAddress
-  ).fetchState();
+  const gameContractId = deployed.contractInstance.contractId;
+  const gameContractAddress = deployed.contractInstance.address;
 
   try {
-    const tx = await NewInterval.execute(wallet, {
+    const tx = await CreateGame.execute(wallet, {
       initialFields: {
-        predict: predictalphContractId,
-        newRecurrence: newIntervalSecond*1000n
+        game: gameContractId,
+        feesBasisPts: 100n,
+        repeatEvery: repeatEvery * 1000n,
+        claimedByAnyoneDelay: claimedByAnyoneDelay * 1000n,
+        title: binToHex(new TextEncoder().encode(title)),
       },
       attoAlphAmount: ONE_ALPH,
     });
-
-    console.log(
-      `new recurrence ${newIntervalSecond/60n} minutes ${tx.txId}`
-    );
+    console.log(`wait on ${tx.txId}`);
     await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
-    console.log("New recurrence is set");
+
+    const gameStates = await Game.at(
+      gameContractAddress
+    ).fetchState();
+    console.log(gameStates.fields);
+
+    const predictGame = getPredictObject(
+      gameContractId,
+      gameStates.fields.gameCounter-1n,
+      wallet.account.group
+    );
+    const predictStates = await predictGame.fetchState();
+    console.log(
+      `Predict ${hexToString(predictStates.fields.title)} contract id: ${predictGame.contractId}, address: ${predictGame.address}`
+    );
   } catch (error) {
     console.error(error);
   }
 }
-
-
 
 const retryFetch = fetchRetry.default(fetch, {
   retries: 10,
@@ -91,7 +113,7 @@ let action = process.argv.slice(2)[1];
 let newParameter = process.argv.slice(2)[2];
 //if (networkToUse === undefined) networkToUse = "mainnet";
 
-if (process.argv.length > 3) console.error("parameters empty")
+if (process.argv.length > 3) console.error("parameters empty");
 
 //Select our network defined in alephium.config.ts
 
@@ -105,18 +127,14 @@ const nodeProvider = new NodeProvider(
 //Sometimes, it's convenient to setup a global NodeProvider for your project:
 web3.setCurrentNodeProvider(nodeProvider);
 
-switch (action) {
-    case "interval":
-        newInterval(
-            configuration.networks[networkToUse].privateKeys[0],
-            "Predictalph",
-            BigInt(parseInt(newParameter))
-          );
-        break;
+const ONE_WEEK_SEC = 604800n;
+const ONE_DAY_SEC = 86400n;
+const ONE_HOUR_SEC = 3600n;
 
-    default:
-        break;
-}
-
-
-
+newPredict(
+  configuration.networks[networkToUse].privateKeys[0],
+  "Game",
+  ONE_HOUR_SEC,
+  ONE_WEEK_SEC,
+  "First Event2"
+);

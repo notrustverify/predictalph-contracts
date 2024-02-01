@@ -1,6 +1,6 @@
-TxScript CreateGame(game: Game,feesBasisPts: U256, repeatEvery: U256, claimedByAnyoneDelay: U256 ) {
+TxScript CreateGame(game: Game,feesBasisPts: U256, repeatEvery: U256, claimedByAnyoneDelay: U256, title: ByteVec ) {
    let caller = callerAddress!()
-   game.createGame{caller -> ALPH : 1 alph}(feesBasisPts, repeatEvery, claimedByAnyoneDelay)
+   game.createGame{caller -> ALPH : 1 alph}(feesBasisPts, repeatEvery, claimedByAnyoneDelay, title)
 }
 
 TxScript GameDestroyPrediction(game: Game, gameId: U256) {

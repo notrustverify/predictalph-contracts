@@ -10,6 +10,7 @@ import {
   fetchContractState,
   DUST_AMOUNT,
   ZERO_ADDRESS,
+  hexToString,
 } from "@alephium/web3";
 import {
   expectAssertionError,
@@ -65,6 +66,9 @@ describe("unit tests", () => {
   let punter: PunterInstance;
   let bidders: PrivateKeyWallet[];
   let operator: PrivateKeyWallet;
+
+  const DEFAULT_TITLE = "TEST"
+
 
   function getSubContractIdByContractId(contractId: string, path: string) {
     return subContractId(contractId, path, groupIndex);
@@ -159,12 +163,14 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt(120 * 1000)
+      BigInt(120 * 1000),
+      DEFAULT_TITLE
     );
 
     const gameState = await game.fetchState();
     const numberGame = gameState.fields.gameCounter;
     expect(numberGame).toEqual(1n);
+    
 
     await gameStartRound(operator, game, 0n, 10n);
     await gameBid(bidder1, game, 0n, 9n * ONE_ALPH + ONE_ALPH, true);
@@ -172,7 +178,7 @@ describe("unit tests", () => {
 
     const predictContractId = getSubPredictContractId(getPredictPath(0n));
     await gameBoostRound(operator, game, 0n, 0n, 10n * ONE_ALPH);
-
+   
     await sleep((bidDurationSecond + 1) * 1000);
     await gameEndRound(operator, game, 0n, 11n, false);
 
@@ -252,12 +258,32 @@ describe("unit tests", () => {
         game,
         100n,
         BigInt(bidDurationSecond * 1000),
-        BigInt(10 * 1000)
+        BigInt(10 * 1000),
+        DEFAULT_TITLE
       ),
       game.address,
       300
     );
   });
+
+  test("title check", async () => {
+   const bidder1 = bidders[0];
+   const title = "Test title"
+     await createGame(
+       operator,
+       game,
+       100n,
+       BigInt(bidDurationSecond * 1000),
+       BigInt(10 * 1000),
+       "Test title"
+     )
+
+      const predictObj = getPredictObject(0n)
+
+    const titleContract = (await predictObj.fetchState()).fields.title
+
+    expect(title).toEqual(hexToString(titleContract))
+ });
 
   test("try to start end round direct call", async () => {
     const bidder1 = bidders[0];
@@ -267,7 +293,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(0.5 * 1000),
-      BigInt(10 * 1000)
+      BigInt(10 * 1000),
+      DEFAULT_TITLE
     );
     const predictContractId = getSubPredictContractId(getPredictPath(0n));
 
@@ -298,7 +325,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt((bidDurationSecond + 3) * 1000)
+      BigInt((bidDurationSecond + 3) * 1000),
+      DEFAULT_TITLE
     );
 
     const gameState = await game.fetchState();
@@ -332,7 +360,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt((bidDurationSecond + 3) * 1000)
+      BigInt((bidDurationSecond + 3) * 1000),
+      DEFAULT_TITLE
     );
 
     await expectAssertionError(
@@ -352,7 +381,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt((bidDurationSecond + 3) * 1000)
+      BigInt((bidDurationSecond + 3) * 1000),
+      DEFAULT_TITLE
     );
 
     const gameState = await game.fetchState();
@@ -391,7 +421,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt((bidDurationSecond + 3) * 1000)
+      BigInt((bidDurationSecond + 3) * 1000),
+      DEFAULT_TITLE
     );
     await gameStartRound(operator, game, 0n, 10n);
     const predictContract = getPredictObject(0n);
@@ -409,7 +440,8 @@ describe("unit tests", () => {
       game,
       100n,
       BigInt(bidDurationSecond * 1000),
-      BigInt((bidDurationSecond + 3) * 1000)
+      BigInt((bidDurationSecond + 3) * 1000),
+      DEFAULT_TITLE
     );
     await gameStartRound(operator, game, 0n, 10n);
     const predictContract = getPredictObject(0n);

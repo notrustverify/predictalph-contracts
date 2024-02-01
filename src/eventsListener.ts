@@ -15,9 +15,9 @@ import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
 import {
   End,
-  Predictalph,
-  PredictalphInstance,
-  PredictalphTypes,
+  Predict,
+  PredictInstance,
+  PredictTypes,
   Start,
 } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
@@ -62,12 +62,12 @@ async function setKeyValue(key: string, value: string) {
 }
 
 // `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
-const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
+const optionsBear: EventSubscribeOptions<PredictTypes.BetBearEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
   messageCallback: async (
-    event: PredictalphTypes.BetBearEvent
+    event: PredictTypes.BetBearEvent
   ): Promise<void> => {
     //if(BigInt(actualEpoch) == event.fields.epoch){
     console.log(
@@ -111,12 +111,12 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
   },
 };
 
-const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
+const optionsBull: EventSubscribeOptions<PredictTypes.BetBullEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
   messageCallback: async (
-    event: PredictalphTypes.BetBullEvent
+    event: PredictTypes.BetBullEvent
   ): Promise<void> => {
     //  if(BigInt(actualEpoch) == event.fields.epoch){
 
@@ -160,12 +160,12 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
   },
 };
 
-const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
+const optionsClaimed: EventSubscribeOptions<PredictTypes.ClaimedEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
   messageCallback: async (
-    event: PredictalphTypes.ClaimedEvent
+    event: PredictTypes.ClaimedEvent
   ): Promise<void> => {
     console.log(
       `Claimed(from: ${event.fields.from}, for: ${
@@ -200,13 +200,13 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
   },
 };
 
-const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
+const optionsRoundEnd: EventSubscribeOptions<PredictTypes.RoundEndedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
 
@@ -226,13 +226,13 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
     },
   };
 
-const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent> =
+const optionsRoundStart: EventSubscribeOptions<PredictTypes.RoundStartedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
@@ -277,7 +277,7 @@ async function getPunterBid(
   const predictalphInstance = deployed.contractInstance;
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
-  const predictalphDeployed = await Predictalph.at(predictalphContractAddress);
+  const predictalphDeployed = await Predict.at(predictalphContractAddress);
 
   const contractIdKeyExists = await keyExists("contractid");
   if (contractIdKeyExists) {

@@ -15,9 +15,9 @@ import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
 import {
   End,
-  Predictalph,
-  PredictalphInstance,
-  PredictalphTypes,
+  Predict,
+  PredictInstance,
+  PredictTypes,
   Start,
 } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
@@ -62,11 +62,11 @@ const ALPH="ℵ"
 const MAX_MESSAGE_BET=6
 
 // `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
-const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
+const optionsBear: EventSubscribeOptions<PredictTypes.BetBearEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
-  messageCallback: (event: PredictalphTypes.BetBearEvent): Promise<void> => {
+  messageCallback: (event: PredictTypes.BetBearEvent): Promise<void> => {
     //if(BigInt(actualEpoch) == event.fields.epoch){
     console.log(
       `Bear(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
@@ -94,11 +94,11 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
   },
 };
 
-const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
+const optionsBull: EventSubscribeOptions<PredictTypes.BetBullEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
-  messageCallback: (event: PredictalphTypes.BetBullEvent): Promise<void> => {
+  messageCallback: (event: PredictTypes.BetBullEvent): Promise<void> => {
     //  if(BigInt(actualEpoch) == event.fields.epoch){
     console.log(
       `Bull(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
@@ -128,13 +128,13 @@ const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
   },
 };
 
-const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
+const optionsRoundEnd: EventSubscribeOptions<PredictTypes.RoundEndedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
 
@@ -148,11 +148,11 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
     },
   };
 
-const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent> =
+const optionsRoundStart: EventSubscribeOptions<PredictTypes.RoundStartedEvent> =
   {
     pollingInterval: POLLING_INTERVAL_EVENTS,
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
@@ -206,11 +206,11 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
     },
   };
 
-const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
+const optionsClaimed: EventSubscribeOptions<PredictTypes.ClaimedEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
-  messageCallback: (event: PredictalphTypes.ClaimedEvent): Promise<void> => {
+  messageCallback: (event: PredictTypes.ClaimedEvent): Promise<void> => {
     console.log(
       `Claimed(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
         event.fields.epoch
@@ -247,7 +247,7 @@ async function getPunterBid(privKey: string, contractName: string) {
   const predictalphInstance = deployed.contractInstance;
   predictalphContractId = deployed.contractInstance.contractId;
   predictalphContractAddress = deployed.contractInstance.address;
-  const predictalphDeployed = await Predictalph.at(predictalphContractAddress);
+  const predictalphDeployed = await Predict.at(predictalphContractAddress);
 
   const predictionStates = await predictalphDeployed.fetchState();
 
@@ -306,5 +306,5 @@ web3.setCurrentNodeProvider(nodeProvider);
 
 getPunterBid(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph"
+  "Predict"
 );

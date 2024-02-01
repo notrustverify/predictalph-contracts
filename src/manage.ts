@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { End, Predictalph, Start } from "../artifacts/ts";
+import { End, Predict, Start } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
   contractExists,
@@ -48,7 +48,7 @@ async function startRound(
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
 
-  const predictionStates = await Predictalph.at(
+  const predictionStates = await Predict.at(
     predictalphContractAddress
   ).fetchState();
 
@@ -71,7 +71,7 @@ async function startRound(
   try {
     const txStart = await Start.execute(wallet, {
       initialFields: {
-        predictalph: predictalphContractId,
+        predict: predictalphContractId,
         price: priceToStore,
       },
       attoAlphAmount: ONE_ALPH,
@@ -112,7 +112,7 @@ async function endRound(privKey: string, contractName: string) {
   const predictalphContractAddress = deployed.contractInstance.address;
 
   const moveRound = async () => {
-    const predictionStates = await Predictalph.at(
+    const predictionStates = await Predict.at(
       predictalphContractAddress
     ).fetchState();
 
@@ -147,7 +147,7 @@ async function endRound(privKey: string, contractName: string) {
 
           const txStart = await End.execute(wallet, {
             initialFields: {
-              predictalph: predictalphContractId,
+              predict: predictalphContractId,
               price: priceToStore,
               immediatelyStart: true
             },

@@ -130,6 +130,7 @@ class Factory extends ContractFactory<GameInstance, GameTypes.Fields> {
           feesBasisPts: bigint;
           repeatEvery: bigint;
           claimedByAnyoneDelay: bigint;
+          title: HexString;
         }
       >
     ): Promise<TestContractResult<null>> => {
@@ -201,7 +202,7 @@ export const Game = new Factory(
   Contract.fromJson(
     GameContractJson,
     "",
-    "9afab44a232ba739983bd6187de993f021d3fa1e7ba8bde336980e69cb7f0daa"
+    "86d0a5151081a3e9c780514a8f19fc58d55d47e37627e59940f6e0730579ca39"
   )
 );
 

@@ -43,6 +43,7 @@ export const CreateGame = new ExecutableScript<{
   feesBasisPts: bigint;
   repeatEvery: bigint;
   claimedByAnyoneDelay: bigint;
+  title: HexString;
 }>(Script.fromJson(CreateGameScriptJson));
 export const DestroyRound = new ExecutableScript<{
   predict: HexString;

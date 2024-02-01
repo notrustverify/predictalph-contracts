@@ -2,6 +2,7 @@ Contract Predict (
    gameContract: Game,
    punterTemplateId: ByteVec,
    roundTemplateId: ByteVec,
+   title: ByteVec,
    mut epoch: U256,
    mut operator: Address,
    mut feesBasisPts: U256,
@@ -57,6 +58,10 @@ Contract Predict (
       assert!(contractExists!(bidderContractId), ErrorCodes.PunterNotExists)
     
       return Punter(bidderContractId)
+   }
+
+   pub fn getTitle() -> (ByteVec){
+      return title
    }
 
 
