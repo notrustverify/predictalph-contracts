@@ -40,23 +40,33 @@ export namespace GameTypes {
   export type State = ContractState<Fields>;
 
   export type BetBullEvent = ContractEvent<{
+    gameId: bigint;
     from: Address;
     epoch: bigint;
     amount: bigint;
     up: boolean;
+    claimedByAnyoneTimestamp: bigint;
   }>;
   export type BetBearEvent = ContractEvent<{
+    gameId: bigint;
     from: Address;
     epoch: bigint;
     amount: bigint;
     up: boolean;
+    claimedByAnyoneTimestamp: bigint;
   }>;
-  export type RoundEndedEvent = ContractEvent<{ epoch: bigint; price: bigint }>;
+  export type RoundEndedEvent = ContractEvent<{
+    gameId: bigint;
+    epoch: bigint;
+    price: bigint;
+  }>;
   export type RoundStartedEvent = ContractEvent<{
+    gameId: bigint;
     epoch: bigint;
     price: bigint;
   }>;
   export type ClaimedEvent = ContractEvent<{
+    gameId: bigint;
     addressToClaim: Address;
     from: Address;
     epochs: HexString;
@@ -202,7 +212,7 @@ export const Game = new Factory(
   Contract.fromJson(
     GameContractJson,
     "",
-    "86d0a5151081a3e9c780514a8f19fc58d55d47e37627e59940f6e0730579ca39"
+    "ef614f82d69b46c10d71cd6adf8e21c0e53aaea45e6be46b74b9132e52f67ba8"
   )
 );
 

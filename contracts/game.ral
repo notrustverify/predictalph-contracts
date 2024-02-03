@@ -6,11 +6,11 @@ Contract Game(
    mut gameCounter: U256
 ){
 
-   event BetBull(from: Address, epoch: U256, amount: U256, up: Bool)
-   event BetBear(from: Address, epoch: U256, amount: U256, up: Bool)
-   event RoundEnded(epoch: U256, price: U256)
-   event RoundStarted(epoch: U256, price: U256)
-   event Claimed(addressToClaim: Address, from: Address, epochs: ByteVec)
+   event BetBull(gameId: U256, from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
+   event BetBear(gameId: U256, from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
+   event RoundEnded(gameId: U256, epoch: U256, price: U256)
+   event RoundStarted(gameId: U256, epoch: U256, price: U256)
+   event Claimed(gameId: U256, addressToClaim: Address, from: Address, epochs: ByteVec)
    event GameCreated(contractId: ByteVec, gameId: U256)
 
 
@@ -85,7 +85,7 @@ Contract Game(
 
       let epoch = predict.startRound{caller -> ALPH: 1 alph}(caller, price)
 
-      emit RoundStarted(epoch, price)
+      emit RoundStarted(gameId, epoch, price)
    }
 
    @using(preapprovedAssets = true, checkExternalCaller = true)
@@ -98,7 +98,7 @@ Contract Game(
 
       let epoch = predict.endRound{caller -> ALPH: 1 alph}(caller, actualPrice, immediatelyStart)
 
-      emit RoundEnded(epoch, actualPrice)
+      emit RoundEnded(gameId, epoch, actualPrice)
 
    }
 
@@ -107,12 +107,12 @@ Contract Game(
       let predict = getGame(gameId)
       let caller = callerAddress!()
 
-      let epoch = predict.bid{caller -> ALPH: amount}(amount, up, caller)
+      let (epoch, claimedByAnyoneTimestamp) = predict.bid{caller -> ALPH: amount}(amount, up, caller)
 
       if (up){
-         emit BetBull(caller, epoch, amount, up)
+         emit BetBull(gameId, caller, epoch, amount, up, claimedByAnyoneTimestamp)
       } else {
-         emit BetBear(caller, epoch, amount, up)
+         emit BetBear(gameId, caller, epoch, amount, up, claimedByAnyoneTimestamp)
       }
       
    }
@@ -124,7 +124,7 @@ Contract Game(
 
       predict.withdraw(caller, arrayEpochIn, addressToClaim)
       
-      emit Claimed(addressToClaim, caller, arrayEpochIn)
+      emit Claimed(gameId, addressToClaim, caller, arrayEpochIn)
    }
 
    @using(preapprovedAssets = true, checkExternalCaller = false)
@@ -140,7 +140,5 @@ Contract Game(
    pub fn setNewOperator(newOperator: Address) -> (){
       checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
       operator = newOperator
-   
-
    }
 }

@@ -97,7 +97,7 @@ export namespace PredictTypes {
         up: boolean;
         from: Address;
       }>;
-      result: CallContractResult<bigint>;
+      result: CallContractResult<[bigint, bigint]>;
     };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
@@ -200,7 +200,7 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
         PredictTypes.Fields,
         { amount: bigint; up: boolean; from: Address }
       >
-    ): Promise<TestContractResult<bigint>> => {
+    ): Promise<TestContractResult<[bigint, bigint]>> => {
       return testMethod(this, "bid", params);
     },
     withdraw: async (
@@ -259,8 +259,8 @@ class Factory extends ContractFactory<PredictInstance, PredictTypes.Fields> {
 export const Predict = new Factory(
   Contract.fromJson(
     PredictContractJson,
-    "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+7=3-1+3=3-1+f=3-1+4=3-1+6=3-1+8=3-1+a=3-1+c=3-1+d=3-1+f=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1782",
-    "edaf1e6b04edfe3993dbb0046a7b24e8131106aeb7c1cbaa02c8249280a02b47"
+    "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+7=3-1+3=2-2+30=3-1+5=3-1+7=3-1+8=3-1+a=3-1+c=3-1+d=3-1+f=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1786",
+    "3dad5ed77628f9aa84ee5626e2bce4602bd1a0dca74072260d1384683e5da292"
   )
 );
 

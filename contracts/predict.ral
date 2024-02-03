@@ -107,7 +107,7 @@ Contract Predict (
     }
 
    @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = true)
-   pub fn bid(amount: U256, up: Bool, from: Address) -> (U256){
+   pub fn bid(amount: U256, up: Bool, from: Address) -> (U256, U256){
       let caller = from
 
       let round = getRoundByEpoch(epoch)
@@ -123,7 +123,8 @@ Contract Predict (
       // user never played, create contract
       assert!(!contractExists!(subContractId!(bidderContractId)), ErrorCodes.AlreadyPlayed)
 
-      let bidAmount = amount - 1 alph let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
+      let bidAmount = amount - 1 alph 
+      let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
       let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContract!(), caller, epoch, up, bidAmount, claimedByAnyoneTimestamp)
       copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
       round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, up)
@@ -135,7 +136,7 @@ Contract Predict (
          emit BetBear(caller, epoch, amount, up, claimedByAnyoneTimestamp)
       }
       
-      return epoch
+      return epoch,claimedByAnyoneTimestamp
     }
 
    

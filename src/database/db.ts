@@ -14,11 +14,18 @@ export class Round extends Model {
 export class RoundParticipation extends Model {
   declare roundId: Number;
   declare addressId: Number;
+  declare gameId: Number;
   declare upBid: boolean;
   declare amountBid: Number;
   declare claimed: boolean;
   declare claimedByAnyoneTimestamp: bigint;
 }
+
+export class Game extends Model {
+   declare id: Number;
+   declare contractId: string;
+   declare gameId: Number
+ }
 
 export function initDb(sequelize: Sequelize, sync: boolean) {
   Address.init(
@@ -83,8 +90,35 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
     }
   );
 
+
+  Game.init(
+   {
+     id: {
+       type: DataTypes.INTEGER,
+       autoIncrement: true,
+       primaryKey: true,
+     },
+     contractId: {
+       type: DataTypes.STRING,
+       allowNull: false,
+       unique: true,
+     },
+     gameId: {
+      type: DataTypes.NUMBER,
+      allowNull: false,
+      unique: false
+     }
+   },
+   {
+     sequelize,
+     modelName: "Game",
+   }
+ );
+
   Address.belongsToMany(Round, { through: RoundParticipation });
   Round.belongsToMany(Address, { through: RoundParticipation });
+  Game.belongsToMany(Round, {through: RoundParticipation })
+  Game.belongsToMany(Address, {through: RoundParticipation })
 
   sequelize
     .sync({force: sync})
@@ -95,6 +129,23 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       console.error(error);
     });
 }
+
+
+export async function createAndGetNewGame(
+   gameIdContract: bigint
+ ): Promise<[Game, boolean]> {
+   try {
+     const [gameId, created] = await Game.findCreateFind({
+       where: { gameIdContract: gameIdContract },
+       defaults: { gameId: gameIdContract },
+     });
+     return [gameId, created];
+   } catch (error) {
+     console.error(error);
+   }
+ }
+
+
 
 export async function createAndGetNewRound(
   epoch: bigint,
@@ -130,9 +181,11 @@ export async function createAndGetNewAddress(
     console.error(error);
   }
 }
+
 export async function createAndGetNewParticipation(
   roundId: Round,
   addrId: Address,
+  gameId: Game,
   upBid: boolean,
   amountBid: bigint,
   claimed: boolean,
@@ -140,10 +193,11 @@ export async function createAndGetNewParticipation(
 ): Promise<[RoundParticipation, boolean]> {
   try {
     const [round, created] = await RoundParticipation.findCreateFind({
-      where: { RoundId: roundId.id, AddressId: addrId.id },
+      where: { RoundId: roundId.id, AddressId: addrId.id, GameId: gameId.id },
       defaults: {
         RoundId: roundId.id,
         AddressId: addrId.id,
+        GameId: gameId.id,
         upBid: upBid,
         amountBid: amountBid,
         claimed: claimed,

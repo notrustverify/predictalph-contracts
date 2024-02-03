@@ -9,7 +9,6 @@ import {
   PunterInstance,
   Round,
   RoundInstance,
-
   Predict,
   PredictInstance,
   Game,
@@ -42,7 +41,6 @@ function toDeployments(json: any): Deployments {
         json.contracts["Round"].contractInstance.address
       ),
     },
-    
     Predict:
       json.contracts["Predict"] === undefined
         ? undefined
