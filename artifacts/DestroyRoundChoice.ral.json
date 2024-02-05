@@ -1,15 +1,15 @@
 {
   "version": "v2.8.0",
-  "name": "NewInterval",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}010c",
+  "name": "DestroyRoundChoice",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}0109",
   "fieldsSig": {
     "names": [
       "predict",
-      "newRecurrence"
+      "arrayEpoch"
     ],
     "types": [
       "ByteVec",
-      "U256"
+      "ByteVec"
     ],
     "isMutable": [
       false,

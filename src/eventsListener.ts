@@ -15,9 +15,9 @@ import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
 import {
   End,
-  Predictalph,
-  PredictalphInstance,
-  PredictalphTypes,
+  PredictPrice,
+  PredictPriceInstance,
+  PredictPriceTypes,
   Start,
 } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
@@ -62,16 +62,16 @@ async function setKeyValue(key: string, value: string) {
 }
 
 // `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
-const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
+const optionsBet: EventSubscribeOptions<PredictPriceTypes.BetEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
   messageCallback: async (
-    event: PredictalphTypes.BetBearEvent
+    event: PredictPriceTypes.BetEvent
   ): Promise<void> => {
     //if(BigInt(actualEpoch) == event.fields.epoch){
     console.log(
-      `Bear(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
+      `Bet(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, side: ${
         event.fields.up
       }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
@@ -111,61 +111,12 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
   },
 };
 
-const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
+const optionsClaimed: EventSubscribeOptions<PredictPriceTypes.ClaimedEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
   messageCallback: async (
-    event: PredictalphTypes.BetBullEvent
-  ): Promise<void> => {
-    //  if(BigInt(actualEpoch) == event.fields.epoch){
-
-    console.log(
-      `Bull(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
-        event.fields.up
-      }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
-    );
-
-    const userAddressEvent = event.fields.from;
-    const epoch = event.fields.epoch;
-    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
-
-    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
-    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
-      
-    const [roundParticipation, created] = await createAndGetNewParticipation(
-      roundId,
-      addrId,
-      event.fields.up,
-      event.fields.amount,
-      false,
-      claimedByAnyone
-    );
-
-    if (!created)
-      await roundParticipation.update({
-        upBid: event.fields.up,
-        amountBid: event.fields.amount,
-        claimedByAnyoneTimestamp: claimedByAnyone
-      });
-
-    //}
-    return Promise.resolve();
-  },
-  // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
-  errorCallback: (error, subscription): Promise<void> => {
-    console.error(error);
-    subscription.unsubscribe();
-    return Promise.resolve();
-  },
-};
-
-const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
-  // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-  pollingInterval: POLLING_INTERVAL_EVENTS,
-  // The `messageCallback` will be called every time we recive a new event
-  messageCallback: async (
-    event: PredictalphTypes.ClaimedEvent
+    event: PredictPriceTypes.ClaimedEvent
   ): Promise<void> => {
     console.log(
       `Claimed(from: ${event.fields.from}, for: ${
@@ -200,13 +151,13 @@ const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
   },
 };
 
-const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
+const optionsRoundEnd: EventSubscribeOptions<PredictPriceTypes.RoundEndedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictPriceTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
 
@@ -226,13 +177,13 @@ const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
     },
   };
 
-const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent> =
+const optionsRoundStart: EventSubscribeOptions<PredictPriceTypes.RoundStartedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictPriceTypes.RoundEndedEvent
     ): Promise<void> => {
       console.log(
         `Round Started(${event.fields.epoch}, ${event.fields.price})`
@@ -277,7 +228,7 @@ async function getPunterBid(
   const predictalphInstance = deployed.contractInstance;
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
-  const predictalphDeployed = await Predictalph.at(predictalphContractAddress);
+  const predictalphDeployed = await PredictPrice.at(predictalphContractAddress);
 
   const contractIdKeyExists = await keyExists("contractid");
   if (contractIdKeyExists) {
@@ -301,13 +252,8 @@ async function getPunterBid(
     eventCounterSaved
   );
   
-  const subscriptionBear = predictalphDeployed.subscribeBetBearEvent(
-    optionsBear,
-    eventCounterSaved
-  );
-  
-  const subscriptionBull = predictalphDeployed.subscribeBetBullEvent(
-    optionsBull,
+  const subscriptionBear = predictalphDeployed.subscribeBetEvent(
+    optionsBet,
     eventCounterSaved
   );
   
@@ -327,7 +273,6 @@ async function getPunterBid(
 
   if (
     subscriptionBear.isCancelled() ||
-    subscriptionBull.isCancelled() ||
     subscriptionRoundEnd.isCancelled() ||
     subscriptionRoundStart.isCancelled() ||
     subscriptionClaimed.isCancelled()
@@ -371,7 +316,7 @@ sequelize
 
 getPunterBid(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph",
+  "PredictPrice",
   sequelize
 );
 

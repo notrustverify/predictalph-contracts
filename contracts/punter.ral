@@ -1,46 +1,40 @@
 Contract Punter(
-    prediction: Predictalph,
-    punterAddress: Address,
-    epoch: U256,
-    upBid: Bool,
-    amountBid: U256,
-    claimedByAnyoneAt: U256
+   predictionContractId: ByteVec,
+   punterAddress: Address,
+   epoch: U256,
+   side: Bool,
+   amountBid: U256,
+   claimedByAnyoneAt: U256
 ) {
 
-    enum ErrorCodes {
-        InvalidCaller = 200
-      }
+   enum ErrorCodes {
+      InvalidCaller = 200
+   }
 
 
-    pub fn getAddress() -> (Address){
-        return punterAddress
-    }
+   pub fn getAddress() -> (Address){
+      return punterAddress
+   }
 
-    pub fn getBid() -> (Bool){
-        return upBid
-    }
+   pub fn getBid() -> (Bool){
+      return side
+   }
 
-    pub fn getAmountBid() -> (U256) {
-        return amountBid
-    }
+   pub fn getAmountBid() -> (U256) {
+      return amountBid
+   }
 
-    pub fn getRoundEpoch() -> (U256){
-        return epoch
-    }
+   pub fn getRoundEpoch() -> (U256){
+      return epoch
+   }
 
-    pub fn getClaimedByAnyone() -> (U256){
-        return claimedByAnyoneAt
-    }
+   pub fn getClaimedByAnyone() -> (U256){
+      return claimedByAnyoneAt
+   }
 
-    @using(assetsInContract = true)
-    pub fn destroy() -> (){
-        checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-        destroySelf!(punterAddress)
-    }
-
-    @using(assetsInContract = true)
-    pub fn destroyByOther(from: Address) -> (){
-        checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-        destroySelf!(from)
-    }
+   @using(assetsInContract = true)
+   pub fn destroy(from: Address) -> (){
+      checkCaller!(callerContractId!() == predictionContractId, ErrorCodes.InvalidCaller)
+      destroySelf!(from)
+   }
 }

@@ -5,10 +5,10 @@
   "codeHash": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
   "fieldsSig": {
     "names": [
-      "predictionContractId",
+      "prediction",
       "punterAddress",
       "epoch",
-      "side",
+      "upBid",
       "amountBid",
       "claimedByAnyoneAt"
     ],

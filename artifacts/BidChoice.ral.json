@@ -1,17 +1,20 @@
 {
   "version": "v2.8.0",
-  "name": "NewInterval",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}010c",
+  "name": "BidChoice",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}0107",
   "fieldsSig": {
     "names": [
       "predict",
-      "newRecurrence"
+      "amount",
+      "side"
     ],
     "types": [
       "ByteVec",
-      "U256"
+      "U256",
+      "Bool"
     ],
     "isMutable": [
+      false,
       false,
       false
     ]

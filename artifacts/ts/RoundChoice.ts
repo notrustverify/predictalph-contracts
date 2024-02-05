@@ -24,24 +24,23 @@ import {
   ContractInstance,
   getContractEventsCurrentCount,
 } from "@alephium/web3";
-import { default as RoundContractJson } from "../price/Round.ral.json";
+import { default as RoundChoiceContractJson } from "../choice/RoundChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace RoundTypes {
+export namespace RoundChoiceTypes {
   export type Fields = {
     prediction: HexString;
     epoch: bigint;
-    priceStart: bigint;
     feesBasisPts: bigint;
     bidEndTimestamp: bigint;
     operator: Address;
     rewardsComputed: boolean;
     totalAmountBoost: bigint;
-    priceEnd: bigint;
+    sideWon: boolean;
     totalAmount: bigint;
-    amountUp: bigint;
-    amountDown: bigint;
+    amountTrue: bigint;
+    amountFalse: bigint;
     treasuryAmount: bigint;
     rewardAmount: bigint;
     rewardBaseCalAmount: bigint;
@@ -82,9 +81,12 @@ export namespace RoundTypes {
   };
 }
 
-class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
+class Factory extends ContractFactory<
+  RoundChoiceInstance,
+  RoundChoiceTypes.Fields
+> {
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as RoundTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as RoundChoiceTypes.Fields;
   }
 
   consts = {
@@ -97,61 +99,79 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
     },
   };
 
-  at(address: string): RoundInstance {
-    return new RoundInstance(address);
+  at(address: string): RoundChoiceInstance {
+    return new RoundChoiceInstance(address);
   }
 
   tests = {
     getEndRoundTime: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
+      params: Omit<
+        TestContractParams<RoundChoiceTypes.Fields, never>,
+        "testArgs"
+      >
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "getEndRoundTime", params);
     },
     getRewardAmount: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
+      params: Omit<
+        TestContractParams<RoundChoiceTypes.Fields, never>,
+        "testArgs"
+      >
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "getRewardAmount", params);
     },
     getRewardBaseCalAmount: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
+      params: Omit<
+        TestContractParams<RoundChoiceTypes.Fields, never>,
+        "testArgs"
+      >
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "getRewardBaseCalAmount", params);
     },
     getRoundEpoch: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
+      params: Omit<
+        TestContractParams<RoundChoiceTypes.Fields, never>,
+        "testArgs"
+      >
     ): Promise<TestContractResult<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
     updateAmount: async (
       params: TestContractParams<
-        RoundTypes.Fields,
-        { from: Address; amount: bigint; up: boolean }
+        RoundChoiceTypes.Fields,
+        { from: Address; amount: bigint; side: boolean }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "updateAmount", params);
     },
     calculateRewards: async (
-      params: TestContractParams<RoundTypes.Fields, { price: bigint }>
+      params: TestContractParams<
+        RoundChoiceTypes.Fields,
+        { sideWinning: boolean }
+      >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "calculateRewards", params);
     },
     boost: async (
       params: TestContractParams<
-        RoundTypes.Fields,
+        RoundChoiceTypes.Fields,
         { from: Address; amount: bigint }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "boost", params);
     },
     destroy: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
+      params: Omit<
+        TestContractParams<RoundChoiceTypes.Fields, never>,
+        "testArgs"
+      >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "destroy", params);
     },
     userClaimRewards: async (
       params: TestContractParams<
-        RoundTypes.Fields,
-        { addressPunter: Address; amountBid: bigint; upBid: boolean }
+        RoundChoiceTypes.Fields,
+        { addressPunter: Address; amountBid: bigint; sideBid: boolean }
       >
     ): Promise<TestContractResult<null>> => {
       return testMethod(this, "userClaimRewards", params);
@@ -160,30 +180,30 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
 }
 
 // Use this object to test and deploy the contract
-export const Round = new Factory(
+export const RoundChoice = new Factory(
   Contract.fromJson(
-    RoundContractJson,
+    RoundChoiceContractJson,
     "",
-    "4a43dd8c1ec8b2bb5e5e2234577ed61f088f55168fb510d2921569860b2c8fd1"
+    "fbc167ffb4204a22ac97255649ed57cd8c570677499f03b56eaab76d327e4bf7"
   )
 );
 
 // Use this class to interact with the blockchain
-export class RoundInstance extends ContractInstance {
+export class RoundChoiceInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<RoundTypes.State> {
-    return fetchContractState(Round, this);
+  async fetchState(): Promise<RoundChoiceTypes.State> {
+    return fetchContractState(RoundChoice, this);
   }
 
   methods = {
     getEndRoundTime: async (
-      params?: RoundTypes.CallMethodParams<"getEndRoundTime">
-    ): Promise<RoundTypes.CallMethodResult<"getEndRoundTime">> => {
+      params?: RoundChoiceTypes.CallMethodParams<"getEndRoundTime">
+    ): Promise<RoundChoiceTypes.CallMethodResult<"getEndRoundTime">> => {
       return callMethod(
-        Round,
+        RoundChoice,
         this,
         "getEndRoundTime",
         params === undefined ? {} : params,
@@ -191,10 +211,10 @@ export class RoundInstance extends ContractInstance {
       );
     },
     getRewardAmount: async (
-      params?: RoundTypes.CallMethodParams<"getRewardAmount">
-    ): Promise<RoundTypes.CallMethodResult<"getRewardAmount">> => {
+      params?: RoundChoiceTypes.CallMethodParams<"getRewardAmount">
+    ): Promise<RoundChoiceTypes.CallMethodResult<"getRewardAmount">> => {
       return callMethod(
-        Round,
+        RoundChoice,
         this,
         "getRewardAmount",
         params === undefined ? {} : params,
@@ -202,10 +222,10 @@ export class RoundInstance extends ContractInstance {
       );
     },
     getRewardBaseCalAmount: async (
-      params?: RoundTypes.CallMethodParams<"getRewardBaseCalAmount">
-    ): Promise<RoundTypes.CallMethodResult<"getRewardBaseCalAmount">> => {
+      params?: RoundChoiceTypes.CallMethodParams<"getRewardBaseCalAmount">
+    ): Promise<RoundChoiceTypes.CallMethodResult<"getRewardBaseCalAmount">> => {
       return callMethod(
-        Round,
+        RoundChoice,
         this,
         "getRewardBaseCalAmount",
         params === undefined ? {} : params,
@@ -213,10 +233,10 @@ export class RoundInstance extends ContractInstance {
       );
     },
     getRoundEpoch: async (
-      params?: RoundTypes.CallMethodParams<"getRoundEpoch">
-    ): Promise<RoundTypes.CallMethodResult<"getRoundEpoch">> => {
+      params?: RoundChoiceTypes.CallMethodParams<"getRoundEpoch">
+    ): Promise<RoundChoiceTypes.CallMethodResult<"getRoundEpoch">> => {
       return callMethod(
-        Round,
+        RoundChoice,
         this,
         "getRoundEpoch",
         params === undefined ? {} : params,
@@ -225,14 +245,14 @@ export class RoundInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends RoundTypes.MultiCallParams>(
+  async multicall<Calls extends RoundChoiceTypes.MultiCallParams>(
     calls: Calls
-  ): Promise<RoundTypes.MultiCallResults<Calls>> {
+  ): Promise<RoundChoiceTypes.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      Round,
+      RoundChoice,
       this,
       calls,
       getContractByCodeHash
-    )) as RoundTypes.MultiCallResults<Calls>;
+    )) as RoundChoiceTypes.MultiCallResults<Calls>;
   }
 }

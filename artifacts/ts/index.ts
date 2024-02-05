@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export * from "./Predictalph";
+export * from "./PredictChoice";
+export * from "./PredictPrice";
 export * from "./Punter";
 export * from "./Round";
+export * from "./RoundChoice";
 export * from "./scripts";

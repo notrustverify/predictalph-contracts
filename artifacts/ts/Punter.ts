@@ -30,10 +30,10 @@ import { getContractByCodeHash } from "./contracts";
 // Custom types for the contract
 export namespace PunterTypes {
   export type Fields = {
-    prediction: HexString;
+    predictionContractId: HexString;
     punterAddress: Address;
     epoch: bigint;
-    upBid: boolean;
+    side: boolean;
     amountBid: bigint;
     claimedByAnyoneAt: bigint;
   };
@@ -114,14 +114,9 @@ class Factory extends ContractFactory<PunterInstance, PunterTypes.Fields> {
       return testMethod(this, "getClaimedByAnyone", params);
     },
     destroy: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "destroy", params);
-    },
-    destroyByOther: async (
       params: TestContractParams<PunterTypes.Fields, { from: Address }>
     ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "destroyByOther", params);
+      return testMethod(this, "destroy", params);
     },
   };
 }
@@ -131,7 +126,7 @@ export const Punter = new Factory(
   Contract.fromJson(
     PunterContractJson,
     "",
-    "b05092c77ff27c5278afb6930d4046fdaa3a522ae3a7d031d6fbd30074170d24"
+    "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a"
   )
 );
 

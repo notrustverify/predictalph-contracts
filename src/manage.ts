@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { End, Predictalph, Start } from "../artifacts/ts";
+import { End, PredictPrice, Start } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
   contractExists,
@@ -45,15 +45,15 @@ async function startRound(
     group,
     contractName
   );
-  const predictalphContractId = deployed.contractInstance.contractId;
-  const predictalphContractAddress = deployed.contractInstance.address;
+  const predictPriceContractId = deployed.contractInstance.contractId;
+  const predictPriceContractAddress = deployed.contractInstance.address;
 
-  const predictionStates = await Predictalph.at(
-    predictalphContractAddress
+  const predictionStates = await PredictPrice.at(
+    predictPriceContractAddress
   ).fetchState();
 
   const roundContractId = getRoundContractId(
-    predictalphContractId,
+    predictPriceContractId,
     predictionStates.fields.epoch,
     wallet.group
   );
@@ -71,7 +71,7 @@ async function startRound(
   try {
     const txStart = await Start.execute(wallet, {
       initialFields: {
-        predictalph: predictalphContractId,
+        predict: predictPriceContractId,
         price: priceToStore,
       },
       attoAlphAmount: ONE_ALPH,
@@ -108,16 +108,16 @@ async function endRound(privKey: string, contractName: string) {
     group,
     contractName
   );
-  const predictalphContractId = deployed.contractInstance.contractId;
-  const predictalphContractAddress = deployed.contractInstance.address;
+  const predictPriceContractId = deployed.contractInstance.contractId;
+  const predictPriceContractAddress = deployed.contractInstance.address;
 
   const moveRound = async () => {
-    const predictionStates = await Predictalph.at(
-      predictalphContractAddress
+    const predictionStates = await PredictPrice.at(
+      predictPriceContractAddress
     ).fetchState();
 
     const roundContractId = getRoundContractId(
-      predictalphContractId,
+      predictPriceContractId,
       predictionStates.fields.epoch,
       wallet.group
     );
@@ -131,7 +131,7 @@ async function endRound(privKey: string, contractName: string) {
 
     if (roundExists) {
       roundState = await getRoundContractState(
-        predictalphContractId,
+        predictPriceContractId,
         predictionStates.fields.epoch,
         wallet.group
       );
@@ -147,7 +147,7 @@ async function endRound(privKey: string, contractName: string) {
 
           const txStart = await End.execute(wallet, {
             initialFields: {
-              predictalph: predictalphContractId,
+              predict: predictPriceContractId,
               price: priceToStore,
               immediatelyStart: true
             },
@@ -162,7 +162,7 @@ async function endRound(privKey: string, contractName: string) {
           /*
           startRound(
             configuration.networks[networkToUse].privateKeys[group],
-            "Predictalph"
+            "PredictPrice"
           );*/
         }
       } catch (error) {
@@ -212,10 +212,10 @@ web3.setCurrentNodeProvider(nodeProvider);
 
 startRound(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph"
+  "PredictPrice"
 );
 
 endRound(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph"
+  "PredictPrice"
 );
