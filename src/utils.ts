@@ -10,18 +10,18 @@ import {
   web3,
 } from "@alephium/web3";
 import {
-  Predictalph,
+  PredictPrice,
   Round,
   Punter,
-  PredictalphInstance,
+  PredictPriceInstance,
   RoundInstance,
   PunterInstance,
   Start,
   End,
-  Bid,
-  Withdraw,
+  BidPrice,
+  WithdrawPrice,
   DestroyRound,
-  PredictalphTypes,
+  PredictPriceTypes,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -45,15 +45,17 @@ export async function deployPrediction(
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
 
-  return await Predictalph.deploy(defaultSigner, {
+  return await PredictPrice.deploy(defaultSigner, {
     initialFields: {
-      punterTemplateId: punterTemplateId.contractInstance.contractId,
-      roundTemplateId: roundTemplateId.contractInstance.contractId,
-      epoch: epoch,
-      operator: operator,
-      feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: 0n,
+       punterTemplateId: punterTemplateId.contractInstance.contractId,
+       roundTemplateId: roundTemplateId.contractInstance.contractId,
+       epoch: epoch,
+       operator: operator,
+       feesBasisPts: 100n,
+       repeatEvery: BigInt(repeatEverySecond * 1000),
+       claimedByAnyoneDelay: 0n,
+       title: "",
+       playerCounter: 0n
     },
   });
 }
@@ -61,12 +63,12 @@ export async function deployPrediction(
 export async function deployPunterTemplate() {
   return await Punter.deploy(defaultSigner, {
     initialFields: {
-      prediction: "00",
-      punterAddress: ZERO_ADDRESS,
-      epoch: 0n,
-      upBid: false,
-      amountBid: 0n,
-      claimedByAnyoneAt: 0n,
+       punterAddress: ZERO_ADDRESS,
+       epoch: 0n,
+       side: false,
+       amountBid: 0n,
+       claimedByAnyoneAt: 0n,
+       predictionContractId: "00"
     },
   });
 }
@@ -96,24 +98,24 @@ export async function deployRoundTemplate() {
 
 export async function startRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance,
   price: bigint
 ) {
   return await Start.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, price: price },
+    initialFields: { predict: predictalph.contractId, price: price },
     attoAlphAmount: ONE_ALPH,
   });
 }
 
 export async function endRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance,
   price: bigint,
   immediatelyStart: boolean
 ) {
   return await End.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       price: price,
       immediatelyStart: immediatelyStart,
     },
@@ -123,15 +125,15 @@ export async function endRound(
 
 export async function bid(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance,
   amount: bigint,
   up: boolean
 ) {
-  return await Bid.execute(signer, {
+  return await BidPrice.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       amount: amount,
-      up: up,
+      side: up,
     },
     attoAlphAmount: amount + 2n * DUST_AMOUNT,
   });
@@ -139,23 +141,26 @@ export async function bid(
 
 export async function withdraw(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance,
   epochParticipation: string
 ) {
-  return await Withdraw.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, epochParticipation },
+  return await WithdrawPrice.execute(signer, {
+    initialFields: {
+       predict: predictalph.contractId, epochParticipation,
+       addressToClaim: ""
+    },
     attoAlphAmount: DUST_AMOUNT,
   });
 }
 
 export async function destroyRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance,
   epochArray
 ) {
   return await DestroyRound.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       arrayEpoch: epochArray,
     },
     attoAlphAmount: DUST_AMOUNT,

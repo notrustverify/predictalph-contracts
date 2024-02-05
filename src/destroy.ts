@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { DestroyRound, End, Predictalph, Start } from "../artifacts/ts";
+import { DestroyRound, End, PredictPrice, Start } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
   arrayEpochToBytes,
@@ -48,7 +48,7 @@ async function destroyRound(
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
 
-  const predictionStates = await Predictalph.at(
+  const predictionStates = await PredictPrice.at(
     predictalphContractAddress
   ).fetchState();
 
@@ -87,7 +87,7 @@ async function destroyRound(
         let chunk = onlyRoundExists.slice(i, i + chunkSize);
         const tx = await DestroyRound.execute(wallet, {
           initialFields: {
-            predictalph: predictalphContractId,
+            predict: predictalphContractId,
             arrayEpoch: arrayEpochToBytes(chunk),
           },
           attoAlphAmount: ONE_ALPH,
@@ -145,6 +145,6 @@ web3.setCurrentNodeProvider(nodeProvider);
 
 destroyRound(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph",
+  "PredictPrice",
   arrayRound
 );

@@ -9,8 +9,6 @@ import {
   PunterInstance,
   Round,
   RoundInstance,
-  Predictalph,
-  PredictalphInstance,
   PredictPrice,
   PredictPriceInstance,
   RoundChoice,
@@ -26,7 +24,6 @@ export type Deployments = {
   contracts: {
     Punter: DeployContractExecutionResult<PunterInstance>;
     Round: DeployContractExecutionResult<RoundInstance>;
-    Predictalph: DeployContractExecutionResult<PredictalphInstance>;
     PredictPrice_PredictPriceALPH?: DeployContractExecutionResult<PredictPriceInstance>;
     PredictPrice_PredictPriceBTC?: DeployContractExecutionResult<PredictPriceInstance>;
     RoundChoice?: DeployContractExecutionResult<RoundChoiceInstance>;
@@ -46,12 +43,6 @@ function toDeployments(json: any): Deployments {
       ...json.contracts["Round"],
       contractInstance: Round.at(
         json.contracts["Round"].contractInstance.address
-      ),
-    },
-    Predictalph: {
-      ...json.contracts["Predictalph"],
-      contractInstance: Predictalph.at(
-        json.contracts["Predictalph"].contractInstance.address
       ),
     },
     PredictPrice_PredictPriceALPH:

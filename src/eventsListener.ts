@@ -316,7 +316,7 @@ sequelize
 
 getPunterBid(
   configuration.networks[networkToUse].privateKeys[0],
-  "PredictPrice",
+  "PredictPrice:PredictPriceALPH",
   sequelize
 );
 
