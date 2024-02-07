@@ -36,7 +36,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        playerCounter: 0n
     },
 
-  },"PredictPriceBTC")
+  },"PredictChoiceRhone")
 
   console.log(`\nDeploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)

@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { End, PredictPrice, Start } from "../artifacts/ts";
+import { End, EndChoice, PredictChoice, PredictPrice, Start, StartChoice } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
   contractExists,
@@ -45,7 +45,7 @@ async function startRound(
     group,
     contractName
   );
-  const predictPriceContractId = deployed.contractInstance.contractId;
+  const predictContractId = deployed.contractInstance.contractId;
   const predictPriceContractAddress = deployed.contractInstance.address;
 
   const predictionStates = await PredictPrice.at(
@@ -53,7 +53,7 @@ async function startRound(
   ).fetchState();
 
   const roundContractId = getRoundContractId(
-    predictPriceContractId,
+    predictContractId,
     predictionStates.fields.epoch,
     wallet.group
   );
@@ -63,22 +63,20 @@ async function startRound(
   );
 
   // dont continue, round already running
-  if (roundExist) return;
-
-  const price = await getPrice(cgClient);
-  const priceToStore = BigInt(Math.round(price * intPriceDivision)); //store it as a int
+  if (roundExist){ 
+   console.error("Round already running")
+   return};
 
   try {
-    const txStart = await Start.execute(wallet, {
+    const txStart = await StartChoice.execute(wallet, {
       initialFields: {
-        predict: predictPriceContractId,
-        price: priceToStore,
+        predict: predictContractId,
       },
       attoAlphAmount: ONE_ALPH,
     });
 
     console.log(
-      `Start round ${predictionStates.fields.epoch} ${txStart.txId}, price ${price}`
+      `Start round ${predictionStates.fields.epoch} ${txStart.txId}`
     );
     await waitTxConfirmed(nodeProvider, txStart.txId, 1, 1000);
     console.log("Start round done");
@@ -89,7 +87,7 @@ async function startRound(
   }
 }
 
-async function endRound(privKey: string, contractName: string) {
+async function endRound(privKey: string, contractName: string, sideWon: boolean) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
     keyType: undefined,
@@ -103,23 +101,24 @@ async function endRound(privKey: string, contractName: string) {
   );
   //Make sure it match your address group
   const group = wallet.group
+  const immediatelyStart = false
 
   const deployed = deployments.getDeployedContractResult(
     group,
     contractName
   );
-  const predictPriceContractId = deployed.contractInstance.contractId;
+  const predictContractId = deployed.contractInstance.contractId;
   const predictPriceContractAddress = deployed.contractInstance.address;
 
   const moveRound = async () => {
-    const predictionStates = await PredictPrice.at(
+    const predictionStates = await PredictChoice.at(
       predictPriceContractAddress
     ).fetchState();
 
     const roundContractId = getRoundContractId(
-      predictPriceContractId,
+      predictContractId,
       predictionStates.fields.epoch,
-      wallet.group
+      wallet.group,
     );
 
     const roundExists = await contractExists(
@@ -131,9 +130,10 @@ async function endRound(privKey: string, contractName: string) {
 
     if (roundExists) {
       roundState = await getRoundContractState(
-        predictPriceContractId,
+        predictContractId,
         predictionStates.fields.epoch,
-        wallet.group
+        wallet.group,
+        true
       );
 
       endTimestamp = Number(roundState.fields.bidEndTimestamp);
@@ -142,19 +142,17 @@ async function endRound(privKey: string, contractName: string) {
         if (Date.now() >= endTimestamp) {
           console.log(`locking for ${TIME_TO_WAIT_NEW_ROUND/(60*1000)} minutes`)
           await sleep(TIME_TO_WAIT_NEW_ROUND)
-          const price = await getPrice(cgClient);
-          const priceToStore = BigInt(Math.round(price * intPriceDivision)); //store it as a int
 
-          const txStart = await End.execute(wallet, {
+          const txStart = await EndChoice.execute(wallet, {
             initialFields: {
-              predict: predictPriceContractId,
-              price: priceToStore,
-              immediatelyStart: true
+              predict: predictContractId,
+              sideWon: sideWon,
+              immediatelyStart: immediatelyStart
             },
             attoAlphAmount: ONE_ALPH,
           });
           console.log(
-            `End round ${predictionStates.fields.epoch} ${txStart.txId} with price ${price}`
+            `End round ${predictionStates.fields.epoch} ${txStart.txId} with side won ${sideWon}`
           );
           await waitTxConfirmed(nodeProvider, txStart.txId, 1, 1000);
           console.log("End round done");
@@ -171,6 +169,7 @@ async function endRound(privKey: string, contractName: string) {
       }
     }
 
+    if (immediatelyStart){
     // setTimeout only accept 32bit value
     await sleep(4*1000);
     let timeUntilEnd = endTimestamp - Date.now();
@@ -178,6 +177,7 @@ async function endRound(privKey: string, contractName: string) {
 
     console.log(`Will end in ${new Date(endTimestamp)}`);
     setTimeout(moveRound, timeUntilEnd);
+    }
   };
 
   moveRound();
@@ -188,16 +188,15 @@ const retryFetch = fetchRetry.default(fetch, {
   retryDelay: 1000,
 });
 
-const cgClient = new CoinGeckoClient({
-  timeout: 10000,
-  autoRetry: true,
-});
 
 const intPriceDivision = 10_000;
-const TIME_TO_WAIT_NEW_ROUND = 120*1000
+const TIME_TO_WAIT_NEW_ROUND = 0
 
 let networkToUse = process.argv.slice(2)[0];
-if (networkToUse === undefined) networkToUse = "mainnet";
+const contractName = process.argv.slice(2)[1]
+const action = process.argv.slice(2)[2]
+const sideWon = process.argv.slice(2)[3] == 'true'
+
 //Select our network defined in alephium.config.ts
 
 //NodeProvider is an abstraction of a connection to the Alephium network
@@ -210,12 +209,25 @@ const nodeProvider = new NodeProvider(
 //Sometimes, it's convenient to setup a global NodeProvider for your project:
 web3.setCurrentNodeProvider(nodeProvider);
 
-startRound(
-  configuration.networks[networkToUse].privateKeys[0],
-  "PredictPrice"
-);
 
-endRound(
-  configuration.networks[networkToUse].privateKeys[0],
-  "PredictPrice"
-);
+switch (action) {
+   case "start":
+      startRound(
+         configuration.networks[networkToUse].privateKeys[0],
+         contractName
+       );
+      break;
+
+   case "end":
+      endRound(
+         configuration.networks[networkToUse].privateKeys[0],
+         contractName,
+         sideWon
+       );
+      break;
+   default:
+      break;
+}
+
+
+

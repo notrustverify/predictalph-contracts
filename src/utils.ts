@@ -22,6 +22,10 @@ import {
   WithdrawPrice,
   DestroyRound,
   PredictPriceTypes,
+  PredictChoiceInstance,
+  EndChoice,
+  StartChoice,
+  RoundChoice,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -29,7 +33,6 @@ import { waitTxConfirmed as _waitTxConfirmed } from "@alephium/cli";
 import { CoinGeckoClient } from "coingecko-api-v3";
 import { RedisClient } from "ioredis/built/connectors/SentinelConnector/types";
 import Redis from "ioredis";
-
 
 web3.setCurrentNodeProvider("http://127.0.0.1:22973", undefined, fetch);
 export const ZERO_ADDRESS = "tgx7VNFoP9DJiFMFgXXtafQZkUvyEdDHT9ryamHJYrjq";
@@ -47,15 +50,15 @@ export async function deployPrediction(
 
   return await PredictPrice.deploy(defaultSigner, {
     initialFields: {
-       punterTemplateId: punterTemplateId.contractInstance.contractId,
-       roundTemplateId: roundTemplateId.contractInstance.contractId,
-       epoch: epoch,
-       operator: operator,
-       feesBasisPts: 100n,
-       repeatEvery: BigInt(repeatEverySecond * 1000),
-       claimedByAnyoneDelay: 0n,
-       title: "",
-       playerCounter: 0n
+      punterTemplateId: punterTemplateId.contractInstance.contractId,
+      roundTemplateId: roundTemplateId.contractInstance.contractId,
+      epoch: epoch,
+      operator: operator,
+      feesBasisPts: 100n,
+      repeatEvery: BigInt(repeatEverySecond * 1000),
+      claimedByAnyoneDelay: 0n,
+      title: "",
+      playerCounter: 0n,
     },
   });
 }
@@ -63,12 +66,12 @@ export async function deployPrediction(
 export async function deployPunterTemplate() {
   return await Punter.deploy(defaultSigner, {
     initialFields: {
-       punterAddress: ZERO_ADDRESS,
-       epoch: 0n,
-       side: false,
-       amountBid: 0n,
-       claimedByAnyoneAt: 0n,
-       predictionContractId: "00"
+      punterAddress: ZERO_ADDRESS,
+      epoch: 0n,
+      side: false,
+      amountBid: 0n,
+      claimedByAnyoneAt: 0n,
+      predictionContractId: "00",
     },
   });
 }
@@ -98,29 +101,48 @@ export async function deployRoundTemplate() {
 
 export async function startRound(
   signer: SignerProvider,
-  predictalph: PredictPriceInstance,
-  price: bigint
+  predictalph: PredictPriceInstance | PredictChoiceInstance,
+  price?: bigint
 ) {
-  return await Start.execute(signer, {
-    initialFields: { predict: predictalph.contractId, price: price },
-    attoAlphAmount: ONE_ALPH,
-  });
+  if (predictalph instanceof PredictPriceInstance) {
+    return await Start.execute(signer, {
+      initialFields: { predict: predictalph.contractId, price: price },
+      attoAlphAmount: ONE_ALPH,
+    });
+  } else if (predictalph instanceof PredictChoiceInstance) {
+    return await StartChoice.execute(signer, {
+      initialFields: { predict: predictalph.contractId },
+      attoAlphAmount: ONE_ALPH,
+    });
+  }
 }
 
-export async function endRound(
+export async function endRoundAction(
   signer: SignerProvider,
-  predictalph: PredictPriceInstance,
+  predictalph: PredictPriceInstance | PredictChoiceInstance,
   price: bigint,
-  immediatelyStart: boolean
+  immediatelyStart: boolean,
+  sideWon?: boolean
 ) {
-  return await End.execute(signer, {
-    initialFields: {
-      predict: predictalph.contractId,
-      price: price,
-      immediatelyStart: immediatelyStart,
-    },
-    attoAlphAmount: ONE_ALPH,
-  });
+  if (predictalph instanceof PredictPriceInstance) {
+    return await End.execute(signer, {
+      initialFields: {
+        predict: predictalph.contractId,
+        price: price,
+        immediatelyStart: immediatelyStart,
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+  } else if (predictalph instanceof PredictChoiceInstance) {
+    return await EndChoice.execute(signer, {
+      initialFields: {
+        predict: predictalph.contractId,
+        sideWon: sideWon,
+        immediatelyStart: immediatelyStart,
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+  }
 }
 
 export async function bid(
@@ -146,8 +168,9 @@ export async function withdraw(
 ) {
   return await WithdrawPrice.execute(signer, {
     initialFields: {
-       predict: predictalph.contractId, epochParticipation,
-       addressToClaim: ""
+      predict: predictalph.contractId,
+      epochParticipation,
+      addressToClaim: "",
     },
     attoAlphAmount: DUST_AMOUNT,
   });
@@ -208,7 +231,8 @@ export function arrayEpochToBytes(arrayEpoch) {
 export async function getRoundContractState(
   predictAlphContractId: string,
   epoch: bigint,
-  groupIndex: number
+  groupIndex: number,
+  isChoiceContract?: boolean
 ) {
   const roundContractId = getRoundContractId(
     predictAlphContractId,
@@ -216,7 +240,11 @@ export async function getRoundContractState(
     groupIndex
   );
 
-  const roundContract = Round.at(addressFromContractId(roundContractId));
+  let roundContract = undefined
+  roundContract = Round.at(addressFromContractId(roundContractId));
+  if(isChoiceContract)
+   roundContract = RoundChoice.at(addressFromContractId(roundContractId));
+
   const state = await roundContract.fetchState();
   return state;
 }
@@ -233,20 +261,19 @@ function getEpochPath(epoch: bigint) {
   return "00" + epoch.toString(16).padStart(8, "0");
 }
 
-export async function getPrice(cgClient: CoinGeckoClient) {
+export async function getPrice(cgClient: CoinGeckoClient, id: string) {
   const alphCoinGecko = await cgClient.simplePrice({
     vs_currencies: "usd",
-    ids: "alephium",
+    ids: id.toLowerCase(),
   });
-  if (alphCoinGecko.alephium.usd <= 0) {
+  console.log(alphCoinGecko[id]["usd"])
+  if (alphCoinGecko[id]["usd"] <= 0) {
     throw new Error("Price is not correct");
   }
 
   return (
-    Math.round((alphCoinGecko.alephium.usd + Number.EPSILON) * 1000) / 1000
+    Math.round((alphCoinGecko[id]["usd"] + Number.EPSILON) * 1000) / 1000
   );
 }
 
-export function getAddressesNotClaim(redis: Redis, round: number) {
-}
-
+export function getAddressesNotClaim(redis: Redis, round: number) {}

@@ -9,14 +9,13 @@ import {
   PunterInstance,
   Round,
   RoundInstance,
-  PredictPrice,
-  PredictPriceInstance,
   RoundChoice,
   RoundChoiceInstance,
+  PredictPrice,
+  PredictPriceInstance,
   PredictChoice,
   PredictChoiceInstance,
 } from ".";
-import { default as mainnetDeployments } from "../.deployments.mainnet.json";
 import { default as devnetDeployments } from "../.deployments.devnet.json";
 
 export type Deployments = {
@@ -24,10 +23,11 @@ export type Deployments = {
   contracts: {
     Punter: DeployContractExecutionResult<PunterInstance>;
     Round: DeployContractExecutionResult<RoundInstance>;
-    PredictPrice_PredictPriceALPH?: DeployContractExecutionResult<PredictPriceInstance>;
-    PredictPrice_PredictPriceBTC?: DeployContractExecutionResult<PredictPriceInstance>;
-    RoundChoice?: DeployContractExecutionResult<RoundChoiceInstance>;
-    PredictChoice_PredictPriceBTC?: DeployContractExecutionResult<PredictChoiceInstance>;
+    RoundChoice: DeployContractExecutionResult<RoundChoiceInstance>;
+    PredictPrice_PredictPriceALPH: DeployContractExecutionResult<PredictPriceInstance>;
+    PredictPrice_PredictPriceBTC: DeployContractExecutionResult<PredictPriceInstance>;
+    PredictChoice_PredictPriceBTC: DeployContractExecutionResult<PredictChoiceInstance>;
+    PredictChoice_PredictChoiceRhone: DeployContractExecutionResult<PredictChoiceInstance>;
   };
 };
 
@@ -45,45 +45,37 @@ function toDeployments(json: any): Deployments {
         json.contracts["Round"].contractInstance.address
       ),
     },
-    PredictPrice_PredictPriceALPH:
-      json.contracts["PredictPrice:PredictPriceALPH"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["PredictPrice:PredictPriceALPH"],
-            contractInstance: PredictPrice.at(
-              json.contracts["PredictPrice:PredictPriceALPH"].contractInstance
-                .address
-            ),
-          },
-    PredictPrice_PredictPriceBTC:
-      json.contracts["PredictPrice:PredictPriceBTC"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["PredictPrice:PredictPriceBTC"],
-            contractInstance: PredictPrice.at(
-              json.contracts["PredictPrice:PredictPriceBTC"].contractInstance
-                .address
-            ),
-          },
-    RoundChoice:
-      json.contracts["RoundChoice"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["RoundChoice"],
-            contractInstance: RoundChoice.at(
-              json.contracts["RoundChoice"].contractInstance.address
-            ),
-          },
-    PredictChoice_PredictPriceBTC:
-      json.contracts["PredictChoice:PredictPriceBTC"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["PredictChoice:PredictPriceBTC"],
-            contractInstance: PredictChoice.at(
-              json.contracts["PredictChoice:PredictPriceBTC"].contractInstance
-                .address
-            ),
-          },
+    RoundChoice: {
+      ...json.contracts["RoundChoice"],
+      contractInstance: RoundChoice.at(
+        json.contracts["RoundChoice"].contractInstance.address
+      ),
+    },
+    PredictPrice_PredictPriceALPH: {
+      ...json.contracts["PredictPrice:PredictPriceALPH"],
+      contractInstance: PredictPrice.at(
+        json.contracts["PredictPrice:PredictPriceALPH"].contractInstance.address
+      ),
+    },
+    PredictPrice_PredictPriceBTC: {
+      ...json.contracts["PredictPrice:PredictPriceBTC"],
+      contractInstance: PredictPrice.at(
+        json.contracts["PredictPrice:PredictPriceBTC"].contractInstance.address
+      ),
+    },
+    PredictChoice_PredictPriceBTC: {
+      ...json.contracts["PredictChoice:PredictPriceBTC"],
+      contractInstance: PredictChoice.at(
+        json.contracts["PredictChoice:PredictPriceBTC"].contractInstance.address
+      ),
+    },
+    PredictChoice_PredictChoiceRhone: {
+      ...json.contracts["PredictChoice:PredictChoiceRhone"],
+      contractInstance: PredictChoice.at(
+        json.contracts["PredictChoice:PredictChoiceRhone"].contractInstance
+          .address
+      ),
+    },
   };
   return {
     ...json,
@@ -95,12 +87,7 @@ export function loadDeployments(
   networkId: NetworkId,
   deployerAddress?: string
 ): Deployments {
-  const deployments =
-    networkId === "mainnet"
-      ? mainnetDeployments
-      : networkId === "devnet"
-      ? devnetDeployments
-      : undefined;
+  const deployments = networkId === "devnet" ? devnetDeployments : undefined;
   if (deployments === undefined) {
     throw Error("The contract has not been deployed to the " + networkId);
   }
