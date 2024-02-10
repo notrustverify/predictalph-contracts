@@ -44,18 +44,25 @@ export namespace PredictPriceTypes {
   export type State = ContractState<Fields>;
 
   export type BetEvent = ContractEvent<{
+    contractId: HexString;
     from: Address;
     epoch: bigint;
     amount: bigint;
     up: boolean;
     claimedByAnyoneTimestamp: bigint;
   }>;
-  export type RoundEndedEvent = ContractEvent<{ epoch: bigint; price: bigint }>;
+  export type RoundEndedEvent = ContractEvent<{
+    contractId: HexString;
+    epoch: bigint;
+    price: bigint;
+  }>;
   export type RoundStartedEvent = ContractEvent<{
+    contractId: HexString;
     epoch: bigint;
     price: bigint;
   }>;
   export type ClaimedEvent = ContractEvent<{
+    contractId: HexString;
     punterAddress: Address;
     from: Address;
     amount: bigint;
@@ -249,8 +256,8 @@ class Factory extends ContractFactory<
 export const PredictPrice = new Factory(
   Contract.fromJson(
     PredictPriceContractJson,
-    "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+6=2+2=1-1=3-1+c=2-2+31=3-1+3=3-1+4=3-1+5=3-1+6=3-1+7=3-1+8=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1574",
-    "1c011513a0e4dde6b32b0efe9652688016f141e228f242bb0b46778ccbe94f5b"
+    "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+6=2+2=1-1=3-1+d=2+3=1-1=3-1+3=3-1+5=3-1+6=3-1+7=3-1+8=3-1+9=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1600",
+    "35cff66724106a4953bc380897ceb4742e7ece4a52cf282df9e3f8be0cba6e7e"
   )
 );
 

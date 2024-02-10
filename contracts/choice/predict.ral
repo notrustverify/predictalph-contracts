@@ -10,10 +10,10 @@ Contract PredictChoice(
    mut playerCounter: U256  
 ) extends DynamicArrayForInt() {
 
-   event Bet(from: Address, epoch: U256, amount: U256, side: Bool, claimedByAnyoneTimestamp: U256)
-   event RoundEnded(epoch: U256, sideWon: Bool)
-   event RoundStarted(epoch: U256)
-   event Claimed(punterAddress: Address, from: Address, amount: U256, epoch: U256)
+   event Bet(contractId: ByteVec, from: Address, epoch: U256, amount: U256, side: Bool, claimedByAnyoneTimestamp: U256)
+   event RoundEnded(contractId: ByteVec, epoch: U256, sideWon: Bool)
+   event RoundStarted(contractId: ByteVec, epoch: U256)
+   event Claimed(contractId: ByteVec, punterAddress: Address, from: Address, amount: U256, epoch: U256)
 
    enum ErrorCodes {
       PunterNotExists = 1
@@ -75,7 +75,7 @@ Contract PredictChoice(
       let (encodedImmFields, encodedMutFields) = RoundChoice.encodeFields!(selfContract!(), epoch, feesBasisPts, bidTimestampEnd, operator, false, 0 ,false ,0 ,0 ,0, 0, 0, 0, 0)
 
       copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
-      emit RoundStarted(epoch)
+      emit RoundStarted(selfContractId!(), epoch)
    }
 
    @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
@@ -90,7 +90,7 @@ Contract PredictChoice(
 
       round.calculateRewards(sideWon)
 
-      emit RoundEnded(epoch, sideWon)
+      emit RoundEnded(selfContractId!(), epoch, sideWon)
       epoch = epoch + 1
 
       if (immediatelyStart){
@@ -117,12 +117,13 @@ Contract PredictChoice(
 
       let bidAmount = amount - 1 alph 
       let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
-      let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId!(), caller, epoch, side, bidAmount, claimedByAnyoneTimestamp)
+      let selfContractId = selfContractId!()
+      let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId, caller, epoch, side, bidAmount, claimedByAnyoneTimestamp)
       copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
       round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, side)
         
       playerCounter = playerCounter + 1
-      emit Bet(caller, epoch, amount, side, claimedByAnyoneTimestamp)
+      emit Bet(selfContractId, caller, epoch, amount, side, claimedByAnyoneTimestamp)
 
    }
 
@@ -132,6 +133,7 @@ Contract PredictChoice(
       checkCaller!(from == callerAddress!(), ErrorCodes.InvalidCaller)
 
       let timestampNow = blockTimeStamp!()
+      let selfContractId = selfContractId!()
 
       for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
          let epochNumber = getArrayElem(arrayEpochIn, index)
@@ -162,7 +164,7 @@ Contract PredictChoice(
 
             playerCounter = playerCounter - 1 
             // emit who call and with and which punter it concerned
-            emit Claimed(addressPunter, from, amountPunter, u256From4Byte!(epochNumber))
+            emit Claimed(selfContractId, addressPunter, from, amountPunter, u256From4Byte!(epochNumber))
          }
       }
 

@@ -26,6 +26,8 @@ import {
   EndChoice,
   StartChoice,
   RoundChoice,
+  BidChoice,
+  WithdrawChoice,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -145,36 +147,6 @@ export async function endRoundAction(
   }
 }
 
-export async function bid(
-  signer: SignerProvider,
-  predictalph: PredictPriceInstance,
-  amount: bigint,
-  up: boolean
-) {
-  return await BidPrice.execute(signer, {
-    initialFields: {
-      predict: predictalph.contractId,
-      amount: amount,
-      side: up,
-    },
-    attoAlphAmount: amount + 2n * DUST_AMOUNT,
-  });
-}
-
-export async function withdraw(
-  signer: SignerProvider,
-  predictalph: PredictPriceInstance,
-  epochParticipation: string
-) {
-  return await WithdrawPrice.execute(signer, {
-    initialFields: {
-      predict: predictalph.contractId,
-      epochParticipation,
-      addressToClaim: "",
-    },
-    attoAlphAmount: DUST_AMOUNT,
-  });
-}
 
 export async function destroyRound(
   signer: SignerProvider,
@@ -276,4 +248,58 @@ export async function getPrice(cgClient: CoinGeckoClient, id: string) {
   );
 }
 
-export function getAddressesNotClaim(redis: Redis, round: number) {}
+export async function bid(
+   signer: SignerProvider,
+   contractId: string,
+   amount: bigint,
+   up: boolean,
+   type: string
+ ) {
+   if (type.toLowerCase() == "predictprice" ) {
+     return await BidPrice.execute(signer, {
+       initialFields: {
+         predict: contractId,
+         amount: amount,
+         side: up,
+       },
+       attoAlphAmount: amount + 2n * DUST_AMOUNT,
+     });
+   } else if (type.toLowerCase() == "predictchoice" ) {
+     return await BidChoice.execute(signer, {
+       initialFields: {
+         predict: contractId,
+         amount: amount,
+         side: up,
+       },
+       attoAlphAmount: amount + 2n * DUST_AMOUNT,
+     });
+   }
+ }
+
+ export async function withdraw(
+   signer: SignerProvider,
+   contractId: string,
+   arrayEpoch: string,
+   addressToClaim: string,
+   type: string
+ ) {
+   if (type.toLowerCase() == "predictprice" ) {
+     return await WithdrawPrice.execute(signer, {
+       initialFields: {
+          predict: contractId,
+          epochParticipation: arrayEpoch,
+          addressToClaim: addressToClaim
+       },
+       attoAlphAmount: 2n * DUST_AMOUNT,
+     });
+   } else if (type.toLowerCase() == "predictchoice" ) {
+     return await WithdrawChoice.execute(signer, {
+       initialFields: {
+          predict: contractId,
+          epochParticipation: arrayEpoch,
+          addressToClaim: addressToClaim
+       },
+       attoAlphAmount: 2n * DUST_AMOUNT,
+     });
+   }
+ }

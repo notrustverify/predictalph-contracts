@@ -22,7 +22,8 @@
     "destroy": "node dist/src/destroy.js ",
     "bot": "node dist/src/bot.js",
     "parameters": "node dist/src/parameters.js",
-    "claim": "node dist/src/claimOnBehalf.js"
+    "claim": "node dist/src/claimOnBehalf.js",
+    "bet": "node dist/src/userActions.js"
   },
   "author": "",
   "license": "ISC",

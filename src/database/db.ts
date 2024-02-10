@@ -1,5 +1,5 @@
 import { exit } from "process";
-import { Sequelize, Model, DataTypes } from "sequelize";
+import { Sequelize, Model, DataTypes, where } from "sequelize";
 
 export class Address extends Model {
   declare id: Number;
@@ -20,6 +20,11 @@ export class RoundParticipation extends Model {
   declare claimedByAnyoneTimestamp: bigint;
 }
 
+export class Game extends Model {
+  declare id: Number;
+  declare contractId: string;
+}
+
 export function initDb(sequelize: Sequelize, sync: boolean) {
   Address.init(
     {
@@ -31,7 +36,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       address: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: false,
       },
     },
     {
@@ -50,10 +55,11 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       epoch: {
         type: DataTypes.NUMBER,
         allowNull: false,
-        unique: true,
+        unique: false,
       },
       priceEnd: { type: DataTypes.NUMBER, allowNull: true, defaultValue: 0 },
       priceStart: { type: DataTypes.NUMBER, allowNull: true, defaultValue: 0 },
+      sideWon: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
     },
     {
       sequelize,
@@ -68,7 +74,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
         autoIncrement: true,
         primaryKey: true,
       },
-      upBid: DataTypes.BOOLEAN,
+      side: DataTypes.BOOLEAN,
       amountBid: DataTypes.BIGINT,
       claimed: DataTypes.BOOLEAN,
       claimedByAnyoneTimestamp: {
@@ -83,11 +89,37 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
     }
   );
 
+  Game.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      contractId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+    },
+    {
+      sequelize,
+      modelName: "Game",
+    }
+  );
+
   Address.belongsToMany(Round, { through: RoundParticipation });
   Round.belongsToMany(Address, { through: RoundParticipation });
+  Game.belongsToMany(Game, {as: "notused" , through: RoundParticipation })
+  //Game.belongsToMany(Round, {through: RoundParticipation })
 
+  Game.hasMany(Address)
+  Game.hasMany(Round)
+  Game.hasMany(RoundParticipation)
+
+  
   sequelize
-    .sync({force: sync})
+    .sync({ force: sync })
     .then(() => {
       console.log("tables created successfully!");
     })
@@ -99,17 +131,19 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
 export async function createAndGetNewRound(
   epoch: bigint,
   price: Number,
-  isStart: false
+  isStart: false,
+  game: Game
 ): Promise<[Round, boolean]> {
   let defaultData = {};
 
-  if (isStart) defaultData = { priceStart: price };
-  else defaultData = { priceEnd: price };
+  if (isStart) defaultData = { priceStart: price, GameId: game.id };
+  else defaultData = { priceEnd: price, GameId: game.id };
 
+ 
   try {
     const [round, created] = await Round.findCreateFind({
-      where: { epoch: epoch },
-      defaults: { defaultData },
+      where: { epoch: epoch, GameId: game.id },
+      defaults: { defaultData},
     });
     return [round, created];
   } catch (error) {
@@ -118,38 +152,58 @@ export async function createAndGetNewRound(
 }
 
 export async function createAndGetNewAddress(
-  address: string
+  address: string,
+  game: Game
 ): Promise<[Address, boolean]> {
   try {
     const [addrId, created] = await Address.findCreateFind({
-      where: { address: address },
-      defaults: { address: address },
+      where: { address: address, GameId: game.id },
+      defaults: { address: address, GameId: game.id },
     });
     return [addrId, created];
   } catch (error) {
     console.error(error);
   }
 }
+
+
+export async function createAndGetNewGame(
+   contractId: string
+ ): Promise<[Game, boolean]> {
+   try {
+     const [gameId, created] = await Game.findCreateFind({
+       where: { contractId: contractId },
+       defaults: { contractId: contractId },
+     });
+     return [gameId, created];
+   } catch (error) {
+     console.error(error);
+   }
+ }
+
 export async function createAndGetNewParticipation(
   roundId: Round,
   addrId: Address,
-  upBid: boolean,
+  gameId: Game,
+  side: boolean,
   amountBid: bigint,
   claimed: boolean,
   claimedByAnyoneTimestamp: bigint
 ): Promise<[RoundParticipation, boolean]> {
   try {
     const [round, created] = await RoundParticipation.findCreateFind({
-      where: { RoundId: roundId.id, AddressId: addrId.id },
+      where: { RoundId: roundId.id, AddressId: addrId.id, GameId: gameId.id },
       defaults: {
         RoundId: roundId.id,
         AddressId: addrId.id,
-        upBid: upBid,
+        GameId: gameId.id,
+        side: side,
         amountBid: amountBid,
         claimed: claimed,
         claimedByAnyoneTimestamp: claimedByAnyoneTimestamp,
       },
     });
+
     return [round, created];
   } catch (error) {
     console.error(error);

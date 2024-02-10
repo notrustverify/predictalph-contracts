@@ -17,7 +17,6 @@ import * as fetchRetry from "fetch-retry";
 import {
   arrayEpochToBytes,
   contractExists,
-  getAddressesNotClaim,
   getPrice,
   getRoundContractId,
   getRoundContractState,

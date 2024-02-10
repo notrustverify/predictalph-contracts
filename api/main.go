@@ -41,19 +41,19 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(corsConfig))
-	router.GET("/round/:address", getUserRoundsPlayed)
-	router.GET("/allround/:address", getAllUserRounds)
-	router.GET("/topplayer", getTopPlayers)
-	router.GET("/round/notclaimed", getAllRoundNotClaimed)
-	router.GET("/round/claimed", getAllRoundClaimed)
-	router.GET("/address/expiredclaim", getExpiredClaimed)
+	router.GET("/round/:contractid/:address", getUserRoundsPlayed)
+	router.GET("/allround/:contractid/:address", getAllUserRounds)
+	router.GET("/topplayer/:contractid", getTopPlayers)
+	router.GET("/round/:contractid/notclaimed", getAllRoundNotClaimed)
+	router.GET("/round/:contractid/claimed", getAllRoundClaimed)
+	router.GET("/address/:contractid/expiredclaim", getExpiredClaimed)
 
 	router.Run("0.0.0.0:8080")
 
 }
 
 func getUserRoundsPlayed(c *gin.Context) {
-	userRound, err := getRoundParticipation(db, c.Param("address"), 0)
+	userRound, err := getRoundParticipation(db, c.Param("contractid"), c.Param("address"), false)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
@@ -62,7 +62,16 @@ func getUserRoundsPlayed(c *gin.Context) {
 }
 
 func getAllUserRounds(c *gin.Context) {
-	userRound, err := getRoundParticipation(db, c.Param("address"), 1)
+	userRoundClaimed, err := getRoundParticipation(db, c.Param("contractid"), c.Param("address"), true)
+	if err != nil {
+		fmt.Println("Error on getAllUser ", err)
+	}
+	userRoundNotClaimed, err := getRoundParticipation(db, c.Param("contractid"), c.Param("address"), false)
+	if err != nil {
+		fmt.Println("Error on getAllUser ", err)
+	}
+
+	userRound := append(userRoundClaimed, userRoundNotClaimed...)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
@@ -71,7 +80,7 @@ func getAllUserRounds(c *gin.Context) {
 }
 
 func getTopPlayers(c *gin.Context) {
-	userRound, err := getAllPlayer(db, 10)
+	userRound, err := getAllPlayer(db, c.Param("contractid"), 10)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
@@ -80,7 +89,7 @@ func getTopPlayers(c *gin.Context) {
 }
 
 func getAllRoundNotClaimed(c *gin.Context) {
-	userRound, err := getRoundClaimedOrNot(db, 0)
+	userRound, err := getRoundClaimedOrNot(db, c.Param("contractid"), false)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
@@ -89,7 +98,7 @@ func getAllRoundNotClaimed(c *gin.Context) {
 }
 
 func getAllRoundClaimed(c *gin.Context) {
-	userRound, err := getRoundClaimedOrNot(db, 1)
+	userRound, err := getRoundClaimedOrNot(db, c.Param("contractid"), false)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
@@ -99,7 +108,7 @@ func getAllRoundClaimed(c *gin.Context) {
 
 func getExpiredClaimed(c *gin.Context) {
 	now := int(time.Now().UTC().Unix())
-	userRound, err := getExpiredClaimedOrNot(db, now, false)
+	userRound, err := getExpiredClaimedOrNot(db, c.Param("contractid"), now, false)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {

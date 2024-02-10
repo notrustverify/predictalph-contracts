@@ -10,10 +10,10 @@ Contract PredictPrice(
    mut playerCounter: U256  
 ) extends DynamicArrayForInt() {
 
-   event Bet(from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
-   event RoundEnded(epoch: U256, price: U256)
-   event RoundStarted(epoch: U256, price: U256)
-   event Claimed(punterAddress: Address, from: Address, amount: U256, epoch: U256)
+   event Bet(contractId: ByteVec, from: Address, epoch: U256, amount: U256, up: Bool, claimedByAnyoneTimestamp: U256)
+   event RoundEnded(contractId: ByteVec, epoch: U256, price: U256)
+   event RoundStarted(contractId: ByteVec, epoch: U256, price: U256)
+   event Claimed(contractId: ByteVec, punterAddress: Address, from: Address, amount: U256, epoch: U256)
 
    enum ErrorCodes {
       PunterNotExists = 1
@@ -76,7 +76,7 @@ Contract PredictPrice(
 
 
       copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
-      emit RoundStarted(epoch, price)
+      emit RoundStarted(selfContractId!(), epoch, price)
    }
 
    @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
@@ -91,7 +91,7 @@ Contract PredictPrice(
 
       round.calculateRewards(actualPrice)
 
-      emit RoundEnded(epoch, actualPrice)
+      emit RoundEnded(selfContractId!(), epoch, actualPrice)
       epoch = epoch + 1
 
       if (immediatelyStart){
@@ -118,12 +118,13 @@ Contract PredictPrice(
 
       let bidAmount = amount - 1 alph 
       let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
-      let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId!(), caller, epoch, up, bidAmount, claimedByAnyoneTimestamp)
+      let selfContractId = selfContractId!()
+      let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId, caller, epoch, up, bidAmount, claimedByAnyoneTimestamp)
       copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
       round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, up)
         
       playerCounter = playerCounter + 1
-      emit Bet(caller, epoch, amount, up, claimedByAnyoneTimestamp)
+      emit Bet(selfContractId, caller, epoch, amount, up, claimedByAnyoneTimestamp)
 
    }
 
@@ -133,6 +134,7 @@ Contract PredictPrice(
       checkCaller!(from == callerAddress!(), ErrorCodes.InvalidCaller)
 
       let timestampNow = blockTimeStamp!()
+      let selfContractId = selfContractId!()
 
       for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
          let epochNumber = getArrayElem(arrayEpochIn, index)
@@ -163,7 +165,7 @@ Contract PredictPrice(
 
             playerCounter = playerCounter - 1 
             // emit who call and with and which punter it concerned
-            emit Claimed(addressPunter, from, amountPunter, u256From4Byte!(epochNumber))
+            emit Claimed(selfContractId, addressPunter, from, amountPunter, u256From4Byte!(epochNumber))
          }
       }
 
