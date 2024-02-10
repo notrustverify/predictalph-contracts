@@ -46,7 +46,7 @@ import {
 import { Sequelize, where } from "sequelize";
 import { exit } from "process";
 
-const POLLING_INTERVAL_EVENTS = 6 * 1000;
+const POLLING_INTERVAL_EVENTS = 60 * 1000;
 
 async function keyExists(key: string) {
   const reply = await redis.exists(key);
@@ -441,6 +441,7 @@ async function listenerManager(
 
     if (contractId != predictalphContractId) {
       console.log("Contract changed, flush db");
+      await redis.set(KEY_NAME_COUNTER_EVENT, 0)
      // await redis.flushdb();
       //initDb(sequelize, true);
     }

@@ -238,7 +238,6 @@ export async function getPrice(cgClient: CoinGeckoClient, id: string) {
     vs_currencies: "usd",
     ids: id.toLowerCase(),
   });
-  console.log(alphCoinGecko[id]["usd"])
   if (alphCoinGecko[id]["usd"] <= 0) {
     throw new Error("Price is not correct");
   }

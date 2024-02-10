@@ -87,8 +87,9 @@ const cgClient = new CoinGeckoClient({
 const intPriceDivision = 10_000;
 
 let networkToUse = process.argv.slice(2)[0];
-let action = process.argv.slice(2)[1];
-let newParameter = process.argv.slice(2)[2];
+let contractName = process.argv.slice(2)[1];
+let action = process.argv.slice(2)[2];
+let newParameter = process.argv.slice(2)[3];
 //if (networkToUse === undefined) networkToUse = "mainnet";
 
 if (process.argv.length > 3) console.error("parameters empty")
@@ -109,7 +110,7 @@ switch (action) {
     case "interval":
         newInterval(
             configuration.networks[networkToUse].privateKeys[0],
-            "Predictalph",
+            contractName,
             BigInt(parseInt(newParameter))
           );
         break;
