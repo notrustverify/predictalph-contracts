@@ -103,16 +103,15 @@ async function userClaim(privKey: string, contractName: string) {
     const tx = await withdraw(
       wallet,
       predictalphContractId,
-      arrayEpochToBytes([228, 192]),
+      arrayEpochToBytes([13]),
       wallet.address,
-      "price"
+      "predictprice"
     );
-
+console.log(tx)
     console.log(
       `withdraw from ${wallet.address} - ${tx.txId} - ${predictalphContractAddress}`
     );
     await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
-    console.log("New bid is set");
   } catch (error) {
     console.error(error);
   }

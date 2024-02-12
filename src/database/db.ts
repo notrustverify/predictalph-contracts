@@ -36,7 +36,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       address: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false,
+        unique: true,
       },
     },
     {
@@ -110,13 +110,9 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
 
   Address.belongsToMany(Round, { through: RoundParticipation });
   Round.belongsToMany(Address, { through: RoundParticipation });
-  Game.belongsToMany(Game, {as: "notused" , through: RoundParticipation })
-  //Game.belongsToMany(Round, {through: RoundParticipation })
-
-  Game.hasMany(Address)
+   
   Game.hasMany(Round)
- // Game.hasMany(RoundParticipation)
-
+  Game.hasMany(RoundParticipation)
   
   sequelize
     .sync({ force: sync })
@@ -157,8 +153,8 @@ export async function createAndGetNewAddress(
 ): Promise<[Address, boolean]> {
   try {
     const [addrId, created] = await Address.findCreateFind({
-      where: { address: address, GameId: game.id },
-      defaults: { address: address, GameId: game.id },
+      where: { address: address},
+      defaults: { address: address},
     });
     return [addrId, created];
   } catch (error) {
