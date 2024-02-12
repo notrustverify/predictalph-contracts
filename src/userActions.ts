@@ -153,14 +153,14 @@ web3.setCurrentNodeProvider(nodeProvider);
 switch (action) {
   case "bid":
     userBid(
-      configuration.networks[networkToUse].privateKeys[0],
+      configuration.networks[networkToUse].privateKeys[1],
       contractName,
       BigInt(parseInt(amountBet))
     );
     break;
   case "claim":
     userClaim(
-      configuration.networks[networkToUse].privateKeys[0],
+      configuration.networks[networkToUse].privateKeys[1],
       contractName
     );
     break;
