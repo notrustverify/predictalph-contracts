@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { DestroyRound, End, NewInterval, PredictPrice, Start } from "../artifacts/ts";
+import { DestroyRound, End, NewInterval, NewIntervalChoice, PredictPrice, Start } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
     arrayEpochToBytes,
@@ -49,19 +49,29 @@ async function newInterval(
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
 
-  const predictionStates = await PredictPrice.at(
-    predictalphContractAddress
-  ).fetchState();
-
   try {
-    const tx = await NewInterval.execute(wallet, {
+   let tx 
+   const contractType = contractName.split(':')[0].toLowerCase()
+   if (contractType == "predictprice"){
+
+   
+     tx = await NewInterval.execute(wallet, {
       initialFields: {
         predict: predictalphContractId,
         newRecurrence: newIntervalSecond*1000n
       },
       attoAlphAmount: ONE_ALPH,
     });
-
+   } else if (contractType == "predictchoice"){
+         
+     tx = await NewIntervalChoice.execute(wallet, {
+      initialFields: {
+        predict: predictalphContractId,
+        newRecurrence: newIntervalSecond*1000n
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+   }
     console.log(
       `new recurrence ${newIntervalSecond/60n} minutes ${tx.txId}`
     );

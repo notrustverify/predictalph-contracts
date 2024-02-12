@@ -1,5 +1,5 @@
 {
-  "fullNodeVersion": "v2.8.0",
+  "fullNodeVersion": "v2.8.1",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
@@ -74,7 +74,14 @@
     },
     "NewInterval": {
       "sourceFile": "parameters.ral",
-      "sourceCodeHash": "46df160cf6da69aa4e3cd128c6b253be15cc07ebccf107ab25719f3e1f8c5f14",
+      "sourceCodeHash": "3770b695a5fba6f0820db9a822b1004c7d93cd6d5efe917371ffc4b3f4946a92",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "NewIntervalChoice": {
+      "sourceFile": "parameters.ral",
+      "sourceCodeHash": "3770b695a5fba6f0820db9a822b1004c7d93cd6d5efe917371ffc4b3f4946a92",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

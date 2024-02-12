@@ -20,6 +20,7 @@ import { default as DestroyRoundChoiceScriptJson } from "../DestroyRoundChoice.r
 import { default as EndScriptJson } from "../End.ral.json";
 import { default as EndChoiceScriptJson } from "../EndChoice.ral.json";
 import { default as NewIntervalScriptJson } from "../NewInterval.ral.json";
+import { default as NewIntervalChoiceScriptJson } from "../NewIntervalChoice.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
 import { default as StartChoiceScriptJson } from "../StartChoice.ral.json";
 import { default as WithdrawChoiceScriptJson } from "../WithdrawChoice.ral.json";
@@ -67,6 +68,10 @@ export const NewInterval = new ExecutableScript<{
   predict: HexString;
   newRecurrence: bigint;
 }>(Script.fromJson(NewIntervalScriptJson));
+export const NewIntervalChoice = new ExecutableScript<{
+  predict: HexString;
+  newRecurrence: bigint;
+}>(Script.fromJson(NewIntervalChoiceScriptJson));
 export const Start = new ExecutableScript<{
   predict: HexString;
   price: bigint;

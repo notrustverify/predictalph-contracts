@@ -36,7 +36,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       address: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: false,
+        unique: true,
       },
     },
     {
@@ -115,7 +115,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
 
   Game.hasMany(Address)
   Game.hasMany(Round)
-  Game.hasMany(RoundParticipation)
+ // Game.hasMany(RoundParticipation)
 
   
   sequelize
