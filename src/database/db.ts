@@ -36,7 +36,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       address: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: false,
       },
     },
     {
