@@ -57,7 +57,7 @@ func getUserRoundsPlayed(c *gin.Context) {
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
-		c.JSON(http.StatusNotFound, fmt.Sprintf("address %s not found", c.Param("address")))
+		c.JSON(http.StatusOK, make([]string, 0))
 	}
 }
 
@@ -75,7 +75,7 @@ func getAllUserRounds(c *gin.Context) {
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
-		c.JSON(http.StatusNotFound, fmt.Sprintf("address %s not found", c.Param("address")))
+		c.JSON(http.StatusOK, make([]string, 0))
 	}
 }
 
@@ -84,7 +84,7 @@ func getTopPlayers(c *gin.Context) {
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
-		c.JSON(http.StatusNotFound, "nobody played yet")
+		c.JSON(http.StatusOK, make([]string, 0))
 	}
 }
 
@@ -93,7 +93,7 @@ func getAllRoundNotClaimed(c *gin.Context) {
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
-		c.JSON(http.StatusNotFound, "nobody played yet")
+		c.JSON(http.StatusOK, make([]string, 0))
 	}
 }
 
@@ -102,7 +102,7 @@ func getAllRoundClaimed(c *gin.Context) {
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
-		c.JSON(http.StatusNotFound, "nobody played yet")
+		c.JSON(http.StatusOK, make([]string, 0))
 	}
 }
 
@@ -112,6 +112,6 @@ func getExpiredClaimed(c *gin.Context) {
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {
-		c.JSON(http.StatusNotFound, "nobody played yet")
+		c.JSON(http.StatusOK, make([]string, 0))
 	}
 }

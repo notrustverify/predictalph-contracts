@@ -28,9 +28,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@alephium/cli": "^0.29.1",
-    "@alephium/web3": "^0.29.1",
-    "@alephium/web3-wallet": "^0.29.1",
+    "@alephium/cli": "^0.29.3",
+    "@alephium/web3": "^0.29.3",
+    "@alephium/web3-wallet": "^0.29.3",
     "@types/redis": "^4.0.11",
     "axios": "^1.6.2",
     "body-parser": "^1.20.2",
@@ -49,7 +49,7 @@
     "twitter-api-v2": "^1.15.2"
   },
   "devDependencies": {
-    "@alephium/web3-test": "^0.29.1",
+    "@alephium/web3-test": "^0.29.3",
     "@types/better-sqlite3": "^7.6.8",
     "@types/body-parser": "^1.19.5",
     "@types/debug": "^4.1.12",

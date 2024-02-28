@@ -21,6 +21,7 @@ import {
   getRoundContractState,
 } from "./utils";
 import { CoinGeckoClient } from "coingecko-api-v3";
+import { exit } from "process";
 
 
 
@@ -195,6 +196,11 @@ const TIME_TO_WAIT_NEW_ROUND = 0
 let networkToUse = process.argv.slice(2)[0];
 const contractName = process.argv.slice(2)[1]
 const action = process.argv.slice(2)[2]
+
+if(action == "end" && process.argv.slice(2)[3] == undefined){
+   console.error("Need value true or false for end")
+   exit(-1)
+}
 const sideWon = process.argv.slice(2)[3] == 'true'
 
 //Select our network defined in alephium.config.ts
