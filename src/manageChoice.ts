@@ -163,6 +163,8 @@ async function endRound(privKey: string, contractName: string, sideWon: boolean)
             configuration.networks[networkToUse].privateKeys[group],
             "PredictPrice"
           );*/
+        }else{
+         console.log(`didnt end yet, end at ${new Date(endTimestamp)}`)
         }
       } catch (error) {
         console.error(error);
