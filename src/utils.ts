@@ -182,9 +182,7 @@ export async function transferAlphTo(to: Address, amount: bigint) {
 export async function contractExists(address: string): Promise<boolean> {
   try {
     const nodeProvider = web3.getCurrentNodeProvider();
-    await nodeProvider.contracts.getContractsAddressState(address, {
-      group: groupOfAddress(address),
-    });
+    await nodeProvider.contracts.getContractsAddressState(address);
     return true;
   } catch (error: any) {
     if (error instanceof Error && error.message.includes("KeyNotFound")) {

@@ -36,7 +36,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        playerCounter: 0n
     },
 
-  },"PredictChoiceALPHFourQ1")
+  },"PredictChoiceALPHFour")
 
   console.log(`\nDeploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
@@ -44,7 +44,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   console.log(`Round contract id: ${roundTemplateId.contractInstance.contractId}`)
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
-  console.log(`Prediction contract address: ${predict.contractInstance.address}`)
+  console.log(`Prediction contract address: ${predict.contractInstance.address}\n\n`)
 }
 
 export default deployPredictChoice
