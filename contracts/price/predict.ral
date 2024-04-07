@@ -75,7 +75,7 @@ Contract PredictPrice(
       let (encodedImmFields, encodedMutFields) = Round.encodeFields!(selfContract!(), epoch, price, feesBasisPts, bidTimestampEnd, operator, false, 0, 0 ,0 ,0 ,0 ,0, 0, 0, 0)
 
 
-      copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
+      let _ = copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
       emit RoundStarted(selfContractId!(), epoch, price)
    }
 
@@ -120,7 +120,7 @@ Contract PredictPrice(
       let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
       let selfContractId = selfContractId!()
       let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId, caller, epoch, up, bidAmount, claimedByAnyoneTimestamp)
-      copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
+      let _ = copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
       round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, up)
         
       playerCounter = playerCounter + 1

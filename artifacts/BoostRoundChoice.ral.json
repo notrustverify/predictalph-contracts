@@ -1,5 +1,5 @@
 {
-  "version": "v2.9.0",
+  "version": "v2.11.0",
   "name": "BoostRoundChoice",
   "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}010b",
   "fieldsSig": {
@@ -9,7 +9,7 @@
       "epochToBoost"
     ],
     "types": [
-      "ByteVec",
+      "PredictChoice",
       "U256",
       "U256"
     ],

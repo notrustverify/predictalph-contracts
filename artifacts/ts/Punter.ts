@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as PunterContractJson } from "../Punter.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -89,33 +91,51 @@ class Factory extends ContractFactory<PunterInstance, PunterTypes.Fields> {
 
   tests = {
     getAddress: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<Address>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getAddress", params);
     },
     getBid: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<boolean>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "getBid", params);
     },
     getAmountBid: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountBid", params);
     },
     getRoundEpoch: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
     getClaimedByAnyone: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getClaimedByAnyone", params);
     },
     destroy: async (
-      params: TestContractParams<PunterTypes.Fields, { from: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        PunterTypes.Fields,
+        { from: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroy", params);
     },
   };

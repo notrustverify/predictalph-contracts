@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as RoundContractJson } from "../price/Round.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -103,57 +105,75 @@ class Factory extends ContractFactory<RoundInstance, RoundTypes.Fields> {
 
   tests = {
     getEndRoundTime: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<RoundTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getEndRoundTime", params);
     },
     getRewardAmount: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<RoundTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRewardAmount", params);
     },
     getRewardBaseCalAmount: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<RoundTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRewardBaseCalAmount", params);
     },
     getRoundEpoch: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<RoundTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
     updateAmount: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         RoundTypes.Fields,
         { from: Address; amount: bigint; up: boolean }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "updateAmount", params);
     },
     calculateRewards: async (
-      params: TestContractParams<RoundTypes.Fields, { price: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        RoundTypes.Fields,
+        { price: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "calculateRewards", params);
     },
     boost: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         RoundTypes.Fields,
         { from: Address; amount: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "boost", params);
     },
     destroy: async (
-      params: Omit<TestContractParams<RoundTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<RoundTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroy", params);
     },
     userClaimRewards: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         RoundTypes.Fields,
         { addressPunter: Address; amountBid: bigint; upBid: boolean }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "userClaimRewards", params);
     },
   };

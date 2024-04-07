@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as PredictChoiceContractJson } from "../choice/PredictChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -124,128 +126,131 @@ class Factory extends ContractFactory<
 
   tests = {
     getArrayElem: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { array: HexString; index: bigint }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getArrayElem", params);
     },
     getRoundByEpoch: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { epochToGet: bigint }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getRoundByEpoch", params);
     },
     getRoundByEpochByteVec: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { epochToGet: HexString }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getRoundByEpochByteVec", params);
     },
     getBetInfoByEpoch: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { from: Address; epochToGet: HexString }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getBetInfoByEpoch", params);
     },
     getTitle: async (
       params: Omit<
-        TestContractParams<PredictChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<PredictChoiceTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getTitle", params);
     },
     startRound: async (
-      params: TestContractParams<PredictChoiceTypes.Fields, { from: Address }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        PredictChoiceTypes.Fields,
+        { from: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "startRound", params);
     },
     endRound: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { sideWon: boolean; immediatelyStart: boolean }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "endRound", params);
     },
     bid: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { amount: bigint; side: boolean }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "bid", params);
     },
     withdraw: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { from: Address; arrayEpochIn: HexString; addressToClaim: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "withdraw", params);
     },
     destroyRound: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { epochArray: HexString }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroyRound", params);
     },
     destroy: async (
       params: Omit<
-        TestContractParams<PredictChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<PredictChoiceTypes.Fields, never>,
         "testArgs"
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroy", params);
     },
     boostRound: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { amount: bigint; epochToBoost: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "boostRound", params);
     },
     setNewRepeatEvery: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { newRecurrence: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewRepeatEvery", params);
     },
     setNewFees: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { basisPts: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewFees", params);
     },
     setNewOperator: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { newOperator: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewOperator", params);
     },
     setNewClaimedByAnyone: async (
-      params: TestContractParams<
+      params: TestContractParamsWithoutMaps<
         PredictChoiceTypes.Fields,
         { newClaimedByAnyoneDelay: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewClaimedByAnyone", params);
     },
   };

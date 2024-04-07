@@ -18,7 +18,7 @@ const deployPredictPrice: DeployFunction<Settings> = async (
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
   const settings = network.settings
-  const title = "Predict price of BTC"
+  const title = "Predict BTC price"
 
   const predict = await deployer.deployContract(PredictPrice, {
     initialFields: {
@@ -28,7 +28,7 @@ const deployPredictPrice: DeployFunction<Settings> = async (
        operator: deployer.account.address,
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
-       repeatEvery: BigInt(60 * 1000),
+       repeatEvery: BigInt(ONE_DAY_SEC/2 * 1000),
        claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
