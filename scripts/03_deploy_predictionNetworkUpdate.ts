@@ -29,8 +29,8 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        operator: deployer.account.address,
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
-       repeatEvery: BigInt(1719791999 * 1000),
-       claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC * 1000)
+       repeatEvery: BigInt(Q2_END * 1000),
+       claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC+Q2_END * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
        title: binToHex(new TextEncoder().encode(title)),

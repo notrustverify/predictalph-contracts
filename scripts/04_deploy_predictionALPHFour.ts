@@ -30,7 +30,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
        repeatEvery: BigInt(END_2024 * 1000),
-       claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC * 1000)
+       claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC+END_2024 * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
        title: binToHex(new TextEncoder().encode(title)),
