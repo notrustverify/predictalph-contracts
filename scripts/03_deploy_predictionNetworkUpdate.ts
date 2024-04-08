@@ -18,7 +18,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
   const settings = network.settings
-  const Q2_END = 7_257_600
+  const Q2_END = 7_344_000
   const title = "Rhone upgrade deployed in Q2 on mainnet"
 
   const predict = await deployer.deployContract(PredictChoice, {
