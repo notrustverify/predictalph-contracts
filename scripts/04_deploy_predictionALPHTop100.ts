@@ -17,9 +17,9 @@ const deployPredictChoice: DeployFunction<Settings> = async (
 
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
-  const END_2024 = 1735689599
+  const END_2024 = 23_241_600
   const settings = network.settings
-  const title = "ALPH in top 100 before end of 2024"
+  const title = "ALPH in top 100 by market cap on CoinGecko before end of 2024"
 
   const predict = await deployer.deployContract(PredictChoice, {
     initialFields: {
@@ -30,7 +30,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
        repeatEvery: BigInt(END_2024 * 1000),
-       claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC+END_2024 * 1000)
+       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC+END_2024) * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
        title: binToHex(new TextEncoder().encode(title)),

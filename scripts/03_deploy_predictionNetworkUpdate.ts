@@ -18,7 +18,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
   const settings = network.settings
-  const Q2_END = 1719791999
+  const Q2_END = 7_257_600
   const title = "Rhone upgrade deployed in Q2 on mainnet"
 
   const predict = await deployer.deployContract(PredictChoice, {
@@ -30,7 +30,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
        repeatEvery: BigInt(Q2_END * 1000),
-       claimedByAnyoneDelay: BigInt(ONE_WEEK_SEC+Q2_END * 1000)
+       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC+Q2_END) * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
        title: binToHex(new TextEncoder().encode(title)),
