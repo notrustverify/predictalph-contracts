@@ -9,10 +9,15 @@ import {
   PunterInstance,
   Round,
   RoundInstance,
-  Predictalph,
-  PredictalphInstance,
+  RoundChoice,
+  RoundChoiceInstance,
+  PredictPrice,
+  PredictPriceInstance,
+  PredictChoice,
+  PredictChoiceInstance,
 } from ".";
 import { default as mainnetDeployments } from "../.deployments.mainnet.json";
+import { default as testnetDeployments } from "../.deployments.testnet.json";
 import { default as devnetDeployments } from "../.deployments.devnet.json";
 
 export type Deployments = {
@@ -20,7 +25,11 @@ export type Deployments = {
   contracts: {
     Punter: DeployContractExecutionResult<PunterInstance>;
     Round: DeployContractExecutionResult<RoundInstance>;
-    Predictalph: DeployContractExecutionResult<PredictalphInstance>;
+    RoundChoice: DeployContractExecutionResult<RoundChoiceInstance>;
+    PredictPrice_PredictPriceALPH: DeployContractExecutionResult<PredictPriceInstance>;
+    PredictPrice_PredictPriceBTC: DeployContractExecutionResult<PredictPriceInstance>;
+    PredictChoice_PredictChoiceRhone: DeployContractExecutionResult<PredictChoiceInstance>;
+    PredictChoice_PredictChoiceALPHFour: DeployContractExecutionResult<PredictChoiceInstance>;
   };
 };
 
@@ -38,10 +47,36 @@ function toDeployments(json: any): Deployments {
         json.contracts["Round"].contractInstance.address
       ),
     },
-    Predictalph: {
-      ...json.contracts["Predictalph"],
-      contractInstance: Predictalph.at(
-        json.contracts["Predictalph"].contractInstance.address
+    RoundChoice: {
+      ...json.contracts["RoundChoice"],
+      contractInstance: RoundChoice.at(
+        json.contracts["RoundChoice"].contractInstance.address
+      ),
+    },
+    PredictPrice_PredictPriceALPH: {
+      ...json.contracts["PredictPrice:PredictPriceALPH"],
+      contractInstance: PredictPrice.at(
+        json.contracts["PredictPrice:PredictPriceALPH"].contractInstance.address
+      ),
+    },
+    PredictPrice_PredictPriceBTC: {
+      ...json.contracts["PredictPrice:PredictPriceBTC"],
+      contractInstance: PredictPrice.at(
+        json.contracts["PredictPrice:PredictPriceBTC"].contractInstance.address
+      ),
+    },
+    PredictChoice_PredictChoiceRhone: {
+      ...json.contracts["PredictChoice:PredictChoiceRhone"],
+      contractInstance: PredictChoice.at(
+        json.contracts["PredictChoice:PredictChoiceRhone"].contractInstance
+          .address
+      ),
+    },
+    PredictChoice_PredictChoiceALPHFour: {
+      ...json.contracts["PredictChoice:PredictChoiceALPHFour"],
+      contractInstance: PredictChoice.at(
+        json.contracts["PredictChoice:PredictChoiceALPHFour"].contractInstance
+          .address
       ),
     },
   };
@@ -58,6 +93,8 @@ export function loadDeployments(
   const deployments =
     networkId === "mainnet"
       ? mainnetDeployments
+      : networkId === "testnet"
+      ? testnetDeployments
       : networkId === "devnet"
       ? devnetDeployments
       : undefined;

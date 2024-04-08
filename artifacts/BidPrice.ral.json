@@ -1,17 +1,17 @@
 {
-  "version": "v2.5.9",
-  "name": "WithdrawAddress",
-  "bytecodeTemplate": "01010300000006{1}{2}0e0c{0}0108",
+  "version": "v2.11.0",
+  "name": "BidPrice",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}0107",
   "fieldsSig": {
     "names": [
-      "predictalph",
-      "epochParticipation",
-      "addressToClaim"
+      "predict",
+      "amount",
+      "side"
     ],
     "types": [
-      "ByteVec",
-      "ByteVec",
-      "Address"
+      "PredictPrice",
+      "U256",
+      "Bool"
     ],
     "isMutable": [
       false,

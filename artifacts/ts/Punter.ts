@@ -23,6 +23,8 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
 import { default as PunterContractJson } from "../Punter.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -30,10 +32,10 @@ import { getContractByCodeHash } from "./contracts";
 // Custom types for the contract
 export namespace PunterTypes {
   export type Fields = {
-    prediction: HexString;
+    predictionContractId: HexString;
     punterAddress: Address;
     epoch: bigint;
-    upBid: boolean;
+    side: boolean;
     amountBid: bigint;
     claimedByAnyoneAt: bigint;
   };
@@ -89,39 +91,52 @@ class Factory extends ContractFactory<PunterInstance, PunterTypes.Fields> {
 
   tests = {
     getAddress: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<Address>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<Address>> => {
       return testMethod(this, "getAddress", params);
     },
     getBid: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<boolean>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
       return testMethod(this, "getBid", params);
     },
     getAmountBid: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getAmountBid", params);
     },
     getRoundEpoch: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
     getClaimedByAnyone: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<bigint>> => {
+      params: Omit<
+        TestContractParamsWithoutMaps<PunterTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getClaimedByAnyone", params);
     },
     destroy: async (
-      params: Omit<TestContractParams<PunterTypes.Fields, never>, "testArgs">
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        PunterTypes.Fields,
+        { from: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroy", params);
-    },
-    destroyByOther: async (
-      params: TestContractParams<PunterTypes.Fields, { from: Address }>
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "destroyByOther", params);
     },
   };
 }
@@ -131,7 +146,7 @@ export const Punter = new Factory(
   Contract.fromJson(
     PunterContractJson,
     "",
-    "b05092c77ff27c5278afb6930d4046fdaa3a522ae3a7d031d6fbd30074170d24"
+    "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a"
   )
 );
 

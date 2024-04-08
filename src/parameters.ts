@@ -12,7 +12,7 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { DestroyRound, End, NewInterval, Predictalph, Start } from "../artifacts/ts";
+import { DestroyRound, End, NewInterval, NewIntervalChoice, PredictPrice, Start } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
     arrayEpochToBytes,
@@ -49,19 +49,29 @@ async function newInterval(
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
 
-  const predictionStates = await Predictalph.at(
-    predictalphContractAddress
-  ).fetchState();
-
   try {
-    const tx = await NewInterval.execute(wallet, {
+   let tx 
+   const contractType = contractName.split(':')[0].toLowerCase()
+   if (contractType == "predictprice"){
+
+   
+     tx = await NewInterval.execute(wallet, {
       initialFields: {
-        predictalph: predictalphContractId,
+        predict: predictalphContractId,
         newRecurrence: newIntervalSecond*1000n
       },
       attoAlphAmount: ONE_ALPH,
     });
-
+   } else if (contractType == "predictchoice"){
+         
+     tx = await NewIntervalChoice.execute(wallet, {
+      initialFields: {
+        predict: predictalphContractId,
+        newRecurrence: newIntervalSecond*1000n
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+   }
     console.log(
       `new recurrence ${newIntervalSecond/60n} minutes ${tx.txId}`
     );
@@ -87,8 +97,9 @@ const cgClient = new CoinGeckoClient({
 const intPriceDivision = 10_000;
 
 let networkToUse = process.argv.slice(2)[0];
-let action = process.argv.slice(2)[1];
-let newParameter = process.argv.slice(2)[2];
+let contractName = process.argv.slice(2)[1];
+let action = process.argv.slice(2)[2];
+let newParameter = process.argv.slice(2)[3];
 //if (networkToUse === undefined) networkToUse = "mainnet";
 
 if (process.argv.length > 3) console.error("parameters empty")
@@ -109,7 +120,7 @@ switch (action) {
     case "interval":
         newInterval(
             configuration.networks[networkToUse].privateKeys[0],
-            "Predictalph",
+            contractName,
             BigInt(parseInt(newParameter))
           );
         break;

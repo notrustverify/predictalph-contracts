@@ -15,10 +15,13 @@ import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
 import {
   End,
-  Predictalph,
-  PredictalphInstance,
-  PredictalphTypes,
+  PredictPrice,
+  PredictPriceInstance,
+  PredictPriceTypes,
+  PredictChoice,
+  PredictChoiceTypes,
   Start,
+  PredictChoiceInstance,
 } from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
@@ -30,10 +33,12 @@ import { Redis } from "ioredis";
 import { CoinGeckoClient } from "coingecko-api-v3";
 import {
   Address,
+  Game,
   Round,
   RoundParticipation,
   connect,
   createAndGetNewAddress,
+  createAndGetNewGame,
   createAndGetNewParticipation,
   createAndGetNewRound,
   initDb,
@@ -41,7 +46,7 @@ import {
 import { Sequelize, where } from "sequelize";
 import { exit } from "process";
 
-const POLLING_INTERVAL_EVENTS = 6 * 1000;
+const POLLING_INTERVAL_EVENTS = 60 * 1000;
 
 async function keyExists(key: string) {
   const reply = await redis.exists(key);
@@ -61,33 +66,87 @@ async function setKeyValue(key: string, value: string) {
   await redis.set(key, value);
 }
 
-// `TokenFaucetTypes.WithdrawEvent` is a generated TypeScript type
-const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
+const optionsPriceBet: EventSubscribeOptions<PredictPriceTypes.BetEvent> = {
+  // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
+  pollingInterval: POLLING_INTERVAL_EVENTS,
+  // The `messageCallback` will be called every time we recive a new event
+  messageCallback: async (event: PredictPriceTypes.BetEvent): Promise<void> => {
+    //if(BigInt(actualEpoch) == event.fields.epoch){
+    console.log(
+      `${addressFromContractId(event.fields.contractId)} - Bet(${
+        event.fields.from
+      }, ${event.fields.amount / ONE_ALPH}, side: ${event.fields.up}, ${
+        event.fields.epoch
+      }, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
+    );
+
+    const userAddressEvent = event.fields.from;
+    const epoch = event.fields.epoch;
+    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp;
+    const contractId = event.fields.contractId;
+    const side = event.fields.up
+
+    const [gameId] = await createAndGetNewGame(contractId);
+    const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
+    const [roundId] = await createAndGetNewRound(epoch, 0, false, gameId);
+
+    const [roundParticipation, created] = await createAndGetNewParticipation(
+      roundId,
+      addrId,
+      gameId,
+      event.fields.up,
+      event.fields.amount,
+      false,
+      claimedByAnyone
+    );
+      
+    if (!created)
+      await roundParticipation.update({
+        side: side,
+        amountBid: event.fields.amount,
+        claimedByAnyoneTimestamp: claimedByAnyone,
+      });
+    //}
+    return Promise.resolve();
+  },
+  // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
+  errorCallback: (error, subscription): Promise<void> => {
+    console.error(error);
+    //subscription.unsubscribe();
+    return Promise.resolve();
+  },
+};
+
+const optionsChoiceBet: EventSubscribeOptions<PredictChoiceTypes.BetEvent> = {
   // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
   pollingInterval: POLLING_INTERVAL_EVENTS,
   // The `messageCallback` will be called every time we recive a new event
   messageCallback: async (
-    event: PredictalphTypes.BetBearEvent
+    event: PredictChoiceTypes.BetEvent
   ): Promise<void> => {
     //if(BigInt(actualEpoch) == event.fields.epoch){
     console.log(
-      `Bear(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
-        event.fields.up
-      }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
+      `${addressFromContractId(event.fields.contractId)} - Bet(${
+        event.fields.from
+      }, ${event.fields.amount / ONE_ALPH}, side: ${event.fields.side}, ${
+        event.fields.epoch
+      }, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
     );
-
 
     const userAddressEvent = event.fields.from;
     const epoch = event.fields.epoch;
-    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
+    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp;
+    const contractId = event.fields.contractId;
 
-    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
-    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
+    const [gameId] = await createAndGetNewGame(contractId);
+    const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
+    const [roundId] = await createAndGetNewRound(epoch, 0, false, gameId);
 
     const [roundParticipation, created] = await createAndGetNewParticipation(
       roundId,
       addrId,
-      event.fields.up,
+      gameId,
+      event.fields.side,
       event.fields.amount,
       false,
       claimedByAnyone
@@ -95,10 +154,9 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
 
     if (!created)
       await roundParticipation.update({
-        upBid: event.fields.up,
+        side: event.fields.side,
         amountBid: event.fields.amount,
-        claimedByAnyoneTimestamp: claimedByAnyone
-
+        claimedByAnyoneTimestamp: claimedByAnyone,
       });
     //}
     return Promise.resolve();
@@ -106,140 +164,189 @@ const optionsBear: EventSubscribeOptions<PredictalphTypes.BetBearEvent> = {
   // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
   errorCallback: (error, subscription): Promise<void> => {
     console.error(error);
-    subscription.unsubscribe();
+    //subscription.unsubscribe();
     return Promise.resolve();
   },
 };
 
-const optionsBull: EventSubscribeOptions<PredictalphTypes.BetBullEvent> = {
-  // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-  pollingInterval: POLLING_INTERVAL_EVENTS,
-  // The `messageCallback` will be called every time we recive a new event
-  messageCallback: async (
-    event: PredictalphTypes.BetBullEvent
-  ): Promise<void> => {
-    //  if(BigInt(actualEpoch) == event.fields.epoch){
-
-    console.log(
-      `Bull(${event.fields.from}, ${event.fields.amount / ONE_ALPH}, ${
-        event.fields.up
-      }, ${event.fields.epoch}, anyone can claim ${event.fields.claimedByAnyoneTimestamp})`
-    );
-
-    const userAddressEvent = event.fields.from;
-    const epoch = event.fields.epoch;
-    const claimedByAnyone = event.fields.claimedByAnyoneTimestamp
-
-    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
-    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
-      
-    const [roundParticipation, created] = await createAndGetNewParticipation(
-      roundId,
-      addrId,
-      event.fields.up,
-      event.fields.amount,
-      false,
-      claimedByAnyone
-    );
-
-    if (!created)
-      await roundParticipation.update({
-        upBid: event.fields.up,
-        amountBid: event.fields.amount,
-        claimedByAnyoneTimestamp: claimedByAnyone
-      });
-
-    //}
-    return Promise.resolve();
-  },
-  // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
-  errorCallback: (error, subscription): Promise<void> => {
-    console.error(error);
-    subscription.unsubscribe();
-    return Promise.resolve();
-  },
-};
-
-const optionsClaimed: EventSubscribeOptions<PredictalphTypes.ClaimedEvent> = {
-  // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
-  pollingInterval: POLLING_INTERVAL_EVENTS,
-  // The `messageCallback` will be called every time we recive a new event
-  messageCallback: async (
-    event: PredictalphTypes.ClaimedEvent
-  ): Promise<void> => {
-    console.log(
-      `Claimed(from: ${event.fields.from}, for: ${
-        event.fields.punterAddress
-      }, ${event.fields.amount / ONE_ALPH}, ${event.fields.epoch})`
-    );
-
-    const userAddressEvent = event.fields.punterAddress;
-    const epoch = event.fields.epoch;
-
-    const [addrId, ] = await createAndGetNewAddress(userAddressEvent);
-    const [roundId, ] = await createAndGetNewRound(epoch, 0, false);
-
-    const [roundParticipation, created] = await createAndGetNewParticipation(
-      roundId,
-      addrId,
-      false,
-      0n,
-      true,
-      0n
-    );
-
-    if (!created) await roundParticipation.update({ claimed: true });
-
-    return Promise.resolve();
-  },
-  // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
-  errorCallback: (error, subscription): Promise<void> => {
-    console.error(error);
-    subscription.unsubscribe();
-    return Promise.resolve();
-  },
-};
-
-const optionsRoundEnd: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent> =
+const optionsPriceClaimed: EventSubscribeOptions<PredictPriceTypes.ClaimedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictPriceTypes.ClaimedEvent
     ): Promise<void> => {
-      console.log(`Round Ended(${event.fields.epoch}, ${event.fields.price})`);
+      console.log(
+        `${addressFromContractId(event.fields.contractId)} - Claimed(from: ${
+          event.fields.from
+        }, for: ${event.fields.punterAddress}, ${
+          event.fields.amount / ONE_ALPH
+        }, ${event.fields.epoch})`
+      );
 
-      const [round, created] = await Round.findCreateFind({
-        where: { epoch: event.fields.epoch },
-        defaults: { priceEnd: event.fields.price },
-      });
-      if (!created) await round.update({ priceEnd: event.fields.price });
-      
+      const userAddressEvent = event.fields.punterAddress;
+      const epoch = event.fields.epoch;
+      const contractId = event.fields.contractId;
+
+      const [gameId] = await createAndGetNewGame(contractId);
+      const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
+      const [roundId] = await createAndGetNewRound(epoch, 0, false, gameId);
+
+      const [roundParticipation, created] = await createAndGetNewParticipation(
+        roundId,
+        addrId,
+        gameId,
+        false,
+        0n,
+        true,
+        0n
+      );
+
+      if (!created) await roundParticipation.update({ claimed: true });
+
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      subscription.unsubscribe();
+      //subscription.unsubscribe();
       return Promise.resolve();
     },
   };
 
-const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent> =
+const optionsChoiceClaimed: EventSubscribeOptions<PredictChoiceTypes.ClaimedEvent> =
   {
     // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
     pollingInterval: POLLING_INTERVAL_EVENTS,
     // The `messageCallback` will be called every time we recive a new event
     messageCallback: async (
-      event: PredictalphTypes.RoundEndedEvent
+      event: PredictChoiceTypes.ClaimedEvent
     ): Promise<void> => {
       console.log(
-        `Round Started(${event.fields.epoch}, ${event.fields.price})`
+        `${addressFromContractId(event.fields.contractId)} - Claimed(from: ${
+          event.fields.from
+        }, for: ${event.fields.punterAddress}, ${
+          event.fields.amount / ONE_ALPH
+        }, ${event.fields.epoch})`
       );
 
+      const userAddressEvent = event.fields.punterAddress;
+      const epoch = event.fields.epoch;
+      const contractId = event.fields.contractId;
+
+      const [gameId] = await createAndGetNewGame(contractId);
+      const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
+      const [roundId] = await createAndGetNewRound(epoch, 0, false, gameId);
+
+      const [roundParticipation, created] = await createAndGetNewParticipation(
+        roundId,
+        addrId,
+        gameId,
+        false,
+        0n,
+        true,
+        0n
+      );
+
+      if (!created) await roundParticipation.update({ claimed: true });
+
+      return Promise.resolve();
+    },
+    // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
+    errorCallback: (error, subscription): Promise<void> => {
+      console.error(error);
+      //subscription.unsubscribe();
+      return Promise.resolve();
+    },
+  };
+
+const optionsPriceRoundEnd: EventSubscribeOptions<PredictPriceTypes.RoundEndedEvent> =
+  {
+    // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
+    pollingInterval: POLLING_INTERVAL_EVENTS,
+    // The `messageCallback` will be called every time we recive a new event
+    messageCallback: async (
+      event: PredictPriceTypes.RoundEndedEvent
+    ): Promise<void> => {
+      console.log(
+        `${addressFromContractId(event.fields.contractId)} - Round Ended(${
+          event.fields.epoch
+        }, ${event.fields.price})`
+      );
+
+      const contractId = event.fields.contractId;
+      const [gameId] = await createAndGetNewGame(contractId);
+
       const [round, created] = await Round.findCreateFind({
-        where: { epoch: event.fields.epoch },
+        where: { epoch: event.fields.epoch, GameId: gameId.id },
+        defaults: { priceEnd: event.fields.price },
+      });
+      if (!created) await round.update({ priceEnd: event.fields.price });
+
+      return Promise.resolve();
+    },
+    // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
+    errorCallback: (error, subscription): Promise<void> => {
+      console.error(error);
+      //subscription.unsubscribe();
+      return Promise.resolve();
+    },
+  };
+
+const optionsChoiceRoundEnd: EventSubscribeOptions<PredictChoiceTypes.RoundEndedEvent> =
+  {
+    // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
+    pollingInterval: POLLING_INTERVAL_EVENTS,
+    // The `messageCallback` will be called every time we recive a new event
+    messageCallback: async (
+      event: PredictChoiceTypes.RoundEndedEvent
+    ): Promise<void> => {
+      console.log(
+        `${addressFromContractId(event.fields.contractId)} - Round Ended(${
+          event.fields.epoch
+        } - Side Won ${event.fields.sideWon})`
+      );
+
+      const contractId = event.fields.contractId;
+      const sideWon = event.fields.sideWon;
+      const [gameId] = await createAndGetNewGame(contractId);
+
+      const [round, created] = await Round.findCreateFind({
+        where: { epoch: event.fields.epoch, GameId: gameId.id },
+        defaults: { sideWon: sideWon },
+      });
+      if (!created) await round.update({ sideWon: sideWon });
+
+      return Promise.resolve();
+    },
+    // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
+    errorCallback: (error, subscription): Promise<void> => {
+      console.error(error);
+      //subscription.unsubscribe();
+      return Promise.resolve();
+    },
+  };
+
+const optionsPriceRoundStart: EventSubscribeOptions<PredictPriceTypes.RoundStartedEvent> =
+  {
+    // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
+    pollingInterval: POLLING_INTERVAL_EVENTS,
+    // The `messageCallback` will be called every time we recive a new event
+    messageCallback: async (
+      event: PredictPriceTypes.RoundEndedEvent
+    ): Promise<void> => {
+      console.log(
+        `${addressFromContractId(event.fields.contractId)} - Round Started(${
+          event.fields.epoch
+        }, ${event.fields.price})`
+      );
+
+      const contractId = event.fields.contractId;
+      const [gameId] = await createAndGetNewGame(contractId);
+
+      const [round, created] = await Round.findCreateFind({
+        where: { epoch: event.fields.epoch, GameId: gameId.id },
         defaults: { priceStart: event.fields.price },
       });
       if (!created) await round.update({ priceStart: event.fields.price });
@@ -249,12 +356,47 @@ const optionsRoundStart: EventSubscribeOptions<PredictalphTypes.RoundStartedEven
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      subscription.unsubscribe();
+      //subscription.unsubscribe();
       return Promise.resolve();
     },
   };
 
-async function getPunterBid(
+const optionsChoiceRoundStart: EventSubscribeOptions<PredictChoiceTypes.RoundStartedEvent> =
+  {
+    // We specify the pollingInterval as 4 seconds, which will query the contract for new events every 4 seconds
+    pollingInterval: POLLING_INTERVAL_EVENTS,
+    // The `messageCallback` will be called every time we recive a new event
+    messageCallback: async (
+      event: PredictChoiceTypes.RoundEndedEvent
+    ): Promise<void> => {
+      console.log(
+        `${addressFromContractId(event.fields.contractId)} - Round Started(${
+          event.fields.epoch
+        })`
+      );
+
+      const contractId = event.fields.contractId;
+
+      const [gameId] = await createAndGetNewGame(contractId);
+
+      // at start the sideWon is false at start
+      const [round, created] = await Round.findCreateFind({
+        where: { epoch: event.fields.epoch, GameId: gameId.id },
+        defaults: { sideWon: false },
+      });
+      if (!created) await round.update({ sideWon: false });
+
+      return Promise.resolve();
+    },
+    // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
+    errorCallback: (error, subscription): Promise<void> => {
+      console.error(error);
+      //subscription.unsubscribe();
+      return Promise.resolve();
+    },
+  };
+
+async function listenerManager(
   privKey: string,
   contractName: string,
   sequelize: Sequelize
@@ -274,19 +416,34 @@ async function getPunterBid(
   const group = wallet.group;
   const deployed = deployments.getDeployedContractResult(group, contractName);
 
+  const contractType = contractName.split(":")[0].toLowerCase();
+
   const predictalphInstance = deployed.contractInstance;
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
-  const predictalphDeployed = await Predictalph.at(predictalphContractAddress);
+  let predictalphDeployed: PredictChoiceInstance | PredictPriceInstance;
 
-  const contractIdKeyExists = await keyExists("contractid");
+  if (contractType == "predictprice")
+    predictalphDeployed = PredictPrice.at(predictalphContractAddress);
+  else if (contractType == "predictchoice")
+    predictalphDeployed = PredictChoice.at(predictalphContractAddress);
+  else {
+    console.error(`Contract type ${contractType} not found`);
+    return;
+  }
+
+  const redisContractKeyName = `contractid:${contractName}`;
+  const KEY_NAME_COUNTER_EVENT = `eventsCounter:${contractName}`;
+
+  const contractIdKeyExists = await keyExists(redisContractKeyName);
   if (contractIdKeyExists) {
-    const contractId = await redis.get("contractid");
+    const contractId = await redis.get(redisContractKeyName);
 
     if (contractId != predictalphContractId) {
       console.log("Contract changed, flush db");
-      await redis.flushdb();
-      initDb(sequelize, true)
+      await redis.set(KEY_NAME_COUNTER_EVENT, 0)
+     // await redis.flushdb();
+      //initDb(sequelize, true);
     }
   }
 
@@ -294,40 +451,63 @@ async function getPunterBid(
     await predictalphDeployed.getContractEventsCurrentCount();
   let eventCounterSaved = Number(await redis.get(KEY_NAME_COUNTER_EVENT));
 
-  setKeyValue("contractid", predictalphContractId);
-  
-  const subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(
-    optionsRoundStart,
-    eventCounterSaved
-  );
-  
-  const subscriptionBear = predictalphDeployed.subscribeBetBearEvent(
-    optionsBear,
-    eventCounterSaved
-  );
-  
-  const subscriptionBull = predictalphDeployed.subscribeBetBullEvent(
-    optionsBull,
-    eventCounterSaved
-  );
-  
-  const subscriptionRoundEnd = predictalphDeployed.subscribeRoundEndedEvent(
-    optionsRoundEnd,
-    eventCounterSaved
-  );
+  setKeyValue(redisContractKeyName, predictalphContractId);
 
-  const subscriptionClaimed = predictalphDeployed.subscribeClaimedEvent(
-    optionsClaimed,
-    eventCounterSaved
+  let subscriptionRoundStart;
+  let subscriptionRoundEnd;
+  let subscriptionBet;
+  let subscriptionClaimed;
+
+  if (predictalphDeployed instanceof PredictPriceInstance) {
+    subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(
+      optionsPriceRoundStart,
+      eventCounterSaved
+    );
+
+    subscriptionBet = predictalphDeployed.subscribeBetEvent(
+      optionsPriceBet,
+      eventCounterSaved
+    );
+
+    subscriptionRoundEnd = predictalphDeployed.subscribeRoundEndedEvent(
+      optionsPriceRoundEnd,
+      eventCounterSaved
+    );
+
+    subscriptionClaimed = predictalphDeployed.subscribeClaimedEvent(
+      optionsPriceClaimed,
+      eventCounterSaved
+    );
+  } else if (predictalphDeployed instanceof PredictChoiceInstance) {
+    subscriptionRoundStart = predictalphDeployed.subscribeRoundStartedEvent(
+      optionsChoiceRoundStart,
+      eventCounterSaved
+    );
+
+    subscriptionBet = predictalphDeployed.subscribeBetEvent(
+      optionsChoiceBet,
+      eventCounterSaved
+    );
+
+    subscriptionRoundEnd = predictalphDeployed.subscribeRoundEndedEvent(
+      optionsChoiceRoundEnd,
+      eventCounterSaved
+    );
+
+    subscriptionClaimed = predictalphDeployed.subscribeClaimedEvent(
+      optionsChoiceClaimed,
+      eventCounterSaved
+    );
+  }
+
+  console.log(
+    `Events from contract ${contractEventsCounter}, number of events seen ${eventCounterSaved}`
   );
-  
-  console.log(`Events from contract ${contractEventsCounter}, number of events seen ${eventCounterSaved}`);
 
   setKeyValue(KEY_NAME_COUNTER_EVENT, contractEventsCounter.toString());
 
   if (
-    subscriptionBear.isCancelled() ||
-    subscriptionBull.isCancelled() ||
+    subscriptionBet.isCancelled() ||
     subscriptionRoundEnd.isCancelled() ||
     subscriptionRoundStart.isCancelled() ||
     subscriptionClaimed.isCancelled()
@@ -341,11 +521,10 @@ const retryFetch = fetchRetry.default(fetch, {
   retryDelay: 1000,
 });
 
-const KEY_NAME_COUNTER_EVENT = "eventsCounter";
 
 let networkToUse = process.argv.slice(2)[0];
-if (networkToUse === undefined) networkToUse = "mainnet";
 //Select our network defined in alephium.config.ts
+let contractName = process.argv.slice(2)[1];
 
 //NodeProvider is an abstraction of a connection to the Alephium network
 const nodeProvider = new NodeProvider(
@@ -358,7 +537,11 @@ const nodeProvider = new NodeProvider(
 web3.setCurrentNodeProvider(nodeProvider);
 
 const redis = new Redis({ host: process.env.REDIS_HOST });
-const sequelize = connect(process.env.DB_PATH === undefined ? "/data/roundsData.sqlite" :  process.env.DB_PATH);
+const sequelize = connect(
+  process.env.DB_PATH === undefined
+    ? "/data/roundsData.sqlite"
+    : process.env.DB_PATH
+);
 
 sequelize
   .authenticate()
@@ -369,10 +552,10 @@ sequelize
     console.error("Unable to connect to the database: ", error);
   });
 
-getPunterBid(
+listenerManager(
   configuration.networks[networkToUse].privateKeys[0],
-  "Predictalph",
+  contractName,
   sequelize
 );
 
-console.log("dine")
+console.log("done");

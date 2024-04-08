@@ -5,3 +5,5 @@ dist/
 docker-compose.yml
 *.bkp
 *.dtmp
+alephium/*
+!alephium/user.conf

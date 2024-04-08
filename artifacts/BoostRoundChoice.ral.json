@@ -1,17 +1,20 @@
 {
-  "version": "v2.5.9",
-  "name": "Withdraw",
-  "bytecodeTemplate": "01010300000005{1}0d0c{0}0107",
+  "version": "v2.11.0",
+  "name": "BoostRoundChoice",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}010b",
   "fieldsSig": {
     "names": [
-      "predictalph",
-      "epochParticipation"
+      "predict",
+      "amount",
+      "epochToBoost"
     ],
     "types": [
-      "ByteVec",
-      "ByteVec"
+      "PredictChoice",
+      "U256",
+      "U256"
     ],
     "isMutable": [
+      false,
       false,
       false
     ]

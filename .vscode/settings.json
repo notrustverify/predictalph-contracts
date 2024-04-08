@@ -1,0 +1,12 @@
+{
+   "editor.detectIndentation": false,
+   "[*]": {
+      "editor.tabSize": 3
+  },
+   "[yaml]": {
+      "editor.tabSize": 3
+   },
+   "[ralph]": {
+      "editor.tabSize": 3
+   }
+}

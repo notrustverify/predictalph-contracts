@@ -3,12 +3,12 @@
 /* eslint-disable */
 
 import { Contract, ContractFactory } from "@alephium/web3";
-import { Predictalph, Punter, Round } from ".";
+import { PredictChoice, PredictPrice, Punter, Round, RoundChoice } from ".";
 
 let contracts: ContractFactory<any>[] | undefined = undefined;
 export function getContractByCodeHash(codeHash: string): Contract {
   if (contracts === undefined) {
-    contracts = [Predictalph, Punter, Round];
+    contracts = [PredictChoice, PredictPrice, Punter, Round, RoundChoice];
   }
   const c = contracts.find(
     (c) =>

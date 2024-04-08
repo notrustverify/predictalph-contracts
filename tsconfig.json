@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "resolveJsonModule": true,
-    "allowJs": false,
+    "allowJs": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
   },

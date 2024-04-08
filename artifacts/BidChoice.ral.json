@@ -1,0 +1,34 @@
+{
+  "version": "v2.11.0",
+  "name": "BidChoice",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}0107",
+  "fieldsSig": {
+    "names": [
+      "predict",
+      "amount",
+      "side"
+    ],
+    "types": [
+      "PredictChoice",
+      "U256",
+      "Bool"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

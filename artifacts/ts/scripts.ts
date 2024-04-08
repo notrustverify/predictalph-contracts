@@ -11,48 +11,94 @@ import {
   SignerProvider,
   HexString,
 } from "@alephium/web3";
-import { default as BidScriptJson } from "../Bid.ral.json";
+import { default as BidChoiceScriptJson } from "../BidChoice.ral.json";
+import { default as BidPriceScriptJson } from "../BidPrice.ral.json";
 import { default as BoostRoundScriptJson } from "../BoostRound.ral.json";
+import { default as BoostRoundChoiceScriptJson } from "../BoostRoundChoice.ral.json";
 import { default as DestroyRoundScriptJson } from "../DestroyRound.ral.json";
+import { default as DestroyRoundChoiceScriptJson } from "../DestroyRoundChoice.ral.json";
 import { default as EndScriptJson } from "../End.ral.json";
+import { default as EndChoiceScriptJson } from "../EndChoice.ral.json";
 import { default as NewIntervalScriptJson } from "../NewInterval.ral.json";
+import { default as NewIntervalChoiceScriptJson } from "../NewIntervalChoice.ral.json";
 import { default as StartScriptJson } from "../Start.ral.json";
-import { default as WithdrawScriptJson } from "../Withdraw.ral.json";
-import { default as WithdrawAddressScriptJson } from "../WithdrawAddress.ral.json";
+import { default as StartChoiceScriptJson } from "../StartChoice.ral.json";
+import { default as WithdrawChoiceScriptJson } from "../WithdrawChoice.ral.json";
+import { default as WithdrawPriceScriptJson } from "../WithdrawPrice.ral.json";
 
-export const Bid = new ExecutableScript<{
-  predictalph: HexString;
+export const BidChoice = new ExecutableScript<{
+  predict: HexString;
   amount: bigint;
-  up: boolean;
-}>(Script.fromJson(BidScriptJson));
+  side: boolean;
+}>(Script.fromJson(BidChoiceScriptJson, ""));
+
+export const BidPrice = new ExecutableScript<{
+  predict: HexString;
+  amount: bigint;
+  side: boolean;
+}>(Script.fromJson(BidPriceScriptJson, ""));
+
 export const BoostRound = new ExecutableScript<{
-  predictalph: HexString;
+  predict: HexString;
   amount: bigint;
   epochToBoost: bigint;
-}>(Script.fromJson(BoostRoundScriptJson));
+}>(Script.fromJson(BoostRoundScriptJson, ""));
+
+export const BoostRoundChoice = new ExecutableScript<{
+  predict: HexString;
+  amount: bigint;
+  epochToBoost: bigint;
+}>(Script.fromJson(BoostRoundChoiceScriptJson, ""));
+
 export const DestroyRound = new ExecutableScript<{
-  predictalph: HexString;
+  predict: HexString;
   arrayEpoch: HexString;
-}>(Script.fromJson(DestroyRoundScriptJson));
+}>(Script.fromJson(DestroyRoundScriptJson, ""));
+
+export const DestroyRoundChoice = new ExecutableScript<{
+  predict: HexString;
+  arrayEpoch: HexString;
+}>(Script.fromJson(DestroyRoundChoiceScriptJson, ""));
+
 export const End = new ExecutableScript<{
-  predictalph: HexString;
+  predict: HexString;
   price: bigint;
   immediatelyStart: boolean;
-}>(Script.fromJson(EndScriptJson));
+}>(Script.fromJson(EndScriptJson, ""));
+
+export const EndChoice = new ExecutableScript<{
+  predict: HexString;
+  sideWon: boolean;
+  immediatelyStart: boolean;
+}>(Script.fromJson(EndChoiceScriptJson, ""));
+
 export const NewInterval = new ExecutableScript<{
-  predictalph: HexString;
+  predict: HexString;
   newRecurrence: bigint;
-}>(Script.fromJson(NewIntervalScriptJson));
+}>(Script.fromJson(NewIntervalScriptJson, ""));
+
+export const NewIntervalChoice = new ExecutableScript<{
+  predict: HexString;
+  newRecurrence: bigint;
+}>(Script.fromJson(NewIntervalChoiceScriptJson, ""));
+
 export const Start = new ExecutableScript<{
-  predictalph: HexString;
+  predict: HexString;
   price: bigint;
-}>(Script.fromJson(StartScriptJson));
-export const Withdraw = new ExecutableScript<{
-  predictalph: HexString;
-  epochParticipation: HexString;
-}>(Script.fromJson(WithdrawScriptJson));
-export const WithdrawAddress = new ExecutableScript<{
-  predictalph: HexString;
+}>(Script.fromJson(StartScriptJson, ""));
+
+export const StartChoice = new ExecutableScript<{ predict: HexString }>(
+  Script.fromJson(StartChoiceScriptJson, "")
+);
+
+export const WithdrawChoice = new ExecutableScript<{
+  predict: HexString;
   epochParticipation: HexString;
   addressToClaim: Address;
-}>(Script.fromJson(WithdrawAddressScriptJson));
+}>(Script.fromJson(WithdrawChoiceScriptJson, ""));
+
+export const WithdrawPrice = new ExecutableScript<{
+  predict: HexString;
+  epochParticipation: HexString;
+  addressToClaim: Address;
+}>(Script.fromJson(WithdrawPriceScriptJson, ""));

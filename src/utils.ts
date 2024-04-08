@@ -10,18 +10,24 @@ import {
   web3,
 } from "@alephium/web3";
 import {
-  Predictalph,
+  PredictPrice,
   Round,
   Punter,
-  PredictalphInstance,
+  PredictPriceInstance,
   RoundInstance,
   PunterInstance,
   Start,
   End,
-  Bid,
-  Withdraw,
+  BidPrice,
+  WithdrawPrice,
   DestroyRound,
-  PredictalphTypes,
+  PredictPriceTypes,
+  PredictChoiceInstance,
+  EndChoice,
+  StartChoice,
+  RoundChoice,
+  BidChoice,
+  WithdrawChoice,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -29,7 +35,6 @@ import { waitTxConfirmed as _waitTxConfirmed } from "@alephium/cli";
 import { CoinGeckoClient } from "coingecko-api-v3";
 import { RedisClient } from "ioredis/built/connectors/SentinelConnector/types";
 import Redis from "ioredis";
-
 
 web3.setCurrentNodeProvider("http://127.0.0.1:22973", undefined, fetch);
 export const ZERO_ADDRESS = "tgx7VNFoP9DJiFMFgXXtafQZkUvyEdDHT9ryamHJYrjq";
@@ -45,7 +50,7 @@ export async function deployPrediction(
   const punterTemplateId = await deployPunterTemplate();
   const roundTemplateId = await deployRoundTemplate();
 
-  return await Predictalph.deploy(defaultSigner, {
+  return await PredictPrice.deploy(defaultSigner, {
     initialFields: {
       punterTemplateId: punterTemplateId.contractInstance.contractId,
       roundTemplateId: roundTemplateId.contractInstance.contractId,
@@ -54,6 +59,8 @@ export async function deployPrediction(
       feesBasisPts: 100n,
       repeatEvery: BigInt(repeatEverySecond * 1000),
       claimedByAnyoneDelay: 0n,
+      title: "",
+      playerCounter: 0n,
     },
   });
 }
@@ -61,12 +68,12 @@ export async function deployPrediction(
 export async function deployPunterTemplate() {
   return await Punter.deploy(defaultSigner, {
     initialFields: {
-      prediction: "00",
       punterAddress: ZERO_ADDRESS,
       epoch: 0n,
-      upBid: false,
+      side: false,
       amountBid: 0n,
       claimedByAnyoneAt: 0n,
+      predictionContractId: "00",
     },
   });
 }
@@ -96,66 +103,59 @@ export async function deployRoundTemplate() {
 
 export async function startRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
-  price: bigint
+  predictalph: PredictPriceInstance | PredictChoiceInstance,
+  price?: bigint
 ) {
-  return await Start.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, price: price },
-    attoAlphAmount: ONE_ALPH,
-  });
+  if (predictalph instanceof PredictPriceInstance) {
+    return await Start.execute(signer, {
+      initialFields: { predict: predictalph.contractId, price: price },
+      attoAlphAmount: ONE_ALPH,
+    });
+  } else if (predictalph instanceof PredictChoiceInstance) {
+    return await StartChoice.execute(signer, {
+      initialFields: { predict: predictalph.contractId },
+      attoAlphAmount: ONE_ALPH,
+    });
+  }
 }
 
-export async function endRound(
+export async function endRoundAction(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance | PredictChoiceInstance,
   price: bigint,
-  immediatelyStart: boolean
+  immediatelyStart: boolean,
+  sideWon?: boolean
 ) {
-  return await End.execute(signer, {
-    initialFields: {
-      predictalph: predictalph.contractId,
-      price: price,
-      immediatelyStart: immediatelyStart,
-    },
-    attoAlphAmount: ONE_ALPH,
-  });
+  if (predictalph instanceof PredictPriceInstance) {
+    return await End.execute(signer, {
+      initialFields: {
+        predict: predictalph.contractId,
+        price: price,
+        immediatelyStart: immediatelyStart,
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+  } else if (predictalph instanceof PredictChoiceInstance) {
+    return await EndChoice.execute(signer, {
+      initialFields: {
+        predict: predictalph.contractId,
+        sideWon: sideWon,
+        immediatelyStart: immediatelyStart,
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+  }
 }
 
-export async function bid(
-  signer: SignerProvider,
-  predictalph: PredictalphInstance,
-  amount: bigint,
-  up: boolean
-) {
-  return await Bid.execute(signer, {
-    initialFields: {
-      predictalph: predictalph.contractId,
-      amount: amount,
-      up: up,
-    },
-    attoAlphAmount: amount + 2n * DUST_AMOUNT,
-  });
-}
-
-export async function withdraw(
-  signer: SignerProvider,
-  predictalph: PredictalphInstance,
-  epochParticipation: string
-) {
-  return await Withdraw.execute(signer, {
-    initialFields: { predictalph: predictalph.contractId, epochParticipation },
-    attoAlphAmount: DUST_AMOUNT,
-  });
-}
 
 export async function destroyRound(
   signer: SignerProvider,
-  predictalph: PredictalphInstance,
+  predictalph: PredictPriceInstance,
   epochArray
 ) {
   return await DestroyRound.execute(signer, {
     initialFields: {
-      predictalph: predictalph.contractId,
+      predict: predictalph.contractId,
       arrayEpoch: epochArray,
     },
     attoAlphAmount: DUST_AMOUNT,
@@ -182,9 +182,7 @@ export async function transferAlphTo(to: Address, amount: bigint) {
 export async function contractExists(address: string): Promise<boolean> {
   try {
     const nodeProvider = web3.getCurrentNodeProvider();
-    await nodeProvider.contracts.getContractsAddressState(address, {
-      group: groupOfAddress(address),
-    });
+    await nodeProvider.contracts.getContractsAddressState(address);
     return true;
   } catch (error: any) {
     if (error instanceof Error && error.message.includes("KeyNotFound")) {
@@ -203,7 +201,8 @@ export function arrayEpochToBytes(arrayEpoch) {
 export async function getRoundContractState(
   predictAlphContractId: string,
   epoch: bigint,
-  groupIndex: number
+  groupIndex: number,
+  isChoiceContract?: boolean
 ) {
   const roundContractId = getRoundContractId(
     predictAlphContractId,
@@ -211,7 +210,11 @@ export async function getRoundContractState(
     groupIndex
   );
 
-  const roundContract = Round.at(addressFromContractId(roundContractId));
+  let roundContract = undefined
+  roundContract = Round.at(addressFromContractId(roundContractId));
+  if(isChoiceContract)
+   roundContract = RoundChoice.at(addressFromContractId(roundContractId));
+
   const state = await roundContract.fetchState();
   return state;
 }
@@ -228,20 +231,72 @@ function getEpochPath(epoch: bigint) {
   return "00" + epoch.toString(16).padStart(8, "0");
 }
 
-export async function getPrice(cgClient: CoinGeckoClient) {
+export async function getPrice(cgClient: CoinGeckoClient, id: string) {
   const alphCoinGecko = await cgClient.simplePrice({
     vs_currencies: "usd",
-    ids: "alephium",
+    ids: id.toLowerCase(),
   });
-  if (alphCoinGecko.alephium.usd <= 0) {
+  if (alphCoinGecko[id]["usd"] <= 0) {
     throw new Error("Price is not correct");
   }
 
   return (
-    Math.round((alphCoinGecko.alephium.usd + Number.EPSILON) * 1000) / 1000
+    Math.round((alphCoinGecko[id]["usd"] + Number.EPSILON) * 1000) / 1000
   );
 }
 
-export function getAddressesNotClaim(redis: Redis, round: number) {
-}
+export async function bid(
+   signer: SignerProvider,
+   contractId: string,
+   amount: bigint,
+   up: boolean,
+   type: string
+ ) {
+   if (type.toLowerCase() == "predictprice" ) {
+     return await BidPrice.execute(signer, {
+       initialFields: {
+         predict: contractId,
+         amount: amount,
+         side: up,
+       },
+       attoAlphAmount: amount + 2n * DUST_AMOUNT,
+     });
+   } else if (type.toLowerCase() == "predictchoice" ) {
+     return await BidChoice.execute(signer, {
+       initialFields: {
+         predict: contractId,
+         amount: amount,
+         side: up,
+       },
+       attoAlphAmount: amount + 2n * DUST_AMOUNT,
+     });
+   }
+ }
 
+ export async function withdraw(
+   signer: SignerProvider,
+   contractId: string,
+   arrayEpoch: string,
+   addressToClaim: string,
+   type: string
+ ) {
+   if (type.toLowerCase() == "predictprice" ) {
+     return await WithdrawPrice.execute(signer, {
+       initialFields: {
+          predict: contractId,
+          epochParticipation: arrayEpoch,
+          addressToClaim: addressToClaim
+       },
+       attoAlphAmount: 2n * DUST_AMOUNT,
+     });
+   } else if (type.toLowerCase() == "predictchoice" ) {
+     return await WithdrawChoice.execute(signer, {
+       initialFields: {
+          predict: contractId,
+          epochParticipation: arrayEpoch,
+          addressToClaim: addressToClaim
+       },
+       attoAlphAmount: 2n * DUST_AMOUNT,
+     });
+   }
+ }

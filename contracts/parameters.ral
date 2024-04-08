@@ -1,3 +1,7 @@
-TxScript NewInterval(predictalph: Predictalph, newRecurrence: U256){
-    predictalph.setNewRepeatEvery(newRecurrence)
-  }
+TxScript NewInterval(predict: PredictPrice, newRecurrence: U256){
+    predict.setNewRepeatEvery(newRecurrence)
+}
+
+TxScript NewIntervalChoice(predict: PredictChoice, newRecurrence: U256){
+   predict.setNewRepeatEvery(newRecurrence)
+}

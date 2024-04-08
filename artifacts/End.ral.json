@@ -1,15 +1,15 @@
 {
-  "version": "v2.5.9",
+  "version": "v2.11.0",
   "name": "End",
-  "bytecodeTemplate": "01010300000009b413c40de0b6b3a7640000a2{1}{2}0e0c{0}0105",
+  "bytecodeTemplate": "01010300000009b413c40de0b6b3a7640000a2{1}{2}0e0c{0}0106",
   "fieldsSig": {
     "names": [
-      "predictalph",
+      "predict",
       "price",
       "immediatelyStart"
     ],
     "types": [
-      "ByteVec",
+      "PredictPrice",
       "U256",
       "Bool"
     ],

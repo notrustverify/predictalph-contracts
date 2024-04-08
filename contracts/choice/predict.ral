@@ -1,0 +1,231 @@
+Contract PredictChoice(
+   punterTemplateId: ByteVec,
+   roundTemplateId: ByteVec,
+   title: ByteVec,
+   mut epoch: U256,
+   mut operator: Address,
+   mut feesBasisPts: U256,
+   mut repeatEvery: U256,
+   mut claimedByAnyoneDelay: U256,
+   mut playerCounter: U256  
+) extends DynamicArrayForInt() {
+
+   event Bet(contractId: ByteVec, from: Address, epoch: U256, amount: U256, side: Bool, claimedByAnyoneTimestamp: U256)
+   event RoundEnded(contractId: ByteVec, epoch: U256, sideWon: Bool)
+   event RoundStarted(contractId: ByteVec, epoch: U256)
+   event Claimed(contractId: ByteVec, punterAddress: Address, from: Address, amount: U256, epoch: U256)
+
+   enum ErrorCodes {
+      PunterNotExists = 1
+      InvalidPunterAddress = 2
+      InvalidCaller = 3
+      BidTimestampReached = 4
+      RoundAlreadyRunning = 5
+      RoundDidntEnd = 6
+      RoundNotExists = 7
+      AlreadyPlayed = 8
+      NotEnoughAlph = 9
+      CannotBeClaimedYet = 10
+      NotAllPlayerClaimed  = 11
+   }
+
+  enum SubContractTypes {
+      RoundChoice = #00
+      Punter = #01
+   }
+
+
+   fn getRoundByEpoch(epochToGet: U256) -> (RoundChoice) {
+      let roundContractId = subContractId!(SubContractTypes.RoundChoice ++ u256To4Byte!(epochToGet))
+      emit Debug(`RoundChoice contract id ${roundContractId}`)
+      assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
+
+      return RoundChoice(roundContractId)
+   }
+
+   fn getRoundByEpochByteVec(epochToGet: ByteVec) -> (RoundChoice) {
+      let roundContractId = subContractId!(SubContractTypes.RoundChoice ++ epochToGet)
+      emit Debug(`RoundChoice contract id ${roundContractId}`)
+      assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
+
+      return RoundChoice(roundContractId)
+   }
+
+   fn getBetInfoByEpoch(from: Address, epochToGet: ByteVec) -> Punter {
+      let bidderContractId = subContractId!(SubContractTypes.Punter ++ toByteVec!(from) ++ epochToGet)
+      assert!(contractExists!(bidderContractId), ErrorCodes.PunterNotExists)
+    
+      return Punter(bidderContractId)
+   }
+
+   pub fn getTitle() -> (ByteVec){
+      return title
+   }
+
+   @using(updateFields = false, preapprovedAssets = true, checkExternalCaller = true)
+   pub fn startRound(from: Address) -> (){
+      let caller = callerAddress!()
+      checkCaller!(caller == operator || caller == selfAddress!() , ErrorCodes.InvalidCaller)
+
+      let roundContractPath = SubContractTypes.RoundChoice ++ u256To4Byte!(epoch)
+
+      assert!(!contractExists!(subContractId!(roundContractPath)), ErrorCodes.RoundAlreadyRunning)
+
+      let bidTimestampEnd = blockTimeStamp!() + repeatEvery
+      let (encodedImmFields, encodedMutFields) = RoundChoice.encodeFields!(selfContract!(), epoch, feesBasisPts, bidTimestampEnd, operator, false, 0 ,false ,0 ,0 ,0, 0, 0, 0, 0)
+
+      let _ = copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
+      emit RoundStarted(selfContractId!(), epoch)
+   }
+
+   @using(updateFields = true, checkExternalCaller = true, preapprovedAssets = true)
+   pub fn endRound(sideWon: Bool, immediatelyStart: Bool) -> () {
+      let caller = callerAddress!()
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+
+      let round = getRoundByEpoch(epoch)
+      let endRoundChoiceTimestamp = round.getEndRoundTime()
+
+      assert!(endRoundChoiceTimestamp <= blockTimeStamp!(), ErrorCodes.RoundDidntEnd)
+
+      round.calculateRewards(sideWon)
+
+      emit RoundEnded(selfContractId!(), epoch, sideWon)
+      epoch = epoch + 1
+
+      if (immediatelyStart){
+         startRound{caller -> ALPH: 1 alph}(caller)
+      }
+   }
+
+   @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = true)
+   pub fn bid(amount: U256, side: Bool) -> (){
+      let caller = callerAddress!()
+
+      let round = getRoundByEpoch(epoch)
+      let endRoundChoiceTimestamp = round.getEndRoundTime()
+      let timestampNow = blockTimeStamp!()
+      assert!(timestampNow < endRoundChoiceTimestamp, ErrorCodes.BidTimestampReached)
+      assert!(isAssetAddress!(caller), ErrorCodes.InvalidPunterAddress)
+      assert!(amount >= 1 alph, ErrorCodes.NotEnoughAlph)
+
+      // use address for th path to be able to find it back 
+      let bidderContractId = SubContractTypes.Punter ++ toByteVec!(caller) ++ u256To4Byte!(epoch)
+
+      // user never played, create contract
+      assert!(!contractExists!(subContractId!(bidderContractId)), ErrorCodes.AlreadyPlayed)
+
+      let bidAmount = amount - 1 alph 
+      let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
+      let selfContractId = selfContractId!()
+      let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId, caller, epoch, side, bidAmount, claimedByAnyoneTimestamp)
+      let _ = copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
+      round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, side)
+        
+      playerCounter = playerCounter + 1
+      emit Bet(selfContractId, caller, epoch, amount, side, claimedByAnyoneTimestamp)
+
+   }
+
+
+   @using(checkExternalCaller = true, updateFields = true)
+   pub fn withdraw(from: Address, arrayEpochIn: ByteVec, addressToClaim: Address) -> () {
+      checkCaller!(from == callerAddress!(), ErrorCodes.InvalidCaller)
+
+      let timestampNow = blockTimeStamp!()
+      let selfContractId = selfContractId!()
+
+      for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
+         let epochNumber = getArrayElem(arrayEpochIn, index)
+         let roundContractId = subContractId!(SubContractTypes.RoundChoice ++ epochNumber)
+         let betInfoContractId = subContractId!(SubContractTypes.Punter ++ toByteVec!(addressToClaim) ++ epochNumber)
+         assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
+         assert!(contractExists!(betInfoContractId), ErrorCodes.PunterNotExists)
+
+         if (contractExists!(roundContractId) && contractExists!(betInfoContractId)){
+            let betInfoCaller = getBetInfoByEpoch(addressToClaim, epochNumber)
+            
+            let addressPunter = betInfoCaller.getAddress()
+            let canBeClaimedAt = betInfoCaller.getClaimedByAnyone()
+            
+            if(addressToClaim != from){
+               assert!(timestampNow > canBeClaimedAt, ErrorCodes.CannotBeClaimedYet)
+            }
+
+            let amountPunter = betInfoCaller.getAmountBid()
+            let upBid = betInfoCaller.getBid()
+
+            let round = getRoundByEpochByteVec(epochNumber)
+
+            // cannot claim if the round didnt end 
+
+            round.userClaimRewards(addressToClaim, amountPunter, upBid)
+            betInfoCaller.destroy(from)
+
+            playerCounter = playerCounter - 1 
+            // emit who call and with and which punter it concerned
+            emit Claimed(selfContractId, addressPunter, from, amountPunter, u256From4Byte!(epochNumber))
+         }
+      }
+
+   }
+
+   pub fn destroyRound(epochArray: ByteVec) -> (){
+      let caller = callerAddress!()
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+
+      for (let mut index = 0; index < size!(epochArray)/4; index = index + 1) {
+         let epochNumber = getArrayElem(epochArray, index)
+
+         let epochContractId = subContractId!(#00 ++ epochNumber)
+         if (contractExists!(epochContractId)){
+            let round = getRoundByEpochByteVec(epochNumber)
+            round.destroy()
+         }
+      }
+   }
+
+
+   @using(assetsInContract = true)
+   pub fn destroy() -> (){
+      let caller = callerAddress!()
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+
+      assert!(playerCounter <= 0, ErrorCodes.NotAllPlayerClaimed)
+
+      destroySelf!(operator)
+   }
+
+   @using(preapprovedAssets = true, checkExternalCaller = false)
+   pub fn boostRound(amount: U256, epochToBoost: U256) -> (){
+      let caller = callerAddress!()
+      let roundToBoost = getRoundByEpoch(epochToBoost)
+
+      roundToBoost.boost{caller -> ALPH: amount}(caller, amount)
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewRepeatEvery(newRecurrence: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      repeatEvery = newRecurrence
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewFees(basisPts: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      feesBasisPts = basisPts
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewOperator(newOperator: Address) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      operator = newOperator
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setNewClaimedByAnyone(newClaimedByAnyoneDelay: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      claimedByAnyoneDelay = newClaimedByAnyoneDelay
+   }
+
+}

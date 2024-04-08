@@ -1,0 +1,31 @@
+{
+  "version": "v2.11.0",
+  "name": "NewIntervalChoice",
+  "bytecodeTemplate": "01010300000005{1}0d0c{0}010c",
+  "fieldsSig": {
+    "names": [
+      "predict",
+      "newRecurrence"
+    ],
+    "types": [
+      "PredictChoice",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

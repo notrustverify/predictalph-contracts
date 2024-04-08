@@ -6,6 +6,8 @@ services:
     command: redis-server --save 20 1 --loglevel warning
     volumes: 
       - ./data:/data
+    ports:
+       - 6379:6379
 
 
   api:
@@ -16,36 +18,83 @@ services:
       - .env
 
 
-  round-mover:
-    hostname: round-mover
+  round-mover-predictalph:
+    hostname: round-mover-predictalph
     build: .
     restart: unless-stopped
-    command: yarn run manage testnet
+    command: yarn run manage testnet PredictPrice:PredictPriceALPH alephium
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  round-mover-predictbtc:
+    hostname: round-mover-predictbtc
+    build: .
+    restart: unless-stopped
+    command: yarn run manage testnet PredictPrice:PredictPriceBTC bitcoin
     env_file:
       - .env
     depends_on:
       - db
 
 
-  events-listener:
-    hostname: events-listener
+  events-listener-predictbtc:
+    hostname: events-listener-predictbtc
     build: .
     restart: unless-stopped
     volumes:
       - ./data:/data
-    command: yarn run eventsListener testnet
+    command: yarn run eventsListener testnet PredictPrice:PredictPriceBTC
     env_file:
       - .env
     depends_on:
       - db
 
-  bot:
-    hostname: bot
+  events-listener-predictalph:
+    hostname: events-listener-predictalph
     build: .
     restart: unless-stopped
-    command: yarn run bot testnet
+    volumes:
+      - ./data:/data
+    command: yarn run eventsListener testnet PredictPrice:PredictPriceALPH
     env_file:
       - .env
+    depends_on:
+      - db
 
+    
+  events-listener-predictrhone:
+    hostname: events-listener-predictrhone
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    command: yarn run eventsListener testnet PredictChoice:PredictChoiceRhone
+    env_file:
+      - .env
+    depends_on:
+      - db
 
-
+  alephium:
+    image: alephium/alephium:latest
+    restart: "no"
+    logging:
+      driver: "local"
+      options:
+        max-size: "200m"
+        max-file: "30"
+    ports:
+      # 9973 (udp and tcp) is used for external p2p connection and must be exposed
+      - 9973:9973/tcp
+      - 9973:9973/udp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./alephium/alephium-data:/alephium-home/.alephium
+      # - ~/.alephium:/alephium-home/.alephium
+      - ./alephium/alephium-wallets:/alephium-home/.alephium-wallets
+      - ./alephium/user.conf:/alephium-home/.alephium/user.conf
+    healthcheck:
+      test: ["CMD", "curl", "http://127.0.0.1:12973/infos/self-clique"]
+      timeout: 45s

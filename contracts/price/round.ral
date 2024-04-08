@@ -1,0 +1,131 @@
+Contract Round(
+    prediction: PredictPrice,
+    epoch: U256,
+    priceStart: U256,
+    feesBasisPts: U256,
+    bidEndTimestamp: U256,
+    operator: Address,
+    mut rewardsComputed: Bool,
+    mut totalAmountBoost: U256,
+    mut priceEnd: U256,
+    mut totalAmount: U256,
+    mut amountUp: U256,
+    mut amountDown: U256,
+    mut treasuryAmount: U256,
+    mut rewardAmount: U256,
+    mut rewardBaseCalAmount: U256,
+    mut counterAttendees: U256
+
+){
+
+
+    enum ErrorCodes {
+        InvalidCaller = 100
+        NotAllPlayerClaimed = 101
+        RewardsAlreadyComputed = 103
+        BidTimestampNotReached = 104
+        RewardsNotComputed  = 105
+   }
+
+
+   pub fn getEndRoundTime() -> (U256) {
+      return bidEndTimestamp
+   }
+
+   pub fn getRewardAmount() -> (U256) {
+      return treasuryAmount
+   }
+
+   pub fn getRewardBaseCalAmount() -> (U256){
+      return rewardBaseCalAmount
+   }
+
+
+   pub fn getRoundEpoch() -> (U256){
+      return epoch
+   }
+
+
+   @using(updateFields = true, assetsInContract = true, preapprovedAssets = true)
+   pub fn updateAmount(from: Address, amount: U256, up: Bool) -> () {
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+
+      totalAmount = totalAmount + amount
+      
+      if (up) {
+         amountUp = amountUp + amount
+      } else {
+         amountDown = amountDown + amount
+      }
+
+      counterAttendees = counterAttendees + 1
+      transferTokenToSelf!(from, ALPH, amount)
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn calculateRewards(price: U256) -> (){
+      assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      priceEnd = price
+      if (price > priceStart) {
+         rewardBaseCalAmount = amountUp
+         treasuryAmount = totalAmount * feesBasisPts/10000
+         rewardAmount = totalAmount - treasuryAmount
+      } else if (price < priceStart){
+         rewardBaseCalAmount = amountDown
+         treasuryAmount = totalAmount * feesBasisPts/10000
+         rewardAmount = totalAmount - treasuryAmount
+      } else {
+         // all in fees pool
+         rewardBaseCalAmount = 0
+         rewardAmount = 0
+         treasuryAmount = totalAmount
+      }
+
+      rewardsComputed = true
+
+   }
+
+
+   // add more rewards toward a side to incentive people to play
+   @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
+   pub fn boost(from: Address, amount: U256) -> (){
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      totalAmountBoost = totalAmountBoost + amount
+      totalAmount = totalAmount + amount
+      
+      transferTokenToSelf!(from, ALPH, amount)
+
+   }
+
+   @using(assetsInContract = true)
+   pub fn destroy() -> (){
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      assert!(counterAttendees <= 0, ErrorCodes.NotAllPlayerClaimed)
+
+      destroySelf!(operator)
+   }
+
+   @using(updateFields = true, assetsInContract = true)
+   pub fn userClaimRewards(addressPunter: Address, amountBid: U256, upBid: Bool) -> (){
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
+
+      // reward < 0 means that house won, price was equal
+      if (rewardAmount > 0) {
+         if( (priceEnd > priceStart && upBid) || (priceEnd < priceStart && !upBid) ) {
+               let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
+
+               transferTokenFromSelf!(addressPunter, ALPH, userReward)
+               totalAmount = totalAmount - userReward
+         }
+      }
+      counterAttendees = counterAttendees - 1
+   }
+
+}

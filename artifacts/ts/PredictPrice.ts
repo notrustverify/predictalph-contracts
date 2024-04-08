@@ -23,44 +23,48 @@ import {
   fetchContractState,
   ContractInstance,
   getContractEventsCurrentCount,
+  TestContractParamsWithoutMaps,
+  TestContractResultWithoutMaps,
 } from "@alephium/web3";
-import { default as PredictalphContractJson } from "../Predictalph.ral.json";
+import { default as PredictPriceContractJson } from "../price/PredictPrice.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace PredictalphTypes {
+export namespace PredictPriceTypes {
   export type Fields = {
     punterTemplateId: HexString;
     roundTemplateId: HexString;
+    title: HexString;
     epoch: bigint;
     operator: Address;
     feesBasisPts: bigint;
     repeatEvery: bigint;
     claimedByAnyoneDelay: bigint;
+    playerCounter: bigint;
   };
 
   export type State = ContractState<Fields>;
 
-  export type BetBullEvent = ContractEvent<{
+  export type BetEvent = ContractEvent<{
+    contractId: HexString;
     from: Address;
     epoch: bigint;
     amount: bigint;
     up: boolean;
     claimedByAnyoneTimestamp: bigint;
   }>;
-  export type BetBearEvent = ContractEvent<{
-    from: Address;
+  export type RoundEndedEvent = ContractEvent<{
+    contractId: HexString;
     epoch: bigint;
-    amount: bigint;
-    up: boolean;
-    claimedByAnyoneTimestamp: bigint;
+    price: bigint;
   }>;
-  export type RoundEndedEvent = ContractEvent<{ epoch: bigint; price: bigint }>;
   export type RoundStartedEvent = ContractEvent<{
+    contractId: HexString;
     epoch: bigint;
     price: bigint;
   }>;
   export type ClaimedEvent = ContractEvent<{
+    contractId: HexString;
     punterAddress: Address;
     from: Address;
     amount: bigint;
@@ -70,6 +74,10 @@ export namespace PredictalphTypes {
   export interface CallMethodTable {
     getArrayElem: {
       params: CallContractParams<{ array: HexString; index: bigint }>;
+      result: CallContractResult<HexString>;
+    };
+    getTitle: {
+      params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<HexString>;
     };
   }
@@ -88,20 +96,14 @@ export namespace PredictalphTypes {
 }
 
 class Factory extends ContractFactory<
-  PredictalphInstance,
-  PredictalphTypes.Fields
+  PredictPriceInstance,
+  PredictPriceTypes.Fields
 > {
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as PredictalphTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as PredictPriceTypes.Fields;
   }
 
-  eventIndex = {
-    BetBull: 0,
-    BetBear: 1,
-    RoundEnded: 2,
-    RoundStarted: 3,
-    Claimed: 4,
-  };
+  eventIndex = { Bet: 0, RoundEnded: 1, RoundStarted: 2, Claimed: 3 };
   consts = {
     ErrorCodes: {
       PunterNotExists: BigInt(1),
@@ -114,190 +116,189 @@ class Factory extends ContractFactory<
       AlreadyPlayed: BigInt(8),
       NotEnoughAlph: BigInt(9),
       CannotBeClaimedYet: BigInt(10),
+      NotAllPlayerClaimed: BigInt(11),
     },
     SubContractTypes: { Round: "00", Punter: "01" },
   };
 
-  at(address: string): PredictalphInstance {
-    return new PredictalphInstance(address);
+  at(address: string): PredictPriceInstance {
+    return new PredictPriceInstance(address);
   }
 
   tests = {
     getArrayElem: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { array: HexString; index: bigint }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getArrayElem", params);
     },
-    getCurrentRound: async (
-      params: Omit<
-        TestContractParams<PredictalphTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResult<HexString>> => {
-      return testMethod(this, "getCurrentRound", params);
-    },
     getRoundByEpoch: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
-        { epochToGet: HexString }
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
+        { epochToGet: bigint }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getRoundByEpoch", params);
     },
+    getRoundByEpochByteVec: async (
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
+        { epochToGet: HexString }
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "getRoundByEpochByteVec", params);
+    },
     getBetInfoByEpoch: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { from: Address; epochToGet: HexString }
       >
-    ): Promise<TestContractResult<HexString>> => {
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
       return testMethod(this, "getBetInfoByEpoch", params);
     },
+    getTitle: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<PredictPriceTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+      return testMethod(this, "getTitle", params);
+    },
     startRound: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { from: Address; price: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "startRound", params);
     },
     endRound: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { actualPrice: bigint; immediatelyStart: boolean }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "endRound", params);
     },
     bid: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { amount: bigint; up: boolean }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "bid", params);
     },
     withdraw: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
-        { arrayEpochIn: HexString }
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
+        { from: Address; arrayEpochIn: HexString; addressToClaim: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "withdraw", params);
     },
-    withdrawAddress: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
-        { arrayEpochIn: HexString; addressToClaim: Address }
-      >
-    ): Promise<TestContractResult<null>> => {
-      return testMethod(this, "withdrawAddress", params);
-    },
     destroyRound: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { epochArray: HexString }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroyRound", params);
     },
+    destroy: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<PredictPriceTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "destroy", params);
+    },
     boostRound: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { amount: bigint; epochToBoost: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "boostRound", params);
     },
     setNewRepeatEvery: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { newRecurrence: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewRepeatEvery", params);
     },
     setNewFees: async (
-      params: TestContractParams<PredictalphTypes.Fields, { basisPts: bigint }>
-    ): Promise<TestContractResult<null>> => {
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
+        { basisPts: bigint }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewFees", params);
     },
     setNewOperator: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { newOperator: Address }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewOperator", params);
     },
     setNewClaimedByAnyone: async (
-      params: TestContractParams<
-        PredictalphTypes.Fields,
+      params: TestContractParamsWithoutMaps<
+        PredictPriceTypes.Fields,
         { newClaimedByAnyoneDelay: bigint }
       >
-    ): Promise<TestContractResult<null>> => {
+    ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewClaimedByAnyone", params);
     },
   };
 }
 
 // Use this object to test and deploy the contract
-export const Predictalph = new Factory(
+export const PredictPrice = new Factory(
   Contract.fromJson(
-    PredictalphContractJson,
-    "=10-2+54=2-1+8=3-1+9=2-2=1+54=2+a=1-1=1-1+25=1-1=2-1=1-2=1-1=2-2+9e=2-1=1+24401441144214=2-2+1=1-3=1-3=1-3+1=81-1+e=24+7e0212526f756e6420636f6e747261637420696420001600=25-1+d=22+7e0212526f756e6420636f6e747261637420696420001601=81-1+8=82+16037e0212526f756e6420636f6e74726163742069642000a00016017e031041637475616c2065706f6368206973201220776974682073746172742070726963652000=1630",
-    "0ac29513c4719fe384ef331f1fbc66b3804c052ac7764de4483dd28b2bfe6883"
+    PredictPriceContractJson,
+    "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+6=2+2=1-1=3-1+d=2+3=1-1=3-1+3=3-1+5=3-1+6=3-1+7=3-1+8=3-1+9=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1600",
+    "35cff66724106a4953bc380897ceb4742e7ece4a52cf282df9e3f8be0cba6e7e"
   )
 );
 
 // Use this class to interact with the blockchain
-export class PredictalphInstance extends ContractInstance {
+export class PredictPriceInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<PredictalphTypes.State> {
-    return fetchContractState(Predictalph, this);
+  async fetchState(): Promise<PredictPriceTypes.State> {
+    return fetchContractState(PredictPrice, this);
   }
 
   async getContractEventsCurrentCount(): Promise<number> {
     return getContractEventsCurrentCount(this.address);
   }
 
-  subscribeBetBullEvent(
-    options: EventSubscribeOptions<PredictalphTypes.BetBullEvent>,
+  subscribeBetEvent(
+    options: EventSubscribeOptions<PredictPriceTypes.BetEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      Predictalph.contract,
+      PredictPrice.contract,
       this,
       options,
-      "BetBull",
-      fromCount
-    );
-  }
-
-  subscribeBetBearEvent(
-    options: EventSubscribeOptions<PredictalphTypes.BetBearEvent>,
-    fromCount?: number
-  ): EventSubscription {
-    return subscribeContractEvent(
-      Predictalph.contract,
-      this,
-      options,
-      "BetBear",
+      "Bet",
       fromCount
     );
   }
 
   subscribeRoundEndedEvent(
-    options: EventSubscribeOptions<PredictalphTypes.RoundEndedEvent>,
+    options: EventSubscribeOptions<PredictPriceTypes.RoundEndedEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      Predictalph.contract,
+      PredictPrice.contract,
       this,
       options,
       "RoundEnded",
@@ -306,11 +307,11 @@ export class PredictalphInstance extends ContractInstance {
   }
 
   subscribeRoundStartedEvent(
-    options: EventSubscribeOptions<PredictalphTypes.RoundStartedEvent>,
+    options: EventSubscribeOptions<PredictPriceTypes.RoundStartedEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      Predictalph.contract,
+      PredictPrice.contract,
       this,
       options,
       "RoundStarted",
@@ -319,11 +320,11 @@ export class PredictalphInstance extends ContractInstance {
   }
 
   subscribeClaimedEvent(
-    options: EventSubscribeOptions<PredictalphTypes.ClaimedEvent>,
+    options: EventSubscribeOptions<PredictPriceTypes.ClaimedEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      Predictalph.contract,
+      PredictPrice.contract,
       this,
       options,
       "Claimed",
@@ -333,16 +334,15 @@ export class PredictalphInstance extends ContractInstance {
 
   subscribeAllEvents(
     options: EventSubscribeOptions<
-      | PredictalphTypes.BetBullEvent
-      | PredictalphTypes.BetBearEvent
-      | PredictalphTypes.RoundEndedEvent
-      | PredictalphTypes.RoundStartedEvent
-      | PredictalphTypes.ClaimedEvent
+      | PredictPriceTypes.BetEvent
+      | PredictPriceTypes.RoundEndedEvent
+      | PredictPriceTypes.RoundStartedEvent
+      | PredictPriceTypes.ClaimedEvent
     >,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvents(
-      Predictalph.contract,
+      PredictPrice.contract,
       this,
       options,
       fromCount
@@ -351,26 +351,37 @@ export class PredictalphInstance extends ContractInstance {
 
   methods = {
     getArrayElem: async (
-      params: PredictalphTypes.CallMethodParams<"getArrayElem">
-    ): Promise<PredictalphTypes.CallMethodResult<"getArrayElem">> => {
+      params: PredictPriceTypes.CallMethodParams<"getArrayElem">
+    ): Promise<PredictPriceTypes.CallMethodResult<"getArrayElem">> => {
       return callMethod(
-        Predictalph,
+        PredictPrice,
         this,
         "getArrayElem",
         params,
         getContractByCodeHash
       );
     },
+    getTitle: async (
+      params?: PredictPriceTypes.CallMethodParams<"getTitle">
+    ): Promise<PredictPriceTypes.CallMethodResult<"getTitle">> => {
+      return callMethod(
+        PredictPrice,
+        this,
+        "getTitle",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
   };
 
-  async multicall<Calls extends PredictalphTypes.MultiCallParams>(
+  async multicall<Calls extends PredictPriceTypes.MultiCallParams>(
     calls: Calls
-  ): Promise<PredictalphTypes.MultiCallResults<Calls>> {
+  ): Promise<PredictPriceTypes.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      Predictalph,
+      PredictPrice,
       this,
       calls,
       getContractByCodeHash
-    )) as PredictalphTypes.MultiCallResults<Calls>;
+    )) as PredictPriceTypes.MultiCallResults<Calls>;
   }
 }
