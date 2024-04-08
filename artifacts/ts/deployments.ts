@@ -30,6 +30,8 @@ export type Deployments = {
     PredictPrice_PredictPriceBTC: DeployContractExecutionResult<PredictPriceInstance>;
     PredictChoice_PredictChoiceRhone: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictChoice_PredictChoiceALPHFour: DeployContractExecutionResult<PredictChoiceInstance>;
+    PredictChoice_PredictChoiceRhoneQ2?: DeployContractExecutionResult<PredictChoiceInstance>;
+    PredictChoice_PredictChoiceALPHTop100?: DeployContractExecutionResult<PredictChoiceInstance>;
   };
 };
 
@@ -79,6 +81,26 @@ function toDeployments(json: any): Deployments {
           .address
       ),
     },
+    PredictChoice_PredictChoiceRhoneQ2:
+      json.contracts["PredictChoice:PredictChoiceRhoneQ2"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["PredictChoice:PredictChoiceRhoneQ2"],
+            contractInstance: PredictChoice.at(
+              json.contracts["PredictChoice:PredictChoiceRhoneQ2"]
+                .contractInstance.address
+            ),
+          },
+    PredictChoice_PredictChoiceALPHTop100:
+      json.contracts["PredictChoice:PredictChoiceALPHTop100"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["PredictChoice:PredictChoiceALPHTop100"],
+            contractInstance: PredictChoice.at(
+              json.contracts["PredictChoice:PredictChoiceALPHTop100"]
+                .contractInstance.address
+            ),
+          },
   };
   return {
     ...json,

@@ -18,7 +18,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
   const settings = network.settings
-  const Q2_END = 7_344_000
+  const Q2_END = 7_084_800
   const title = "Rhone upgrade deployed in Q2 on mainnet"
 
   const predict = await deployer.deployContract(PredictChoice, {
@@ -37,7 +37,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        playerCounter: 0n
     },
 
-  },"PredictChoiceRhone")
+  },"PredictChoiceRhoneQ2")
 
   console.log(`\nDeploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
