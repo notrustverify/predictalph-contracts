@@ -37,7 +37,7 @@ func main() {
 		AllowCredentials: true,
 	}
 
-	db = connect("../data/roundsData.sqlite")
+	db = connect(os.Getenv("DB_PATH"))
 
 	router := gin.Default()
 	router.Use(cors.New(corsConfig))
