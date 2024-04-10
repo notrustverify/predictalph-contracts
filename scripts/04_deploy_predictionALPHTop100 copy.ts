@@ -21,7 +21,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   const settings = network.settings
   const title = "ALPH in top 100 by market cap on CoinGecko before end of 2024"
 
-  const predict = await deployer.deployContract(PredictChoice, {
+/*   const predict = await deployer.deployContract(PredictChoice, {
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
        roundTemplateId: roundTemplateId.contractInstance.contractId,
@@ -37,7 +37,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        playerCounter: 0n
     },
 
-  },"PredictChoiceALPHTop100")
+  },"PredictChoiceALPHTop100") 
 
   console.log(`\nDeploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
@@ -46,6 +46,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${predict.contractInstance.address}\n\n`)
+  */
 }
 
 export default deployPredictChoice

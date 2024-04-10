@@ -32,6 +32,7 @@ export type Deployments = {
     PredictChoice_PredictChoiceALPHFour: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictChoice_PredictChoiceRhoneQ2?: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictChoice_PredictChoiceALPHTop100?: DeployContractExecutionResult<PredictChoiceInstance>;
+    PredictChoice_PredictChoiceNGUTOP?: DeployContractExecutionResult<PredictChoiceInstance>;
   };
 };
 
@@ -98,6 +99,16 @@ function toDeployments(json: any): Deployments {
             ...json.contracts["PredictChoice:PredictChoiceALPHTop100"],
             contractInstance: PredictChoice.at(
               json.contracts["PredictChoice:PredictChoiceALPHTop100"]
+                .contractInstance.address
+            ),
+          },
+    PredictChoice_PredictChoiceNGUTOP:
+      json.contracts["PredictChoice:PredictChoiceNGUTOP"] === undefined
+        ? undefined
+        : {
+            ...json.contracts["PredictChoice:PredictChoiceNGUTOP"],
+            contractInstance: PredictChoice.at(
+              json.contracts["PredictChoice:PredictChoiceNGUTOP"]
                 .contractInstance.address
             ),
           },
