@@ -28,6 +28,8 @@ import {
   RoundChoice,
   BidChoice,
   WithdrawChoice,
+  BoostRound,
+  BoostRoundChoice,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -267,6 +269,35 @@ export async function bid(
          predict: contractId,
          amount: amount,
          side: up,
+       },
+       attoAlphAmount: amount + 2n * DUST_AMOUNT,
+     });
+   }
+ }
+
+
+ export async function boost(
+   signer: SignerProvider,
+   contractId: string,
+   amount: bigint,
+   epochToBoost: bigint,
+   type: string
+ ) {
+   if (type.toLowerCase() == "predictprice" ) {
+     return await BoostRound.execute(signer, {
+       initialFields: {
+          predict: contractId,
+          amount: amount,
+          epochToBoost: epochToBoost
+       },
+       attoAlphAmount: amount + 2n * DUST_AMOUNT,
+     });
+   } else if (type.toLowerCase() == "predictchoice" ) {
+     return await BoostRoundChoice.execute(signer, {
+       initialFields: {
+         predict: contractId,
+         amount: amount,
+         epochToBoost: epochToBoost
        },
        attoAlphAmount: amount + 2n * DUST_AMOUNT,
      });

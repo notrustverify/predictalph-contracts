@@ -13,6 +13,7 @@ import {
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
 import {
+   BoostRound,
   DestroyRound,
   End,
   NewInterval,
@@ -24,6 +25,7 @@ import * as fetchRetry from "fetch-retry";
 import {
   arrayEpochToBytes,
   bid,
+  boost,
   contractExists,
   getPrice,
   getRoundContractId,
@@ -117,6 +119,43 @@ console.log(tx)
   }
 }
 
+
+async function boostRound(privKey: string, contractName: string, amount: bigint,epochToBoost: bigint) {
+   const wallet = new PrivateKeyWallet({
+     privateKey: privKey,
+     keyType: undefined,
+     nodeProvider: web3.getCurrentNodeProvider(),
+   });
+ 
+   //.deployments contains the info of our `TokenFaucet` deployement, as we need to now the contractId and address
+   //This was auto-generated with the `cli deploy` of our `scripts/0_deploy_faucet.ts`
+   const deployments = await Deployments.from(
+     "./artifacts/.deployments." + networkToUse + ".json"
+   );
+   //Make sure it match your address group
+   const group = wallet.group;
+   const deployed = deployments.getDeployedContractResult(group, contractName);
+ 
+   const predictalphContractId = deployed.contractInstance.contractId;
+   const predictalphContractAddress = deployed.contractInstance.address;
+ 
+   try {
+     const tx = await boost(
+       wallet,
+       predictalphContractId,
+       amount*ONE_ALPH,
+       epochToBoost,
+       contractName.split(":")[0]
+       );
+     console.log(
+       `boost round ${amount} ALPH - ${tx.txId} - Contract Address: ${predictalphContractAddress}`
+     );
+     await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
+   } catch (error) {
+     console.error(error);
+   }
+ }
+
 const retryFetch = fetchRetry.default(fetch, {
   retries: 10,
   retryDelay: 1000,
@@ -133,6 +172,7 @@ let networkToUse = process.argv.slice(2)[0];
 let contractName = process.argv.slice(2)[1];
 let action = process.argv.slice(2)[2];
 let amountBet = process.argv.slice(2)[3];
+let epoch = process.argv.slice(2)[4];
 
 //if (networkToUse === undefined) networkToUse = "mainnet";
 
@@ -164,6 +204,13 @@ switch (action) {
       contractName
     );
     break;
+    case "boost":
+      boostRound(
+        configuration.networks[networkToUse].privateKeys[0],
+        contractName,
+        BigInt(amountBet),
+        BigInt(epoch),
+      );
   default:
     break;
 }
