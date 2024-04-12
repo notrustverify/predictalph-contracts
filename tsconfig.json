@@ -10,5 +10,5 @@
     "experimentalDecorators": true,
   },
   "exclude": ["node_modules", "api"],
-  "include": ["src/**/*.ts", "test/**/*.ts", "scripts/**/*.ts", "alephium.config.ts", "artifacts/**/*.ts"]
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "alephium.config.ts", "artifacts/**/*.ts"]
 }

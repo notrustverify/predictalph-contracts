@@ -37,6 +37,7 @@ export namespace RoundChoiceTypes {
     feesBasisPts: bigint;
     bidEndTimestamp: bigint;
     operator: Address;
+    endBeforeEnd: boolean;
     rewardsComputed: boolean;
     totalAmountBoost: bigint;
     sideWon: boolean;
@@ -67,6 +68,10 @@ export namespace RoundChoiceTypes {
     getRoundEpoch: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
+    };
+    canEndBeforeEnd: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<boolean>;
     };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
@@ -138,6 +143,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getRoundEpoch", params);
     },
+    canEndBeforeEnd: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<boolean>> => {
+      return testMethod(this, "canEndBeforeEnd", params);
+    },
     updateAmount: async (
       params: TestContractParamsWithoutMaps<
         RoundChoiceTypes.Fields,
@@ -186,7 +199,7 @@ export const RoundChoice = new Factory(
   Contract.fromJson(
     RoundChoiceContractJson,
     "",
-    "fbc167ffb4204a22ac97255649ed57cd8c570677499f03b56eaab76d327e4bf7"
+    "a4f8868dbc702c5680a1d3bef01ed2c2d286fa6cca74c4ca7ba519ef6d640547"
   )
 );
 
@@ -241,6 +254,17 @@ export class RoundChoiceInstance extends ContractInstance {
         RoundChoice,
         this,
         "getRoundEpoch",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    canEndBeforeEnd: async (
+      params?: RoundChoiceTypes.CallMethodParams<"canEndBeforeEnd">
+    ): Promise<RoundChoiceTypes.CallMethodResult<"canEndBeforeEnd">> => {
+      return callMethod(
+        RoundChoice,
+        this,
+        "canEndBeforeEnd",
         params === undefined ? {} : params,
         getContractByCodeHash
       );

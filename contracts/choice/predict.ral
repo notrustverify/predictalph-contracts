@@ -7,7 +7,8 @@ Contract PredictChoice(
    mut feesBasisPts: U256,
    mut repeatEvery: U256,
    mut claimedByAnyoneDelay: U256,
-   mut playerCounter: U256  
+   mut playerCounter: U256,
+   mut endBeforeEnd: Bool // can end round before real end
 ) extends DynamicArrayForInt() {
 
    event Bet(contractId: ByteVec, from: Address, epoch: U256, amount: U256, side: Bool, claimedByAnyoneTimestamp: U256)
@@ -72,7 +73,7 @@ Contract PredictChoice(
       assert!(!contractExists!(subContractId!(roundContractPath)), ErrorCodes.RoundAlreadyRunning)
 
       let bidTimestampEnd = blockTimeStamp!() + repeatEvery
-      let (encodedImmFields, encodedMutFields) = RoundChoice.encodeFields!(selfContract!(), epoch, feesBasisPts, bidTimestampEnd, operator, false, 0 ,false ,0 ,0 ,0, 0, 0, 0, 0)
+      let (encodedImmFields, encodedMutFields) = RoundChoice.encodeFields!(selfContract!(), epoch, feesBasisPts, bidTimestampEnd, operator, endBeforeEnd, false, 0 ,false ,0 ,0 ,0, 0, 0, 0, 0)
 
       let _ = copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
       emit RoundStarted(selfContractId!(), epoch)
@@ -85,8 +86,11 @@ Contract PredictChoice(
 
       let round = getRoundByEpoch(epoch)
       let endRoundChoiceTimestamp = round.getEndRoundTime()
+      let canEndBeforeEnd = round.canEndBeforeEnd()
 
-      assert!(endRoundChoiceTimestamp <= blockTimeStamp!(), ErrorCodes.RoundDidntEnd)
+      if(!canEndBeforeEnd){
+         assert!(endRoundChoiceTimestamp <= blockTimeStamp!(), ErrorCodes.RoundDidntEnd)
+      }
 
       round.calculateRewards(sideWon)
 
@@ -227,5 +231,12 @@ Contract PredictChoice(
       checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
       claimedByAnyoneDelay = newClaimedByAnyoneDelay
    }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn setEndBeforeEnd() -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      endBeforeEnd = !endBeforeEnd
+   }
+
 
 }

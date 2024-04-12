@@ -68,21 +68,23 @@ export async function deployPredictionChoice(
    operator: Address,
    repeatEverySecond: number,
    epoch: bigint,
-   title: string
+   title: string,
+   endBeforeEnd: boolean
  ) {
    const punterTemplateId = await deployPunterTemplate();
    const roundTemplateId = await deployRoundChoiceTemplate();
    return await PredictChoice.deploy(defaultSigner, {
      initialFields: {
-       punterTemplateId: punterTemplateId.contractInstance.contractId,
-       roundTemplateId: roundTemplateId.contractInstance.contractId,
-       epoch: epoch,
-       operator: operator,
-       feesBasisPts: 100n,
-       repeatEvery: BigInt(repeatEverySecond * 1000),
-       claimedByAnyoneDelay: BigInt(1 * 1000),
-       title: binToHex(new TextEncoder().encode(title)),
-       playerCounter: 0n,
+        punterTemplateId: punterTemplateId.contractInstance.contractId,
+        roundTemplateId: roundTemplateId.contractInstance.contractId,
+        epoch: epoch,
+        operator: operator,
+        feesBasisPts: 100n,
+        repeatEvery: BigInt(repeatEverySecond * 1000),
+        claimedByAnyoneDelay: BigInt(1 * 1000),
+        title: binToHex(new TextEncoder().encode(title)),
+        playerCounter: 0n,
+        endBeforeEnd: endBeforeEnd
      },
    });
  }
@@ -140,7 +142,8 @@ export async function deployRoundChoiceTemplate() {
         totalAmountBoost: 0n,
         sideWon: false,
         amountTrue: 0n,
-        amountFalse: 0n
+        amountFalse: 0n,
+        endBeforeEnd: false
      },
    });
  }
@@ -148,7 +151,7 @@ export async function deployRoundChoiceTemplate() {
 export async function startRound(
   signer: SignerProvider,
   predict: PredictPriceInstance | PredictChoiceInstance,
-  price?: bigint
+  price: bigint
 ) {
   if (predict instanceof PredictPriceInstance) {
     return await Start.execute(signer, {
@@ -168,7 +171,7 @@ export async function endRound(
   predict: PredictPriceInstance | PredictChoiceInstance,
   price: bigint,
   immediatelyStart: boolean,
-  sideWon?: boolean
+  sideWon: boolean
 ) {
   if (predict instanceof PredictPriceInstance) {
     return await End.execute(signer, {

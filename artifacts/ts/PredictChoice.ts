@@ -41,6 +41,7 @@ export namespace PredictChoiceTypes {
     repeatEvery: bigint;
     claimedByAnyoneDelay: bigint;
     playerCounter: bigint;
+    endBeforeEnd: boolean;
   };
 
   export type State = ContractState<Fields>;
@@ -253,6 +254,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "setNewClaimedByAnyone", params);
     },
+    setEndBeforeEnd: async (
+      params: Omit<
+        TestContractParamsWithoutMaps<PredictChoiceTypes.Fields, never>,
+        "testArgs"
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "setEndBeforeEnd", params);
+    },
   };
 }
 
@@ -260,8 +269,8 @@ class Factory extends ContractFactory<
 export const PredictChoice = new Factory(
   Contract.fromJson(
     PredictChoiceContractJson,
-    "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-2+19=2-2+69=2-2+20=3-1+1=2-2+29=2-2=2+4=1-1+61=2+71=1-1+381=2-2+91=2-2+a1=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1588",
-    "99856d4825ad0d4176eda35891131d93e85a1192b0b07039ead00f8ade56d9fd"
+    "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+1=3-2+77=2-2+2e=2+e=1-1=2-2+37=2-2+51=2+6f=2+7f=2-2+8f=2-2+9f=2-2+af=2-2+c0=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1650",
+    "b5a11419ca1e49280c3fc8f65c7c42e0d6d887b1de5414930c94c27b0f389f78"
   )
 );
 

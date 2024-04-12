@@ -52,7 +52,8 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
       rewardBaseCalAmount: 0n,
       counterAttendees: 0n,
       totalAmountBoost: 0n,
-      sideWon: false
+      sideWon: false,
+      endBeforeEnd: false
    }
  })
 }

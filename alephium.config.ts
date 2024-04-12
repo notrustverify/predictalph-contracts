@@ -10,7 +10,7 @@ const configuration: Configuration<Settings> = {
       //Make sure the two values match what's in your devnet configuration
       nodeUrl: 'http://127.0.0.1:22973',
       networkId: 4,
-      privateKeys: ['a642942e67258589cd2b1822c631506632db5a12aabcf413604e785300d762a5', '615865d89812a9ea9eff3e1a8d8dead3534673f3203cb789c45c7ec7d8c2d977'],
+      privateKeys: ['615865d89812a9ea9eff3e1a8d8dead3534673f3203cb789c45c7ec7d8c2d977'],
       settings: []
     },
     testnet:{

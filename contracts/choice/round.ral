@@ -4,6 +4,7 @@ Contract RoundChoice(
    feesBasisPts: U256,
    bidEndTimestamp: U256,
    operator: Address,
+   endBeforeEnd: Bool,
    mut rewardsComputed: Bool,
    mut totalAmountBoost: U256,
    mut sideWon: Bool,
@@ -43,6 +44,10 @@ Contract RoundChoice(
       return epoch
    }
 
+   pub fn canEndBeforeEnd() -> (Bool){
+      return endBeforeEnd
+   }
+
 
    @using(updateFields = true, assetsInContract = true, preapprovedAssets = true)
    pub fn updateAmount(from: Address, amount: U256, side: Bool) -> () {
@@ -64,7 +69,11 @@ Contract RoundChoice(
 
    @using(updateFields = true, checkExternalCaller = false)
    pub fn calculateRewards(sideWinning: Bool) -> (){
-      assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      if(!endBeforeEnd){
+         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+         assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      }
+
       assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
 
       if (sideWon) {
@@ -104,7 +113,10 @@ Contract RoundChoice(
    @using(updateFields = true, assetsInContract = true)
    pub fn userClaimRewards(addressPunter: Address, amountBid: U256, sideBid: Bool) -> (){
       checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-      assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      if(!endBeforeEnd){
+         assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      }
+
       assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
 
       // reward < 0 means that house won, price was equal
