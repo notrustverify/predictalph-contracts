@@ -1,6 +1,6 @@
 import { Deployer, DeployFunction } from '@alephium/cli'
 import { Settings } from '../alephium.config'
-import { Punter, Round, RoundChoice } from '../artifacts/ts'
+import { Punter, PunterChoice, Round, RoundChoice, RoundMultipleChoice, RoundMultipleChoiceInstance } from '../artifacts/ts'
 import { ZERO_ADDRESS } from '@alephium/web3'
 
 const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Promise<void> => {
@@ -14,6 +14,17 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
         claimedByAnyoneAt: 0n
     }
   })
+
+  await deployer.deployContract(PunterChoice, {
+   initialFields: {
+       predictionContractId: '00',
+       punterAddress: ZERO_ADDRESS,
+       epoch: 0n,
+       side: 0n,
+       amountBid: 0n,
+       claimedByAnyoneAt: 0n
+   }
+ })
 
   await deployer.deployContract(Round, {
     initialFields: {
@@ -54,6 +65,27 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
       totalAmountBoost: 0n,
       sideWon: false,
       endBeforeEnd: false
+   }
+ })
+
+
+ await deployer.deployContract(RoundMultipleChoice, {
+   initialFields: {
+      prediction: "00",
+      epoch: 0n,
+      feesBasisPts: 0n,
+      bidEndTimestamp: 0n,
+      operator: ZERO_ADDRESS,
+      rewardsComputed: false,
+      totalAmount: 0n,
+      treasuryAmount: 0n,
+      rewardAmount: 0n,
+      rewardBaseCalAmount: 0n,
+      counterAttendees: 0n,
+      totalAmountBoost: 0n,
+      endBeforeEnd: false,
+      sideWon: 0n,
+      amountPunters: [0n, 0n, 0n],
    }
  })
 }

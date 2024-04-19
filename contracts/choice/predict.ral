@@ -71,8 +71,16 @@ Contract PredictChoice(
       let roundContractPath = SubContractTypes.RoundChoice ++ u256To4Byte!(epoch)
 
       assert!(!contractExists!(subContractId!(roundContractPath)), ErrorCodes.RoundAlreadyRunning)
+      let blocktimestampNow = blockTimeStamp!()
 
-      let bidTimestampEnd = blockTimeStamp!() + repeatEvery
+      // allow bet to use timestamp date not only repeat
+      let mut bidTimestampEnd = 0
+      if (repeatEvery >= blocktimestampNow){
+         bidTimestampEnd = repeatEvery
+      }else{
+         bidTimestampEnd = blockTimeStamp!() + repeatEvery
+      }
+
       let (encodedImmFields, encodedMutFields) = RoundChoice.encodeFields!(selfContract!(), epoch, feesBasisPts, bidTimestampEnd, operator, endBeforeEnd, false, 0 ,false ,0 ,0 ,0, 0, 0, 0, 0)
 
       let _ = copyCreateSubContract!{from -> ALPH: 1 alph}(roundContractPath, roundTemplateId, encodedImmFields, encodedMutFields)
@@ -119,8 +127,15 @@ Contract PredictChoice(
       // user never played, create contract
       assert!(!contractExists!(subContractId!(bidderContractId)), ErrorCodes.AlreadyPlayed)
 
-      let bidAmount = amount - 1 alph 
-      let claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
+      let bidAmount = amount - 1 alph
+
+      let mut claimedByAnyoneTimestamp = 0
+      if(claimedByAnyoneDelay >= timestampNow){
+         claimedByAnyoneTimestamp = claimedByAnyoneDelay
+      }else{
+         claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
+      }
+
       let selfContractId = selfContractId!()
       let (encodedImmFields, encodedMutFields) = Punter.encodeFields!(selfContractId, caller, epoch, side, bidAmount, claimedByAnyoneTimestamp)
       let _ = copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)

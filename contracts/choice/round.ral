@@ -69,14 +69,15 @@ Contract RoundChoice(
 
    @using(updateFields = true, checkExternalCaller = false)
    pub fn calculateRewards(sideWinning: Bool) -> (){
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+
       if(!endBeforeEnd){
-         checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
          assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
       }
 
       assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
 
-      if (sideWon) {
+      if (sideWinning) {
          rewardBaseCalAmount = amountTrue
       } else {
          rewardBaseCalAmount = amountFalse
@@ -113,10 +114,6 @@ Contract RoundChoice(
    @using(updateFields = true, assetsInContract = true)
    pub fn userClaimRewards(addressPunter: Address, amountBid: U256, sideBid: Bool) -> (){
       checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-      if(!endBeforeEnd){
-         assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
-      }
-
       assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
 
       // reward < 0 means that house won, price was equal

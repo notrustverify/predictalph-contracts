@@ -30,6 +30,9 @@ import {
   WithdrawChoice,
   BoostRound,
   BoostRoundChoice,
+  RoundMultipleChoice,
+  BidMultipleChoice,
+  WithdrawMultipleChoice,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -43,6 +46,14 @@ export const ZERO_ADDRESS = "tgx7VNFoP9DJiFMFgXXtafQZkUvyEdDHT9ryamHJYrjq";
 export const defaultSigner = new PrivateKeyWallet({
   privateKey: testPrivateKey,
 });
+
+export enum TypeBet {
+   price = "price",
+   choice = "choice",
+   mutipleChoice = "multiplechoice"
+   } 
+   
+
 
 export async function deployPrediction(
   operator: Address,
@@ -204,7 +215,8 @@ export async function getRoundContractState(
   predictAlphContractId: string,
   epoch: bigint,
   groupIndex: number,
-  isChoiceContract?: boolean
+  isChoiceContract?: boolean,
+  isMultipleChoiceContract?: boolean
 ) {
   const roundContractId = getRoundContractId(
     predictAlphContractId,
@@ -214,8 +226,10 @@ export async function getRoundContractState(
 
   let roundContract = undefined
   roundContract = Round.at(addressFromContractId(roundContractId));
-  if(isChoiceContract)
+if(isChoiceContract)
    roundContract = RoundChoice.at(addressFromContractId(roundContractId));
+if(isMultipleChoiceContract)
+   roundContract = RoundMultipleChoice.at(addressFromContractId(roundContractId))
 
   const state = await roundContract.fetchState();
   return state;
@@ -251,7 +265,7 @@ export async function bid(
    signer: SignerProvider,
    contractId: string,
    amount: bigint,
-   up: boolean,
+   up: boolean | bigint,
    type: string
  ) {
    if (type.toLowerCase() == "predictprice" ) {
@@ -259,7 +273,7 @@ export async function bid(
        initialFields: {
          predict: contractId,
          amount: amount,
-         side: up,
+         side: up as boolean,
        },
        attoAlphAmount: amount + 2n * DUST_AMOUNT,
      });
@@ -268,11 +282,20 @@ export async function bid(
        initialFields: {
          predict: contractId,
          amount: amount,
-         side: up,
+         side: up as boolean,
        },
        attoAlphAmount: amount + 2n * DUST_AMOUNT,
      });
-   }
+   }else if (type.toLowerCase() == "predictmultiplechoice" ) {
+      return await BidMultipleChoice.execute(signer, {
+        initialFields: {
+          predict: contractId,
+          amount: amount,
+          side: up as bigint,
+        },
+        attoAlphAmount: amount + 2n * DUST_AMOUNT,
+      });
+    }
  }
 
 
@@ -329,5 +352,14 @@ export async function bid(
        },
        attoAlphAmount: 2n * DUST_AMOUNT,
      });
-   }
+   }else if (type.toLowerCase() == "predictmultiplechoice" ) {
+      return await WithdrawMultipleChoice.execute(signer, {
+        initialFields: {
+         predict: contractId,
+          epochParticipation: arrayEpoch,
+          addressToClaim: addressToClaim
+        },
+        attoAlphAmount: 2n * DUST_AMOUNT,
+      });
+    }
  }

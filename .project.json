@@ -11,42 +11,70 @@
   "infos": {
     "BidChoice": {
       "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "716f35c8b35de7dd1a11317e7be30b6d9c555403f5b05e8889ddd922af2341f6",
+      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "BidMultipleChoice": {
+      "sourceFile": "punterActions.ral",
+      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "BidPrice": {
       "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "716f35c8b35de7dd1a11317e7be30b6d9c555403f5b05e8889ddd922af2341f6",
+      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "BoostRound": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "BoostRoundChoice": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "BoostRoundMultipleChoice": {
+      "sourceFile": "roundActions.ral",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "DestroyPredict": {
+      "sourceFile": "roundActions.ral",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "DestroyRound": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "DestroyRoundChoice": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "DestroyRoundMultipleChoice": {
+      "sourceFile": "roundActions.ral",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -60,14 +88,21 @@
     },
     "End": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "EndChoice": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "EndMultipleChoice": {
+      "sourceFile": "roundActions.ral",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
@@ -88,9 +123,16 @@
     },
     "PredictChoice": {
       "sourceFile": "choice/predict.ral",
-      "sourceCodeHash": "a734549d61e18bc335a51e9e82afd24616037551bf451e110dfb1f33c513af8a",
-      "bytecodeDebugPatch": "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+1=3-2+77=2-2+2e=2+e=1-1=2-2+37=2-2+51=2+6f=2+7f=2-2+8f=2-2+9f=2-2+af=2-2+c0=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1650",
-      "codeHashDebug": "b5a11419ca1e49280c3fc8f65c7c42e0d6d887b1de5414930c94c27b0f389f78",
+      "sourceCodeHash": "9f8f151eac000ca30cb8aef41a7e4f134d745e3d78d9c98024ed527af207894b",
+      "bytecodeDebugPatch": "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+2=2-1=1-1+8a=2-2+51=3-1+2=2+5a4=1-1+74=2-2+92=2-2+a2=2-2+b2=2-2+c2=2-2+d2=2-2+e3=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1720",
+      "codeHashDebug": "ecb96930aa7105c7466435463df9d9186a5459ff9cf7688192cb2c93fd69d9c0",
+      "warnings": []
+    },
+    "PredictMultipleChoice": {
+      "sourceFile": "multiple-choice/predict.ral",
+      "sourceCodeHash": "ba5a06f318b13d2e5e5b63e13905437d737c0fd75edba169f50978d5dee00d85",
+      "bytecodeDebugPatch": "=10+6=1-1=2-1+a2=1+0bd=2+c=1-1=1-3+1=1-3+d=2-2+a9=2-2+70=1-2=1-1=1-2+1=2-2+79=2-1+9=3-2+b1=2-2+c1=2-2+d1=2-2+e1=2-1+f1=1+402=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1746",
+      "codeHashDebug": "19c8ed59e30a68f4b08d7130718e1cefb2f891372e6305ea56bf32afe2a6d0f2",
       "warnings": []
     },
     "PredictPrice": {
@@ -107,6 +149,13 @@
       "codeHashDebug": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
       "warnings": []
     },
+    "PunterChoice": {
+      "sourceFile": "punterChoice.ral",
+      "sourceCodeHash": "d51b047e24d84e916cc870369b8a6f625ca6589cc22178c4580ad9555264412d",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
+      "warnings": []
+    },
     "Round": {
       "sourceFile": "price/round.ral",
       "sourceCodeHash": "116330ad4b9e59448a4fa0204bcd4ed0347cefb3be70ed88576f718e6cf5377d",
@@ -116,35 +165,56 @@
     },
     "RoundChoice": {
       "sourceFile": "choice/round.ral",
-      "sourceCodeHash": "795f0764b88451deff4186956bffd37c76579239c8d9e607ac75d5efa3d94100",
+      "sourceCodeHash": "509d3c9e019376975e633356de45ae2cb402a738b08c25808f8a92c3e49a36e7",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "a4f8868dbc702c5680a1d3bef01ed2c2d286fa6cca74c4ca7ba519ef6d640547",
+      "codeHashDebug": "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c",
+      "warnings": []
+    },
+    "RoundMultipleChoice": {
+      "sourceFile": "multiple-choice/round.ral",
+      "sourceCodeHash": "28b647e4dd16365611361f676f54dd9d04f93237a700fec81b168fc8a8917dbb",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "cadd74b22e40eadbea19e6451396f03418f1de6a48c0ec0c40cb9db152e1e213",
       "warnings": []
     },
     "Start": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "StartChoice": {
       "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "cd443cf51a934cd71aec157c072748869297a445657ab7708ea97d087cec1223",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "StartMultipleChoice": {
+      "sourceFile": "roundActions.ral",
+      "sourceCodeHash": "858b119b6c4abd354595a3a60f4adb4274eb67581d5e3eedf16abf42c215cf28",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "WithdrawChoice": {
       "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "716f35c8b35de7dd1a11317e7be30b6d9c555403f5b05e8889ddd922af2341f6",
+      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "",
+      "warnings": []
+    },
+    "WithdrawMultipleChoice": {
+      "sourceFile": "punterActions.ral",
+      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []
     },
     "WithdrawPrice": {
       "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "716f35c8b35de7dd1a11317e7be30b6d9c555403f5b05e8889ddd922af2341f6",
+      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "",
       "warnings": []

@@ -25,6 +25,7 @@ TxScript EndChoice(predict: PredictChoice, sideWon: Bool, immediatelyStart: Bool
    predict.endRound{callerAddress!() -> ALPH : 1 alph}(sideWon, immediatelyStart)
 }
 
+
 TxScript DestroyRoundChoice(predict: PredictChoice, arrayEpoch: ByteVec) {
    predict.destroyRound(arrayEpoch)
 }
@@ -35,4 +36,25 @@ predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
 }
  
 
+TxScript StartMultipleChoice(predict: PredictMultipleChoice) {
+   let caller = callerAddress!() 
+   predict.startRound{caller -> ALPH : 1 alph}(caller)
+}
+
+TxScript EndMultipleChoice(predict: PredictMultipleChoice, sideWon: U256, immediatelyStart: Bool) {
+   predict.endRound{callerAddress!() -> ALPH : 1 alph}(sideWon, immediatelyStart)
+}
+
+TxScript DestroyRoundMultipleChoice(predict: PredictMultipleChoice, arrayEpoch: ByteVec) {
+   predict.destroyRound(arrayEpoch)
+}
+
+TxScript BoostRoundMultipleChoice(predict: PredictMultipleChoice, amount: U256, epochToBoost: U256){
+let caller = callerAddress!()
+predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
+}
+
+TxScript DestroyPredict(predict: PredictChoice){
+   predict.destroy()
+}
 

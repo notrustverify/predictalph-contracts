@@ -38,6 +38,7 @@ import {
   arrayEpochToBytes,
   boostRound,
   deployPredictionChoice,
+  destroyPredict,
 } from "./utils";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import * as base58 from "bs58";
@@ -143,7 +144,7 @@ describe("unit tests", () => {
     expect(roundState.asset.alphAmount).toEqual(10n*ONE_ALPH + 21n * ONE_ALPH);
     expect(predictionState.fields.epoch).toEqual(1n);
     expect(roundState.fields.totalAmountBoost).toEqual(10n * ONE_ALPH)
-    expect(rewardBaseCalAmount).toEqual(amountFalse);
+    expect(rewardBaseCalAmount).toEqual(amountTrue);
     expect(rewardAmount).toEqual(297n*10n**17n);
     expect(sideWon).toEqual(true);
 
@@ -165,7 +166,7 @@ describe("unit tests", () => {
 
     const totalAmountWithdraw = roundStateWithdraw.fields.totalAmount;
     const rewardBaseCalAmountWithdraw = roundStateWithdraw.fields.rewardBaseCalAmount
-    expect(treasuryAmount).toEqual(totalAmountWithdraw);
+    expect(treasuryAmount).toEqual(300000000000000000n);
 
     //console.log(roundStateWithdraw.asset.alphAmount)
     expect(roundStateWithdraw.asset.alphAmount).toEqual(
@@ -206,6 +207,7 @@ describe("unit tests", () => {
 
     const predictionState = await predictionGame.fetchState();
     expect(predictionState.fields.epoch).toEqual(1n)
+    
 
     
     //create contract
@@ -271,17 +273,16 @@ describe("unit tests", () => {
 
     //const bidder1State = getRoundBidder(bidder1.address, 0n);
     //console.log(bidder1State);
-
     expect(amountDown).toEqual(53n * ONE_ALPH);
     expect(amountUp).toEqual(0n);
     expect(totalAmount).toEqual(53n * ONE_ALPH);
     expect(treasuryAmount).toEqual(53n * 10n ** 16n);
     expect(roundState.asset.alphAmount).toEqual(53n * ONE_ALPH+ONE_ALPH);
     expect(predictionState.fields.epoch).toEqual(1n);
-    expect(rewardBaseCalAmount).toEqual(amountDown);
+    expect(rewardBaseCalAmount).toEqual(amountUp);
     expect(rewardAmount).toEqual(53n * ONE_ALPH - 53n * 10n ** 16n);
     expect(sideWon).toEqual(true);
-    expect(numAttendees).toEqual;
+    expect(numAttendees).toEqual(5n);
 
 
     const arrayEpochBytes = arrayEpochToBytes([0])
@@ -475,13 +476,17 @@ describe("unit tests", () => {
 
 
     //create contract
-    await bid(bidder1, predictionGame, 2n * ONE_ALPH, true);
+    await bid(bidder1, predictionGame, 1n * ONE_ALPH+ONE_ALPH, true);
 
-    await bid(bidder2, predictionGame, 2n * ONE_ALPH, false);
-    await bid(bidder3, predictionGame, 2n * ONE_ALPH, false);
+    await bid(bidder2, predictionGame, 1n * ONE_ALPH+ONE_ALPH, false);
+    await bid(bidder3, predictionGame, 1n * ONE_ALPH+ONE_ALPH, false);
 
     await sleep((bidDurationSecond+1) * 1000);
     await endRound(operator, predictionGame, 11n, false, false)
+
+    let roundState = await getRoundState(0n);
+    expect(roundState.fields.totalAmount).toEqual(3n*ONE_ALPH)
+    expect(roundState.fields.rewardBaseCalAmount).toEqual(roundState.fields.amountFalse)
 
     //ROUND TWO
     await startRound(operator, predictionGame, 10n);
@@ -489,15 +494,19 @@ describe("unit tests", () => {
     const predictionState = await predictionGame.fetchState();
     expect(predictionState.fields.epoch).toEqual(1n)
 
-    
     //create contract
-    await bid(bidder1, predictionGame, 2n * ONE_ALPH, false);
+    await bid(bidder1, predictionGame, 2n * ONE_ALPH + ONE_ALPH, false);
 
-    await bid(bidder2, predictionGame, 2n * ONE_ALPH, true);
-    await bid(bidder3, predictionGame, 2n * ONE_ALPH, true);
+    await bid(bidder2, predictionGame, 2n * ONE_ALPH + ONE_ALPH, true);
+    await bid(bidder3, predictionGame, 1n * ONE_ALPH + ONE_ALPH, true);
 
     await sleep((bidDurationSecond+1) * 1000);
     await endRound(operator, predictionGame, 11n, false, true)
+
+
+    roundState = await getRoundState(1n);
+    expect(roundState.fields.amountTrue).toEqual(3n*ONE_ALPH)
+    expect(roundState.fields.rewardBaseCalAmount).toEqual(roundState.fields.amountTrue)
 
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
@@ -539,7 +548,7 @@ describe("unit tests", () => {
     await bid(bidder3, predictionGame, 2n * ONE_ALPH, true);
 
     await sleep((bidDurationSecond+1) * 1000);
-    await endRound(operator, predictionGame, 11n, false, false)
+    await endRound(operator, predictionGame, 11n, false, true)
 
 
     const arrayEpochBytes = arrayEpochToBytes([0,1])
@@ -549,7 +558,7 @@ describe("unit tests", () => {
     await withdraw(bidder3, predictionGame, arrayEpochBytes, bidder3.address);
 
     await destroyRound(operator, predictionGame,  arrayEpochToBytes([0,1]));
-    const exists = await contractExists(
+    let exists = await contractExists(
       addressFromContractId(
         getSubContractId(
           "00" +
@@ -557,6 +566,10 @@ describe("unit tests", () => {
         )
       )
     );
+    expect(exists).toEqual(false);
+
+    await destroyPredict(operator, predictionGame);
+    exists = await contractExists(predictionGame.address);
     expect(exists).toEqual(false);
 
   });
