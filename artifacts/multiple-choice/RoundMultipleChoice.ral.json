@@ -1,0 +1,254 @@
+{
+  "version": "v2.11.0",
+  "name": "RoundMultipleChoice",
+  "bytecode": "110a09121b4024402d406a40b040d040e94127010000000102ce0302010000000102a00702010000000102a00902010000000102ce0102010000000102ce050201010303004026b3ce00411340647ba000191340677ba00316012aa10316027a0f314d102ac316012a16027a0f314d102ac4a00a0d2aa10a16001601a901000101004027b3ce00411340647bce054b05ce0356321340687ba000191340677b16007a0f314d102ac3a109a003ce022c1367102da107a003a0072ba1081600a10203a10001010202000fa000191340677ba00116012aa101a00316012aa10316001601a901020000000cb3ce00411340647ba00a0c321340657bce04b001020304004021b3ce00411340647ba0001340697ba0080c334c11a00216022f4c0d1601a0082ca0092d170316001603a8a00316032ba103a00a0d2ba10a",
+  "codeHash": "cadd74b22e40eadbea19e6451396f03418f1de6a48c0ec0c40cb9db152e1e213",
+  "fieldsSig": {
+    "names": [
+      "prediction",
+      "epoch",
+      "feesBasisPts",
+      "bidEndTimestamp",
+      "operator",
+      "endBeforeEnd",
+      "rewardsComputed",
+      "totalAmountBoost",
+      "sideWon",
+      "totalAmount",
+      "amountPunters",
+      "treasuryAmount",
+      "rewardAmount",
+      "rewardBaseCalAmount",
+      "counterAttendees"
+    ],
+    "types": [
+      "PredictMultipleChoice",
+      "U256",
+      "U256",
+      "U256",
+      "Address",
+      "Bool",
+      "Bool",
+      "U256",
+      "U256",
+      "U256",
+      "[U256;3]",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [],
+  "functions": [
+    {
+      "name": "getEndRoundTime",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRewardAmount",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRewardBaseCalAmount",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRoundEpoch",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "canEndBeforeEnd",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "updateAmount",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "from",
+        "amount",
+        "side"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "calculateRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [
+        "sideWinning"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "boost",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "from",
+        "amount"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "destroy",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    },
+    {
+      "name": "userClaimRewards",
+      "usePreapprovedAssets": false,
+      "useAssetsInContract": true,
+      "isPublic": true,
+      "paramNames": [
+        "addressPunter",
+        "amountBid",
+        "sideBid"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "InvalidCaller",
+          "value": {
+            "type": "U256",
+            "value": "100"
+          }
+        },
+        {
+          "name": "NotAllPlayerClaimed",
+          "value": {
+            "type": "U256",
+            "value": "101"
+          }
+        },
+        {
+          "name": "RewardsAlreadyComputed",
+          "value": {
+            "type": "U256",
+            "value": "103"
+          }
+        },
+        {
+          "name": "BidTimestampNotReached",
+          "value": {
+            "type": "U256",
+            "value": "104"
+          }
+        },
+        {
+          "name": "RewardsNotComputed",
+          "value": {
+            "type": "U256",
+            "value": "105"
+          }
+        }
+      ]
+    }
+  ]
+}

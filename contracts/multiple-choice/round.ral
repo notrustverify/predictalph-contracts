@@ -1,0 +1,119 @@
+Contract RoundMultipleChoice(
+   prediction: PredictMultipleChoice,
+   epoch: U256,
+   feesBasisPts: U256,
+   bidEndTimestamp: U256,
+   operator: Address,
+   endBeforeEnd: Bool,
+   mut rewardsComputed: Bool,
+   mut totalAmountBoost: U256,
+   mut sideWon: U256,
+   mut totalAmount: U256,
+   mut amountPunters: [U256;3],
+   mut treasuryAmount: U256,
+   mut rewardAmount: U256,
+   mut rewardBaseCalAmount: U256,
+   mut counterAttendees: U256
+){
+
+
+   enum ErrorCodes {
+      InvalidCaller = 100
+      NotAllPlayerClaimed = 101
+      RewardsAlreadyComputed = 103
+      BidTimestampNotReached = 104
+      RewardsNotComputed  = 105
+   }
+
+
+   pub fn getEndRoundTime() -> (U256) {
+      return bidEndTimestamp
+   }
+
+   pub fn getRewardAmount() -> (U256) {
+      return treasuryAmount
+   }
+
+   pub fn getRewardBaseCalAmount() -> (U256){
+      return rewardBaseCalAmount
+   }
+
+
+   pub fn getRoundEpoch() -> (U256){
+      return epoch
+   }
+
+   pub fn canEndBeforeEnd() -> (Bool){
+      return endBeforeEnd
+   }
+
+
+   @using(updateFields = true, assetsInContract = true, preapprovedAssets = true)
+   pub fn updateAmount(from: Address, amount: U256, side: U256) -> () {
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      totalAmount = totalAmount + amount
+      amountPunters[side] = amountPunters[side] + amount
+
+      counterAttendees = counterAttendees + 1
+      transferTokenToSelf!(from, ALPH, amount)
+   }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn calculateRewards(sideWinning: U256) -> (){
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      if(!endBeforeEnd){
+         assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      }
+
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      rewardBaseCalAmount = amountPunters[sideWinning]
+         
+      treasuryAmount = totalAmount * feesBasisPts/10000
+      rewardAmount = totalAmount - treasuryAmount
+
+      sideWon = sideWinning
+      rewardsComputed = true
+   }
+
+
+   // add more rewards toward a side to incentive people to play
+   @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
+   pub fn boost(from: Address, amount: U256) -> (){
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      totalAmountBoost = totalAmountBoost + amount
+      totalAmount = totalAmount + amount
+      
+      transferTokenToSelf!(from, ALPH, amount)
+
+   }
+
+   @using(assetsInContract = true)
+   pub fn destroy() -> (){
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      assert!(counterAttendees <= 0, ErrorCodes.NotAllPlayerClaimed)
+
+      destroySelf!(operator)
+   }
+
+   @using(updateFields = true, assetsInContract = true)
+   pub fn userClaimRewards(addressPunter: Address, amountBid: U256, sideBid: U256) -> (){
+      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+      assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
+
+      // reward < 0 means that house won, price was equal
+      if (rewardAmount > 0) {
+         if(sideWon == sideBid){
+               let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
+
+               transferTokenFromSelf!(addressPunter, ALPH, userReward)
+               totalAmount = totalAmount - userReward
+         }
+      }
+      counterAttendees = counterAttendees - 1
+   }
+
+}
