@@ -98,14 +98,17 @@ const optionsPriceBet: EventSubscribeOptions<PredictPriceTypes.BetEvent> = {
 
     const [gameId] = await createAndGetNewGame(contractId, typeBet);
     const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
-    const [roundId] = await createAndGetNewRound(
+
+    let roundId
+      await mutex.use(async() => {
+     [roundId] = await createAndGetNewRound(
       epoch,
       0,
       false,
       gameId,
       typeBet
     );
-
+   }).catch(err => console.log(`mutex err: ${err}`))
     const [roundParticipation, created] = await createAndGetNewParticipation(
       roundId,
       addrId,
@@ -129,7 +132,8 @@ const optionsPriceBet: EventSubscribeOptions<PredictPriceTypes.BetEvent> = {
   // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
   errorCallback: (error, subscription): Promise<void> => {
     console.error(error);
-    //subscription.unsubscribe();
+    process.kill(process.pid);
+
     return Promise.resolve();
   },
 };
@@ -155,16 +159,20 @@ const optionsChoiceBet: EventSubscribeOptions<PredictChoiceTypes.BetEvent> = {
     const claimedByAnyone = event.fields.claimedByAnyoneTimestamp;
     const contractId = event.fields.contractId;
 
-    mutex.use( async() =>{
     const [gameId] = await createAndGetNewGame(contractId, typeBet);
     const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
-    const [roundId] = await createAndGetNewRound(
+
+    let roundId
+    await mutex.use( async() =>{
+    
+     [roundId] = await createAndGetNewRound(
       epoch,
       0,
       false,
       gameId,
       typeBet
     );
+   } ).catch(err => console.log(`mutex err: ${err}`))
 
     const [roundParticipation, created] = await createAndGetNewParticipation(
       roundId,
@@ -183,13 +191,14 @@ const optionsChoiceBet: EventSubscribeOptions<PredictChoiceTypes.BetEvent> = {
         amountBid: event.fields.amount,
         claimedByAnyoneTimestamp: claimedByAnyone,
       });
-   } )
+   
     return Promise.resolve();
   },
   // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
   errorCallback: (error, subscription): Promise<void> => {
     console.error(error);
-    //subscription.unsubscribe();
+    process.kill(process.pid);
+
     return Promise.resolve();
   },
 };
@@ -216,16 +225,23 @@ const optionsMultipleChoiceBet: EventSubscribeOptions<PredictMultipleChoiceTypes
       const claimedByAnyone = event.fields.claimedByAnyoneTimestamp;
       const contractId = event.fields.contractId;
 
-      mutex.use(async() => {
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
       const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
-      const [roundId] = await createAndGetNewRound(
-        epoch,
-        0,
-        false,
-        gameId,
-        typeBet
-      );
+
+      let roundId
+     await mutex.use(async() => {
+         [roundId] = await createAndGetNewRound(
+            epoch,
+            0,
+            false,
+            gameId,
+            typeBet
+          );
+         }).catch(err => {
+            console.log(`Mutex error ${err}`)
+         })
+     
+   
 
       const [roundParticipation, created] = await createAndGetNewParticipation(
         roundId,
@@ -244,15 +260,14 @@ const optionsMultipleChoiceBet: EventSubscribeOptions<PredictMultipleChoiceTypes
           amountBid: event.fields.amount,
           claimedByAnyoneTimestamp: claimedByAnyone,
         });
-      }).catch(err => {
-         console.log(`Mutex error ${err}`)
-      })
+    
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -276,17 +291,22 @@ const optionsPriceClaimed: EventSubscribeOptions<PredictPriceTypes.ClaimedEvent>
       const userAddressEvent = event.fields.punterAddress;
       const epoch = event.fields.epoch;
       const contractId = event.fields.contractId;
-      mutex.use(async() => {
+
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
       const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
-      const [roundId] = await createAndGetNewRound(
-        epoch,
-        0,
-        false,
-        gameId,
-        typeBet
-      );
 
+      let roundId
+      await mutex.use(async() => {
+         [roundId] = await createAndGetNewRound(
+            epoch,
+            0,
+            false,
+            gameId,
+            typeBet
+          );
+         }).catch(err => {console.log(`Mutex err: ${err}`)})
+      
+   
       const [roundParticipation, created] = await createAndGetNewParticipation(
         roundId,
         addrId,
@@ -299,13 +319,14 @@ const optionsPriceClaimed: EventSubscribeOptions<PredictPriceTypes.ClaimedEvent>
       );
 
       if (!created) await roundParticipation.update({ claimed: true });
-   }).catch(err => {console.log(`Mutex err: ${err}`)})
+  
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -329,16 +350,23 @@ const optionsChoiceClaimed: EventSubscribeOptions<PredictChoiceTypes.ClaimedEven
       const userAddressEvent = event.fields.punterAddress;
       const epoch = event.fields.epoch;
       const contractId = event.fields.contractId;
-      mutex.use(async() => {
+      
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
       const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
-      const [roundId] = await createAndGetNewRound(
-        epoch,
-        0,
-        false,
-        gameId,
-        typeBet
-      );
+
+      let roundId
+      await mutex.use(async() => {
+
+         [roundId] = await createAndGetNewRound(
+            epoch,
+            0,
+            false,
+            gameId,
+            typeBet
+          );
+         }).catch(err => console.log(`Mutex err: ${err}`))
+     
+      
 
       const [roundParticipation, created] = await createAndGetNewParticipation(
         roundId,
@@ -352,13 +380,14 @@ const optionsChoiceClaimed: EventSubscribeOptions<PredictChoiceTypes.ClaimedEven
       );
 
       if (!created) await roundParticipation.update({ claimed: true });
-   }).catch(err => console.log(`Mutex err: ${err}`))
+
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -382,17 +411,21 @@ const optionsMultipleChoiceClaimed: EventSubscribeOptions<PredictMultipleChoiceT
       const userAddressEvent = event.fields.punterAddress;
       const epoch = event.fields.epoch;
       const contractId = event.fields.contractId;
-      mutex.use(async() => { 
+
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
       const [addrId] = await createAndGetNewAddress(userAddressEvent, gameId);
-      const [roundId] = await createAndGetNewRound(
-        epoch,
-        0,
-        false,
-        gameId,
-        typeBet
-      );
+   
 
+      let roundId
+      await mutex.use(async() => { 
+         [roundId] = await createAndGetNewRound(
+            epoch,
+            0,
+            false,
+            gameId,
+            typeBet
+          );
+         }).catch(err => console.log(`mutex error: ${err}`))
       const [roundParticipation, created] = await createAndGetNewParticipation(
         roundId,
         addrId,
@@ -405,14 +438,15 @@ const optionsMultipleChoiceClaimed: EventSubscribeOptions<PredictMultipleChoiceT
       );
 
       if (!created) await roundParticipation.update({ claimed: true });
-   }).catch(err => console.log(`mutex error: ${err}`))
+  
 
       return Promise.resolve();
     },
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -432,8 +466,9 @@ const optionsPriceRoundEnd: EventSubscribeOptions<PredictPriceTypes.RoundEndedEv
       );
 
       const contractId = event.fields.contractId;
-      mutex.use(async () => {
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
+
+      await mutex.use(async () => {
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch, GameId: gameId.id },
@@ -446,7 +481,8 @@ const optionsPriceRoundEnd: EventSubscribeOptions<PredictPriceTypes.RoundEndedEv
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -466,8 +502,10 @@ const optionsChoiceRoundEnd: EventSubscribeOptions<PredictChoiceTypes.RoundEnded
       );
       const contractId = event.fields.contractId;
       const sideWon = event.fields.sideWon;
-      mutex.use(async () => {
+
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
+
+      await mutex.use(async () => {
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch, GameId: gameId.id },
@@ -480,7 +518,8 @@ const optionsChoiceRoundEnd: EventSubscribeOptions<PredictChoiceTypes.RoundEnded
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -503,9 +542,9 @@ const optionsMultipleChoiceRoundEnd: EventSubscribeOptions<PredictMultipleChoice
       const sideWon = event.fields.sideWon;
       const epoch = Number(event.fields.epoch)
 
+      const [gameId] = await createAndGetNewGame(contractId, typeBet);
 
-      mutex.use(async () => {
-         const [gameId] = await createAndGetNewGame(contractId, typeBet);
+      await mutex.use(async () => {
          const [round, created] = await Round.findCreateFind({
             where: { epoch: event.fields.epoch, GameId: gameId.id },
             defaults: { sideWonMultipleChoice: event.fields.sideWon, type: typeBet },
@@ -520,7 +559,7 @@ const optionsMultipleChoiceRoundEnd: EventSubscribeOptions<PredictMultipleChoice
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
       return Promise.resolve();
     },
   };
@@ -540,9 +579,9 @@ const optionsPriceRoundStart: EventSubscribeOptions<PredictPriceTypes.RoundStart
       );
 
       const contractId = event.fields.contractId;
-
-      mutex.use(async() => {
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
+
+      await mutex.use(async() => {
 
          const [round, created] = await Round.findCreateFind({
             where: { epoch: event.fields.epoch, GameId: gameId.id },
@@ -557,7 +596,8 @@ const optionsPriceRoundStart: EventSubscribeOptions<PredictPriceTypes.RoundStart
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -577,9 +617,9 @@ const optionsChoiceRoundStart: EventSubscribeOptions<PredictChoiceTypes.RoundSta
       );
 
       const contractId = event.fields.contractId;
-
-      mutex.use(async() => {
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
+
+      await mutex.use(async() => {
 
       // at start the sideWon is false at start
       const [round, created] = await Round.findCreateFind({
@@ -593,7 +633,8 @@ const optionsChoiceRoundStart: EventSubscribeOptions<PredictChoiceTypes.RoundSta
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -614,10 +655,10 @@ const optionsMultipleChoiceRoundStart: EventSubscribeOptions<PredictMultipleChoi
 
       const contractId = event.fields.contractId;
       const epoch = Number(event.fields.epoch);
-
-      mutex.use(async () =>{
-
       const [gameId] = await createAndGetNewGame(contractId, typeBet);
+
+      await mutex.use(async () =>{
+
 
       // at start the sideWon is false at start
       const [round, created] = await Round.findCreateFind({
@@ -631,7 +672,8 @@ const optionsMultipleChoiceRoundStart: EventSubscribeOptions<PredictMultipleChoi
     // The `errorCallback` will be called when an error occurs, here we unsubscribe the subscription and log the error
     errorCallback: (error, subscription): Promise<void> => {
       console.error(error);
-      //subscription.unsubscribe();
+      process.kill(process.pid);
+
       return Promise.resolve();
     },
   };
@@ -650,7 +692,7 @@ async function listenerManager(
   //.deployments contains the info of our `TokenFaucet` deployement, as we need to now the contractId and address
   //This was auto-generated with the `cli deploy` of our `scripts/0_deploy_faucet.ts`
   const deployments = await Deployments.from(
-    "./artifacts/.deployments." + networkToUse + ".json"
+    `./artifacts/.deployments.${networkToUse}.json`
   );
   //Make sure it match your address group
   const group = wallet.group;

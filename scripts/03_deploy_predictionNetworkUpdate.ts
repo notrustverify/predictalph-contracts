@@ -20,7 +20,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   const settings = network.settings
   const Q2_END = 7_084_800
   const title = "Rhone upgrade deployed in Q2 on mainnet"
-/*
+
   const predict = await deployer.deployContract(PredictChoice, {
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
@@ -30,11 +30,12 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
        repeatEvery: BigInt(Q2_END * 1000),
-       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC+Q2_END) * 1000)
+       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC + Q2_END) * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
        title: binToHex(new TextEncoder().encode(title)),
-       playerCounter: 0n
+       playerCounter: 0n,
+       endBeforeEnd: false
     },
 
   },"PredictChoiceRhoneQ2")
@@ -46,7 +47,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${predict.contractInstance.address}`)
-  */
+  
 }
 
 export default deployPredictChoice

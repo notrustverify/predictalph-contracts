@@ -20,7 +20,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   const APRIL_21 = 912_287
   const settings = network.settings
   const title = "Which project will have a higher mcap on April 24, 2024"
-/*
+
   const predict = await deployer.deployContract(PredictChoice, {
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
@@ -45,7 +45,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${predict.contractInstance.address}\n\n`)
-  */
+  
 }
 
 export default deployPredictChoice

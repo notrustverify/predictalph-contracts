@@ -8,7 +8,7 @@ const configuration: Configuration<Settings> = {
   networks: {
     devnet: {
       //Make sure the two values match what's in your devnet configuration
-      nodeUrl: 'http://127.0.0.1:22973',
+      nodeUrl:process.env.DEVNET_NODE === undefined ? 'http://127.0.0.1:22973' : process.env.DEVNET_NODE,
       networkId: 4,
       privateKeys: ['615865d89812a9ea9eff3e1a8d8dead3534673f3203cb789c45c7ec7d8c2d977'],
       settings: []

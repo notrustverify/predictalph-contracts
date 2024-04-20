@@ -32,7 +32,7 @@ export type Deployments = {
     Punter: DeployContractExecutionResult<PunterInstance>;
     Round: DeployContractExecutionResult<RoundInstance>;
     RoundChoice: DeployContractExecutionResult<RoundChoiceInstance>;
-    PredictPrice_PredictPriceALPH?: DeployContractExecutionResult<PredictPriceInstance>;
+    PredictPrice_PredictPriceALPH: DeployContractExecutionResult<PredictPriceInstance>;
     PredictPrice_PredictPriceBTC?: DeployContractExecutionResult<PredictPriceInstance>;
     PredictChoice_PredictChoiceRhone?: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictChoice_PredictChoiceALPHFour?: DeployContractExecutionResult<PredictChoiceInstance>;
@@ -66,16 +66,12 @@ function toDeployments(json: any): Deployments {
         json.contracts["RoundChoice"].contractInstance.address
       ),
     },
-    PredictPrice_PredictPriceALPH:
-      json.contracts["PredictPrice:PredictPriceALPH"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["PredictPrice:PredictPriceALPH"],
-            contractInstance: PredictPrice.at(
-              json.contracts["PredictPrice:PredictPriceALPH"].contractInstance
-                .address
-            ),
-          },
+    PredictPrice_PredictPriceALPH: {
+      ...json.contracts["PredictPrice:PredictPriceALPH"],
+      contractInstance: PredictPrice.at(
+        json.contracts["PredictPrice:PredictPriceALPH"].contractInstance.address
+      ),
+    },
     PredictPrice_PredictPriceBTC:
       json.contracts["PredictPrice:PredictPriceBTC"] === undefined
         ? undefined

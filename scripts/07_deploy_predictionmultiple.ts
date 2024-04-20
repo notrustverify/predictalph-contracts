@@ -19,7 +19,7 @@ const deployPredictionMultipleChoice: DeployFunction<Settings> = async (
   const ONE_DAY_SEC = 86400
   const APRIL_21 = 1713725025
   const settings = network.settings
-  const title = "Which project will have a higher mcap on April 24, 2024"
+  const title = "France - Suisse"
 
   const predict = await deployer.deployContract(PredictMultipleChoice, {
     initialFields: {
@@ -36,7 +36,7 @@ const deployPredictionMultipleChoice: DeployFunction<Settings> = async (
        endBeforeEnd: true
     },
 
-  },"PredictMultipleChoiceNGUTOP")
+  },"PredictMultipleChoiceEuroFRCH")
 
   console.log(`Deploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)

@@ -19,7 +19,7 @@ const deployPredictPrice: DeployFunction<Settings> = async (
   const ONE_DAY_SEC = 86400
   const settings = network.settings
   const title = "Predict BTC price"
-/*
+
   const predict = await deployer.deployContract(PredictPrice, {
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
@@ -45,7 +45,7 @@ const deployPredictPrice: DeployFunction<Settings> = async (
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${predict.contractInstance.address}`)
-  */
+  
 }
 
 export default deployPredictPrice
