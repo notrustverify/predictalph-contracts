@@ -1,5 +1,5 @@
 {
-  "version": "v2.11.0",
+  "version": "v2.12.0",
   "name": "DestroyPredict",
   "bytecodeTemplate": "010103000000040c0c{0}010a",
   "fieldsSig": {

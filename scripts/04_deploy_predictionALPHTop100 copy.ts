@@ -35,7 +35,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        ,
        title: binToHex(new TextEncoder().encode(title)),
        playerCounter: 0n,
-       endBeforeEnd: false
+       endBeforeEnd: true
     },
 
   },"PredictChoiceALPHTop100") 

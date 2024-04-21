@@ -33,7 +33,7 @@ export type Deployments = {
     Round: DeployContractExecutionResult<RoundInstance>;
     RoundChoice: DeployContractExecutionResult<RoundChoiceInstance>;
     PredictPrice_PredictPriceALPH: DeployContractExecutionResult<PredictPriceInstance>;
-    PredictPrice_PredictPriceBTC?: DeployContractExecutionResult<PredictPriceInstance>;
+    PredictPrice_PredictPriceBTC: DeployContractExecutionResult<PredictPriceInstance>;
     PredictChoice_PredictChoiceRhone?: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictChoice_PredictChoiceALPHFour?: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictChoice_PredictChoiceRhoneQ2?: DeployContractExecutionResult<PredictChoiceInstance>;
@@ -43,6 +43,7 @@ export type Deployments = {
     RoundMultipleChoice?: DeployContractExecutionResult<RoundMultipleChoiceInstance>;
     PredictMultipleChoice_PredictChoiceNGUTOP?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceNGUTOP?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
+    PredictMultipleChoice_PredictMultipleChoiceEuroFRCH?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
   };
 };
 
@@ -72,16 +73,12 @@ function toDeployments(json: any): Deployments {
         json.contracts["PredictPrice:PredictPriceALPH"].contractInstance.address
       ),
     },
-    PredictPrice_PredictPriceBTC:
-      json.contracts["PredictPrice:PredictPriceBTC"] === undefined
-        ? undefined
-        : {
-            ...json.contracts["PredictPrice:PredictPriceBTC"],
-            contractInstance: PredictPrice.at(
-              json.contracts["PredictPrice:PredictPriceBTC"].contractInstance
-                .address
-            ),
-          },
+    PredictPrice_PredictPriceBTC: {
+      ...json.contracts["PredictPrice:PredictPriceBTC"],
+      contractInstance: PredictPrice.at(
+        json.contracts["PredictPrice:PredictPriceBTC"].contractInstance.address
+      ),
+    },
     PredictChoice_PredictChoiceRhone:
       json.contracts["PredictChoice:PredictChoiceRhone"] === undefined
         ? undefined
@@ -171,6 +168,20 @@ function toDeployments(json: any): Deployments {
             contractInstance: PredictMultipleChoice.at(
               json.contracts[
                 "PredictMultipleChoice:PredictMultipleChoiceNGUTOP"
+              ].contractInstance.address
+            ),
+          },
+    PredictMultipleChoice_PredictMultipleChoiceEuroFRCH:
+      json.contracts["PredictMultipleChoice:PredictMultipleChoiceEuroFRCH"] ===
+      undefined
+        ? undefined
+        : {
+            ...json.contracts[
+              "PredictMultipleChoice:PredictMultipleChoiceEuroFRCH"
+            ],
+            contractInstance: PredictMultipleChoice.at(
+              json.contracts[
+                "PredictMultipleChoice:PredictMultipleChoiceEuroFRCH"
               ].contractInstance.address
             ),
           },

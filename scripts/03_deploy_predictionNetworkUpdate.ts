@@ -35,18 +35,18 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        ,
        title: binToHex(new TextEncoder().encode(title)),
        playerCounter: 0n,
-       endBeforeEnd: false
+       endBeforeEnd: true
     },
 
   },"PredictChoiceRhoneQ2")
 
-  console.log(`\nDeploying Choice ${title}`)
+  console.log(`Deploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
   console.log(`Punter contract address: ${punterTemplateId.contractInstance.address}`)
   console.log(`Round contract id: ${roundTemplateId.contractInstance.contractId}`)
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
-  console.log(`Prediction contract address: ${predict.contractInstance.address}`)
+  console.log(`Prediction contract address: ${predict.contractInstance.address}\n\n`)
   
 }
 

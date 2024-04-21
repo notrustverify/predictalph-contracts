@@ -4,5 +4,6 @@ docs/
 scripts/
 data/
 test/
-node_modules
-alephium/*
+node_modules/
+alephium/
+.git

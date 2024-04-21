@@ -38,7 +38,7 @@ const deployPredictPrice: DeployFunction<Settings> = async (
 
   },"PredictPriceBTC")
 
-  console.log(`\nDeploying ${title}`)
+  console.log(`Deploying ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
   console.log(`Punter contract address: ${punterTemplateId.contractInstance.address}`)
   console.log(`Round contract id: ${roundTemplateId.contractInstance.contractId}`)

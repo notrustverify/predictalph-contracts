@@ -842,7 +842,7 @@ const nodeProvider = new NodeProvider(
 //Sometimes, it's convenient to setup a global NodeProvider for your project:
 web3.setCurrentNodeProvider(nodeProvider);
 
-const redis = new Redis({ host: process.env.REDIS_HOST });
+const redis = new Redis({ host: process.env.REDIS_HOST ?? "127.0.0.1" });
 const sequelize = connect(
   process.env.DB_PATH === undefined
     ? "/data/roundsData.sqlite"
