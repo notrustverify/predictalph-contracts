@@ -9,7 +9,7 @@ Contract RoundMultipleChoice(
    mut totalAmountBoost: U256,
    mut sideWon: U256,
    mut totalAmount: U256,
-   mut amountPunters: [U256;3],
+   mut amountPunters: [U256;10],
    mut treasuryAmount: U256,
    mut rewardAmount: U256,
    mut rewardBaseCalAmount: U256,

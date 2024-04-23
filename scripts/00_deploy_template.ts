@@ -1,6 +1,6 @@
 import { Deployer, DeployFunction } from '@alephium/cli'
 import { Settings } from '../alephium.config'
-import { Punter, PunterChoice, Round, RoundChoice, RoundMultipleChoice, RoundMultipleChoiceInstance } from '../artifacts/ts'
+import { Punter, PunterChoice, Round, RoundChoice, RoundMultipleChoice, RoundMultipleChoiceInstance, RoundMultipleChoiceTypes } from '../artifacts/ts'
 import { ZERO_ADDRESS } from '@alephium/web3'
 
 const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Promise<void> => {
@@ -85,7 +85,7 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
       totalAmountBoost: 0n,
       endBeforeEnd: false,
       sideWon: 0n,
-      amountPunters: [0n, 0n, 0n],
+      amountPunters: Array.from(Array(10), () => 0n) as RoundMultipleChoiceTypes.Fields["amountPunters"]
    }
  })
 }

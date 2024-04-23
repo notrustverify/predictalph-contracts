@@ -161,8 +161,15 @@ async function endRound(
           );
           await sleep(TIME_TO_WAIT_NEW_ROUND);
           let txStart;
-          const sideWonBool = sideWon == 'true'
+
+          const sideWonBool = sideWon === 'true'
           if (isChoiceContract) {
+
+            if(sideWon.toLowerCase() != 'true' && sideWon.toLowerCase() != 'false'){
+               console.error("error value side for choice")
+               return
+            }
+            
             txStart = await EndChoice.execute(wallet, {
               initialFields: {
                 predict: predictContractId,

@@ -42,7 +42,18 @@ export namespace RoundMultipleChoiceTypes {
     totalAmountBoost: bigint;
     sideWon: bigint;
     totalAmount: bigint;
-    amountPunters: [bigint, bigint, bigint];
+    amountPunters: [
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint
+    ];
     treasuryAmount: bigint;
     rewardAmount: bigint;
     rewardBaseCalAmount: bigint;
@@ -198,7 +209,7 @@ export const RoundMultipleChoice = new Factory(
   Contract.fromJson(
     RoundMultipleChoiceContractJson,
     "",
-    "cadd74b22e40eadbea19e6451396f03418f1de6a48c0ec0c40cb9db152e1e213"
+    "be3962d657d282ee227e7044c4f4c7db14cda636a4262a3ed7b9975642ab7ac1"
   )
 );
 

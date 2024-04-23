@@ -19,7 +19,7 @@ export class Round extends Model {
   declare priceStart: Number;
   declare sideWon: boolean;
   declare sideWonMultipleChoice: Number;
-  declare type: TypeBet;
+  declare typeBet: TypeBet;
 }
 export class RoundParticipation extends Model {
   declare roundId: Number;
@@ -28,7 +28,7 @@ export class RoundParticipation extends Model {
   declare amountBid: Number;
   declare claimed: boolean;
   declare claimedByAnyoneTimestamp: bigint;
-  declare type: TypeBet;
+  declare typeBet: TypeBet;
   declare sideMultipleChoice: bigint;
 }
 
@@ -69,7 +69,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
         allowNull: false,
         unique: false,
       },
-      type: { type: DataTypes.STRING, allowNull: false, defaultValue: "" },
+      typeBet: { type: DataTypes.STRING, allowNull: false, defaultValue: "" },
       priceEnd: { type: DataTypes.NUMBER, allowNull: true, defaultValue: 0 },
       priceStart: { type: DataTypes.NUMBER, allowNull: true, defaultValue: 0 },
       sideWon: {
@@ -104,7 +104,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
       },
       amountBid: DataTypes.BIGINT,
       claimed: DataTypes.BOOLEAN,
-      type: { type: DataTypes.STRING, allowNull: true, defaultValue: "" },
+      typeBet: { type: DataTypes.STRING, allowNull: true, defaultValue: "" },
       claimedByAnyoneTimestamp: {
         type: DataTypes.BIGINT,
         allowNull: true,
@@ -129,7 +129,7 @@ export function initDb(sequelize: Sequelize, sync: boolean) {
         allowNull: false,
         unique: true,
       },
-      type: { type: DataTypes.STRING, allowNull: true, defaultValue: "" },
+      typeBet: { type: DataTypes.STRING, allowNull: true, defaultValue: "" },
     },
     {
       sequelize,
@@ -163,7 +163,7 @@ export async function createAndGetNewRound(
   let defaultData = {};
 
   if (isStart)
-    defaultData = { priceStart: price, GameId: game.id, type: typeBet };
+    defaultData = { priceStart: price, GameId: game.id, typeBet: typeBet };
   else defaultData = { priceEnd: price, GameId: game.id };
 
   try {
@@ -199,7 +199,7 @@ export async function createAndGetNewGame(
   try {
     const [gameId, created] = await Game.findCreateFind({
       where: { contractId: contractId },
-      defaults: { contractId: contractId, type: typeBet },
+      defaults: { contractId: contractId, typeBet: typeBet },
     });
     return [gameId, created];
   } catch (error) {
@@ -239,7 +239,7 @@ export async function createAndGetNewParticipation(
          side: sideBool,
          sideMultipleChoice: sideMultipleChoice,
          claimedByAnyoneTimestamp: claimedByAnyoneTimestamp,
-         type: typeBet,
+         typeBet: typeBet,
       },
     });
 

@@ -130,9 +130,9 @@
     },
     "PredictMultipleChoice": {
       "sourceFile": "multiple-choice/predict.ral",
-      "sourceCodeHash": "ba5a06f318b13d2e5e5b63e13905437d737c0fd75edba169f50978d5dee00d85",
-      "bytecodeDebugPatch": "=10+6=1-1=2-1+a2=1+0bd=2+c=1-1=1-3+1=1-3+d=2-2+a9=2-2+70=1-2=1-1=1-2+1=2-2+79=2-1+9=3-2+b1=2-2+c1=2-2+d1=2-2+e1=2-1+f1=1+402=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1746",
-      "codeHashDebug": "19c8ed59e30a68f4b08d7130718e1cefb2f891372e6305ea56bf32afe2a6d0f2",
+      "sourceCodeHash": "8950bb18cba55c073866a4c0d5278c108e0cfafee7ed29f2bb66d62a5e569ccc",
+      "bytecodeDebugPatch": "=10+6=1-1=2-2+a2=2-2+bd=2-2+c6=2-2+70=2-2+cc=2-3+9=1-2=2+5=1-1=2-2+9c=2-1+b=3-2+d=1-3=2-2+e=1-3=2-2+f4440444144425=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1816",
+      "codeHashDebug": "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677",
       "warnings": []
     },
     "PredictPrice": {
@@ -172,9 +172,9 @@
     },
     "RoundMultipleChoice": {
       "sourceFile": "multiple-choice/round.ral",
-      "sourceCodeHash": "28b647e4dd16365611361f676f54dd9d04f93237a700fec81b168fc8a8917dbb",
+      "sourceCodeHash": "a5d795447be7ac029b78920eb55d9700f4b568a1f91dddae3f5b9a059353f3be",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "cadd74b22e40eadbea19e6451396f03418f1de6a48c0ec0c40cb9db152e1e213",
+      "codeHashDebug": "be3962d657d282ee227e7044c4f4c7db14cda636a4262a3ed7b9975642ab7ac1",
       "warnings": []
     },
     "Start": {

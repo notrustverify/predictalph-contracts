@@ -35,12 +35,15 @@ type RoundParticipationV2 struct {
 	Address                  string  `json:"address"`
 	Side                     bool    `json:"side"`
 	SideWon                  bool    `json:"sideWon"`
+	SideWonMultipleChoice    int     `json:"sideWonMultipleChoice"`
+	SideMultipleChoice       int     `json:"sideMultipleChoice"`
 	AmountBid                float64 `json:"amountBid"`
 	Claimed                  bool    `json:"claimed"`
 	ClaimedByAnyoneTimestamp int     `json:"claimedByAnyoneTimestamp"`
 	Epoch                    int     `json:"epoch"`
 	PriceStart               int     `json:"priceStart"`
 	PriceEnd                 int     `json:"priceEnd"`
+	TypeBet                  string  `json:"type"`
 }
 
 type RoundParticipationPlayed struct {
@@ -50,7 +53,7 @@ type RoundParticipationPlayed struct {
 
 func getRoundParticipation(db *sql.DB, contractId string, addr string, isClaimedRound bool) ([]RoundParticipationV2, error) {
 
-	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE Claimed = ? AND Games.contractId = ? AND Addresses.address = ?", isClaimedRound, contractId, addr)
+	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon, sideMultipleChoice, RoundParticipations.typebet, SideWonMultipleChoice from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE Claimed = ? AND Games.contractId = ? AND Addresses.address = ?", isClaimedRound, contractId, addr)
 
 	if err != nil {
 		fmt.Println(err)
@@ -63,7 +66,7 @@ func getRoundParticipation(db *sql.DB, contractId string, addr string, isClaimed
 
 	for rows.Next() {
 		i := RoundParticipationV2{}
-		err = rows.Scan(&i.Address, &i.Claimed, &i.Side, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.Epoch, &i.PriceStart, &i.PriceEnd, &i.SideWon)
+		err = rows.Scan(&i.Address, &i.Claimed, &i.Side, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.Epoch, &i.PriceStart, &i.PriceEnd, &i.SideWon, &i.SideMultipleChoice, &i.TypeBet, &i.SideWonMultipleChoice)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
@@ -100,7 +103,7 @@ func getAllPlayer(db *sql.DB, contractId string, limit int) ([]RoundParticipatio
 }
 
 func getRoundClaimedOrNot(db *sql.DB, contractId string, isClaimedRound bool) ([]RoundParticipationV2, error) {
-	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE Claimed = ? AND Games.contractid = ?", isClaimedRound, contractId)
+	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon sideMultipleChoice, RoundParticipations.typebet, SideWonMultipleChoice from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE Claimed = ? AND Games.contractid = ?", isClaimedRound, contractId)
 	if err != nil {
 		fmt.Println(err)
 
@@ -112,7 +115,7 @@ func getRoundClaimedOrNot(db *sql.DB, contractId string, isClaimedRound bool) ([
 
 	for rows.Next() {
 		i := RoundParticipationV2{}
-		err = rows.Scan(&i.Address, &i.Claimed, &i.Side, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.Epoch, &i.PriceStart, &i.PriceEnd, &i.SideWon)
+		err = rows.Scan(&i.Address, &i.Claimed, &i.Side, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.Epoch, &i.PriceStart, &i.PriceEnd, &i.SideWon, &i.SideMultipleChoice, &i.TypeBet, &i.SideWonMultipleChoice)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
@@ -126,7 +129,7 @@ func getRoundClaimedOrNot(db *sql.DB, contractId string, isClaimedRound bool) ([
 }
 
 func getExpiredClaimedOrNot(db *sql.DB, contractId string, timeNow int, isClaimed bool) ([]RoundParticipationV2, error) {
-	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE ClaimedByAnyoneTimestamp < ? AND Claimed = ? AND Games.contractid = ?", timeNow*1000, isClaimed, contractId)
+	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon, sideMultipleChoice, RoundParticipations.typebet, SideWonMultipleChoice from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE ClaimedByAnyoneTimestamp < ? AND Claimed = ? AND Games.contractid = ?", timeNow*1000, isClaimed, contractId)
 
 	if err != nil {
 		fmt.Println(err)
@@ -139,7 +142,7 @@ func getExpiredClaimedOrNot(db *sql.DB, contractId string, timeNow int, isClaime
 
 	for rows.Next() {
 		i := RoundParticipationV2{}
-		err = rows.Scan(&i.Address, &i.Claimed, &i.Side, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.Epoch, &i.PriceStart, &i.PriceEnd, &i.SideWon)
+		err = rows.Scan(&i.Address, &i.Claimed, &i.Side, &i.AmountBid, &i.ClaimedByAnyoneTimestamp, &i.Epoch, &i.PriceStart, &i.PriceEnd, &i.SideWon, &i.SideMultipleChoice, &i.TypeBet, &i.SideWonMultipleChoice)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err

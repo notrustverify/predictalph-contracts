@@ -81,6 +81,7 @@ Contract PredictMultipleChoice(
          bidTimestampEnd = blockTimeStamp!() + repeatEvery
       }
       
+      let arrayAmount = [0;10]
       let (encodedImmFields, encodedMutFields) = RoundMultipleChoice.encodeFields!(selfContract!(),
       epoch,
       feesBasisPts,
@@ -91,7 +92,7 @@ Contract PredictMultipleChoice(
       0, //totalAmountBoost
       0, //sideWon
       0, //totalAmount
-      [0,0,0], //amountPunterChoices
+      arrayAmount, //amountPunterChoices
       0, //treasuryAmount
       0, //rewardAmount
       0, //rewardBaseCalAmount

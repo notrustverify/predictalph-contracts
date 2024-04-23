@@ -472,7 +472,7 @@ const optionsPriceRoundEnd: EventSubscribeOptions<PredictPriceTypes.RoundEndedEv
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch, GameId: gameId.id },
-        defaults: { priceEnd: event.fields.price, type: typeBet },
+        defaults: { priceEnd: event.fields.price, typeBet: typeBet },
       });
       if (!created) await round.update({ priceEnd: event.fields.price });
    } ).catch(err => console.log(`Mutex err: ${err}`))
@@ -509,7 +509,7 @@ const optionsChoiceRoundEnd: EventSubscribeOptions<PredictChoiceTypes.RoundEnded
 
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch, GameId: gameId.id },
-        defaults: { sideWon: sideWon, type: typeBet },
+        defaults: { sideWon: sideWon, typeBet: typeBet },
       });
       if (!created) await round.update({ sideWon: sideWon });
    }).catch(err => console.log(`Mutex err: ${err}`))
@@ -547,7 +547,7 @@ const optionsMultipleChoiceRoundEnd: EventSubscribeOptions<PredictMultipleChoice
       await mutex.use(async () => {
          const [round, created] = await Round.findCreateFind({
             where: { epoch: event.fields.epoch, GameId: gameId.id },
-            defaults: { sideWonMultipleChoice: event.fields.sideWon, type: typeBet },
+            defaults: { sideWonMultipleChoice: event.fields.sideWon, typeBet: typeBet },
           });
           if (!created) await round.update({ sideWonMultipleChoice: event.fields.sideWon });
       }).catch(err => {
@@ -585,7 +585,7 @@ const optionsPriceRoundStart: EventSubscribeOptions<PredictPriceTypes.RoundStart
 
          const [round, created] = await Round.findCreateFind({
             where: { epoch: event.fields.epoch, GameId: gameId.id },
-            defaults: { priceStart: event.fields.price, type: typeBet },
+            defaults: { priceStart: event.fields.price, typeBet: typeBet },
           });
           if (!created) await round.update({ priceStart: event.fields.price });
       
@@ -624,9 +624,9 @@ const optionsChoiceRoundStart: EventSubscribeOptions<PredictChoiceTypes.RoundSta
       // at start the sideWon is false at start
       const [round, created] = await Round.findCreateFind({
         where: { epoch: event.fields.epoch, GameId: gameId.id },
-        defaults: { sideWon: false, type: typeBet },
+        defaults: { sideWon: false, typeBet: typeBet },
       });
-      if (!created) await round.update({ sideWon: false });
+      //if (!created) await round.update({ sideWon: false });
    }).catch(err => console.log(`Mutex err: ${err}`))
       return Promise.resolve();
     },
@@ -659,13 +659,12 @@ const optionsMultipleChoiceRoundStart: EventSubscribeOptions<PredictMultipleChoi
 
       await mutex.use(async () =>{
 
-
       // at start the sideWon is false at start
       const [round, created] = await Round.findCreateFind({
         where: { epoch: epoch, GameId: gameId.id },
-        defaults: { type: typeBet },
+        defaults: { typeBet: typeBet },
       });
-      if (!created) await round.update({ type: typeBet});
+      if (!created) await round.update({ typeBet: typeBet});
    }).catch(err => `Muter error: ${error}`)
       return Promise.resolve();
     },

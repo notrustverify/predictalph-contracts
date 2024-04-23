@@ -17,7 +17,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
 
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
-  const END_2024 = 22_896_000
+  const END_2024 = 1735689599
   const settings = network.settings
   const title = "ALPH in top 100 by market cap on CoinGecko before end of 2024"
 
