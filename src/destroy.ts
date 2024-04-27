@@ -12,7 +12,15 @@ import {
 } from "@alephium/web3";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import configuration from "../alephium.config";
-import { DestroyRound, End, PredictPrice, Start } from "../artifacts/ts";
+import {
+  DestroyPredict,
+  DestroyRound,
+  End,
+  PredictChoice,
+  PredictMultipleChoice,
+  PredictPrice,
+  Start,
+} from "../artifacts/ts";
 import * as fetchRetry from "fetch-retry";
 import {
   arrayEpochToBytes,
@@ -47,9 +55,25 @@ async function destroyRound(
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
 
-  const predictionStates = await PredictPrice.at(
-    predictalphContractAddress
-  ).fetchState();
+  let predictionStates;
+
+  if (contractName.split(":")[0].toLowerCase() == "price") {
+    predictionStates = await PredictPrice.at(
+      predictalphContractAddress
+    ).fetchState();
+  } else if (contractName.split(":")[0].toLowerCase() == "predictchoice") {
+    predictionStates = await PredictChoice.at(
+      predictalphContractAddress
+    ).fetchState();
+    //isChoiceContract = true;
+  } else if (
+    contractName.split(":")[0].toLowerCase() == "predictmultiplechoice"
+  ) {
+    predictionStates = await PredictMultipleChoice.at(
+      predictalphContractAddress
+    ).fetchState();
+    //isMultipleChoiceContract = true;
+  }
 
   const onlyRoundExists = [];
 
@@ -104,6 +128,68 @@ async function destroyRound(
   }
 }
 
+async function destroyPredict(
+  privKey: string,
+  contractName: string,
+  arrayRound: number[]
+) {
+  const wallet = new PrivateKeyWallet({
+    privateKey: privKey,
+    keyType: undefined,
+    nodeProvider: web3.getCurrentNodeProvider(),
+  });
+
+  //.deployments contains the info of our `TokenFaucet` deployement, as we need to now the contractId and address
+  //This was auto-generated with the `cli deploy` of our `scripts/0_deploy_faucet.ts`
+  const deployments = await Deployments.from(
+    "./artifacts/.deployments." + networkToUse + ".json"
+  );
+  //Make sure it match your address group
+  const group = wallet.group;
+  const deployed = deployments.getDeployedContractResult(group, contractName);
+  const predictalphContractId = deployed.contractInstance.contractId;
+  const predictalphContractAddress = deployed.contractInstance.address;
+
+  let predictionStates;
+
+  if (contractName.split(":")[0].toLowerCase() == "price") {
+    predictionStates = await PredictPrice.at(
+      predictalphContractAddress
+    ).fetchState();
+  } else if (contractName.split(":")[0].toLowerCase() == "predictchoice") {
+    predictionStates = await PredictChoice.at(
+      predictalphContractAddress
+    ).fetchState();
+    //isChoiceContract = true;
+  } else if (
+    contractName.split(":")[0].toLowerCase() == "predictmultiplechoice"
+  ) {
+    predictionStates = await PredictMultipleChoice.at(
+      predictalphContractAddress
+    ).fetchState();
+    //isMultipleChoiceContract = true;
+  }
+
+  const numPlayer = predictionStates.fields.playerCounter;
+  if (predictionStates.fields.playerCounter > 0) {
+    console.log(`${numPlayer} still on round`);
+    return;
+  }
+
+  const tx = await DestroyPredict.execute(wallet, {
+    initialFields: {
+      predict: predictalphContractId,
+    },
+    attoAlphAmount: ONE_ALPH,
+  });
+
+  console.log(
+    `Destroy predict game ${predictionStates.fields.title} ${tx.txId}`
+  );
+  await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
+  console.log("Destroy done");
+}
+
 const retryFetch = fetchRetry.default(fetch, {
   retries: 10,
   retryDelay: 1000,
@@ -120,8 +206,11 @@ let networkToUse = process.argv.slice(2)[0];
 if (networkToUse === undefined) networkToUse = "mainnet";
 //Select our network defined in alephium.config.ts
 
-const roundArrayToDestroyFrom = parseInt(process.argv.slice(2)[1]);
-const roundArrayToDestroyTo = parseInt(process.argv.slice(2)[2]);
+const action = process.argv.slice(2)[1];
+const contractName = process.argv.slice(2)[2];
+
+const roundArrayToDestroyFrom = parseInt(process.argv.slice(2)[3]);
+const roundArrayToDestroyTo = parseInt(process.argv.slice(2)[4]);
 
 if (roundArrayToDestroyFrom == undefined)
   throw new Error("Missing array with round to destroy");
@@ -138,12 +227,25 @@ const nodeProvider = new NodeProvider(
   undefined,
   retryFetch
 );
-
 //Sometimes, it's convenient to setup a global NodeProvider for your project:
 web3.setCurrentNodeProvider(nodeProvider);
 
-destroyRound(
-  configuration.networks[networkToUse].privateKeys[0],
-  "PredictPrice",
-  arrayRound
-);
+switch (action) {
+  case "round":
+    destroyRound(
+      configuration.networks[networkToUse].privateKeys[0],
+      contractName,
+      arrayRound
+    );
+    break;
+
+  case "predict":
+    destroyPredict(
+      configuration.networks[networkToUse].privateKeys[0],
+      contractName,
+      arrayRound
+    );
+    break;
+  default:
+    break;
+}

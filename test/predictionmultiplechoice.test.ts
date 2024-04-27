@@ -470,6 +470,39 @@ describe("unit tests", () => {
   });
 
 
+
+  test("create round, test timestamp and delay", async () => {
+   operator = PrivateKeyWallet.Random(groupIndex);
+   const timestampContract = 1714521599*1000
+
+   predictionGame = (
+      await deployPredictionMultipleChoice(operator.address, timestampContract, 0n, "Default title", true)).contractInstance;
+      await transferAlphTo(operator.address, 100n * ONE_ALPH);
+
+   //console.log("Game contract id", predictionGame.contractId);
+   await startRound(operator, predictionGame, 10n);
+   let roundState = await getRoundState(0n);
+
+   let timestamp = roundState.fields.bidEndTimestamp
+   expect(timestamp).toEqual(BigInt(timestampContract*1000))
+
+
+   const dateNow = new Date().getTime()
+   
+   predictionGame = (
+      await deployPredictionMultipleChoice(operator.address, 30*60*1000, 0n, "Default title", true)).contractInstance;
+      await transferAlphTo(operator.address, 100n * ONE_ALPH);
+
+   //console.log("Game contract id", predictionGame.contractId);
+   await startRound(operator, predictionGame, 10n);
+   roundState = await getRoundState(0n);
+
+   timestamp = roundState.fields.bidEndTimestamp
+   expect(timestamp).toBeGreaterThanOrEqual(dateNow+30*60*1000)
+
+ });
+
+
   test("2 rounds, 3 players", async () => {
     const bidder1 = bidders[0];
     const bidder2 = bidders[1];
@@ -508,7 +541,7 @@ describe("unit tests", () => {
     await sleep((bidDurationSecond+1) * 1000);
     await endRound(operator, predictionGame, 11n, false, 0n)
     roundState = await getRoundState(1n);
-    expect(roundState.fields.amountPunters).toEqual([4n*ONE_ALPH, 2n*ONE_ALPH, 0n])
+    expect(roundState.fields.amountPunters).toEqual([4n*ONE_ALPH, 2n*ONE_ALPH, 0n,0n,0n,0n,0n,0n,0n,0n])
     expect(roundState.fields.amountPunters[0]).toEqual(4n*ONE_ALPH)
     expect(roundState.fields.amountPunters[1]).toEqual(2n*ONE_ALPH)
     expect(roundState.fields.rewardBaseCalAmount).toEqual(roundState.fields.amountPunters[0])

@@ -38,6 +38,7 @@ import {
   DestroyRoundMultipleChoice,
   EndMultipleChoice,
   DestroyPredict,
+  RoundMultipleChoiceTypes,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -188,7 +189,7 @@ export async function deployRoundMultipleChoiceTemplate() {
       totalAmountBoost: 0n,
       endBeforeEnd: false,
       sideWon: 0n,
-      amountPunters: [0n, 0n, 0n],
+      amountPunters: Array.from(Array(10), () => 0n) as RoundMultipleChoiceTypes.Fields["amountPunters"],
     },
   });
 }

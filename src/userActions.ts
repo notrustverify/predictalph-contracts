@@ -102,7 +102,8 @@ async function userBid(
  
 }
 
-async function userClaim(privKey: string, contractName: string) {
+async function userClaim(privKey: string, contractName: string,epochdestroy: bigint 
+) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
     keyType: undefined,
@@ -129,7 +130,7 @@ async function userClaim(privKey: string, contractName: string) {
     const tx = await withdraw(
       wallet,
       predictalphContractId,
-      arrayEpochToBytes([6]),
+      arrayEpochToBytes([epochdestroy]),
       wallet.address,
       "predictprice"
     );
@@ -179,6 +180,7 @@ async function boostRound(privKey: string, contractName: string, amount: bigint,
    }
  }
 
+
 const retryFetch = fetchRetry.default(fetch, {
   retries: 10,
   retryDelay: 1000,
@@ -224,7 +226,8 @@ switch (action) {
   case "claim":
     userClaim(
       configuration.networks[networkToUse].privateKeys[0],
-      contractName
+      contractName,
+      BigInt(epoch)
     );
     break;
     case "boost":

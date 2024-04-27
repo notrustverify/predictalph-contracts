@@ -31,8 +31,8 @@ TxScript DestroyRoundChoice(predict: PredictChoice, arrayEpoch: ByteVec) {
 }
 
 TxScript BoostRoundChoice(predict: PredictChoice, amount: U256, epochToBoost: U256){
-let caller = callerAddress!()
-predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
+   let caller = callerAddress!()
+   predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
 }
  
 
@@ -50,11 +50,6 @@ TxScript DestroyRoundMultipleChoice(predict: PredictMultipleChoice, arrayEpoch: 
 }
 
 TxScript BoostRoundMultipleChoice(predict: PredictMultipleChoice, amount: U256, epochToBoost: U256){
-let caller = callerAddress!()
-predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
+   let caller = callerAddress!()
+   predict.boostRound{caller -> ALPH: amount}(amount, epochToBoost)
 }
-
-TxScript DestroyPredict(predict: PredictChoice){
-   predict.destroy()
-}
-

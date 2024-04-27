@@ -137,7 +137,6 @@ async function endRound(
     const roundExists = await contractExists(
       addressFromContractId(roundContractId)
     );
-
     let roundState = null;
     let endTimestamp = 0;
 
