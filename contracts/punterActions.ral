@@ -8,6 +8,16 @@ TxScript WithdrawChoice(predict: PredictChoice, epochParticipation: ByteVec, add
    predict.withdraw(caller, epochParticipation, addressToClaim)
 }
 
+TxScript BidMultipleChoice(predict: PredictMultipleChoice, amount: U256, side: U256) {
+   let caller = callerAddress!()
+   predict.bid{caller -> ALPH : amount}(amount, side)
+}
+
+TxScript WithdrawMultipleChoice(predict: PredictMultipleChoice, epochParticipation: ByteVec, addressToClaim: Address) {
+   let caller = callerAddress!()
+   predict.withdraw(caller, epochParticipation, addressToClaim)
+}
+
 TxScript BidPrice(predict: PredictPrice, amount: U256, side: Bool) {
    let caller = callerAddress!()
    predict.bid{caller -> ALPH : amount}(amount, side)

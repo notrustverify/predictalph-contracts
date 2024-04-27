@@ -10,18 +10,18 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   if (network.settings === undefined) {
     throw new Error('No settings specified')
   }
-
+/*
   const punterTemplateId = deployer.getDeployContractResult('Punter')
   const roundTemplateId = deployer.getDeployContractResult('RoundChoice')
 
 
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
-  const END_2024 = 22_896_000
+  const END_2024 = 1735689599
   const settings = network.settings
   const title = "ALPH in top 100 by market cap on CoinGecko before end of 2024"
 
-/*   const predict = await deployer.deployContract(PredictChoice, {
+  const predict = await deployer.deployContract(PredictChoice, {
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
        roundTemplateId: roundTemplateId.contractInstance.contractId,
@@ -30,11 +30,12 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
        repeatEvery: BigInt(END_2024 * 1000),
-       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC+END_2024) * 1000)
+       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC + END_2024) * 1000)
        //claimedByAnyoneDelay: BigInt(ONE_DAY_SEC*1000)
        ,
        title: binToHex(new TextEncoder().encode(title)),
-       playerCounter: 0n
+       playerCounter: 0n,
+       endBeforeEnd: true
     },
 
   },"PredictChoiceALPHTop100") 
@@ -47,6 +48,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${predict.contractInstance.address}\n\n`)
   */
+  
 }
 
 export default deployPredictChoice

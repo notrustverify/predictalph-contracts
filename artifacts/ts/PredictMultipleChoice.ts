@@ -26,11 +26,11 @@ import {
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
 } from "@alephium/web3";
-import { default as PredictChoiceContractJson } from "../choice/PredictChoice.ral.json";
+import { default as PredictMultipleChoiceContractJson } from "../multiple-choice/PredictMultipleChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace PredictChoiceTypes {
+export namespace PredictMultipleChoiceTypes {
   export type Fields = {
     punterTemplateId: HexString;
     roundTemplateId: HexString;
@@ -51,13 +51,13 @@ export namespace PredictChoiceTypes {
     from: Address;
     epoch: bigint;
     amount: bigint;
-    side: boolean;
+    side: bigint;
     claimedByAnyoneTimestamp: bigint;
   }>;
   export type RoundEndedEvent = ContractEvent<{
     contractId: HexString;
     epoch: bigint;
-    sideWon: boolean;
+    sideWon: bigint;
   }>;
   export type RoundStartedEvent = ContractEvent<{
     contractId: HexString;
@@ -96,18 +96,18 @@ export namespace PredictChoiceTypes {
 }
 
 class Factory extends ContractFactory<
-  PredictChoiceInstance,
-  PredictChoiceTypes.Fields
+  PredictMultipleChoiceInstance,
+  PredictMultipleChoiceTypes.Fields
 > {
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as PredictChoiceTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as PredictMultipleChoiceTypes.Fields;
   }
 
   eventIndex = { Bet: 0, RoundEnded: 1, RoundStarted: 2, Claimed: 3 };
   consts = {
     ErrorCodes: {
-      PunterNotExists: BigInt(1),
-      InvalidPunterAddress: BigInt(2),
+      PunterChoiceNotExists: BigInt(1),
+      InvalidPunterChoiceAddress: BigInt(2),
       InvalidCaller: BigInt(3),
       BidTimestampReached: BigInt(4),
       RoundAlreadyRunning: BigInt(5),
@@ -118,17 +118,17 @@ class Factory extends ContractFactory<
       CannotBeClaimedYet: BigInt(10),
       NotAllPlayerClaimed: BigInt(11),
     },
-    SubContractTypes: { RoundChoice: "00", Punter: "01" },
+    SubContractTypes: { RoundMultipleChoice: "00", PunterChoice: "01" },
   };
 
-  at(address: string): PredictChoiceInstance {
-    return new PredictChoiceInstance(address);
+  at(address: string): PredictMultipleChoiceInstance {
+    return new PredictMultipleChoiceInstance(address);
   }
 
   tests = {
     getArrayElem: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { array: HexString; index: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -136,7 +136,7 @@ class Factory extends ContractFactory<
     },
     getRoundByEpoch: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { epochToGet: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -144,7 +144,7 @@ class Factory extends ContractFactory<
     },
     getRoundByEpochByteVec: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { epochToGet: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -152,7 +152,7 @@ class Factory extends ContractFactory<
     },
     getBetInfoByEpoch: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { from: Address; epochToGet: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -160,7 +160,7 @@ class Factory extends ContractFactory<
     },
     getTitle: async (
       params: Omit<
-        TestContractParamsWithoutMaps<PredictChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<PredictMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -168,7 +168,7 @@ class Factory extends ContractFactory<
     },
     startRound: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { from: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -176,23 +176,23 @@ class Factory extends ContractFactory<
     },
     endRound: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
-        { sideWon: boolean; immediatelyStart: boolean }
+        PredictMultipleChoiceTypes.Fields,
+        { sideWon: bigint; immediatelyStart: boolean }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "endRound", params);
     },
     bid: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
-        { amount: bigint; side: boolean }
+        PredictMultipleChoiceTypes.Fields,
+        { amount: bigint; side: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "bid", params);
     },
     withdraw: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { from: Address; arrayEpochIn: HexString; addressToClaim: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -200,7 +200,7 @@ class Factory extends ContractFactory<
     },
     destroyRound: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { epochArray: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -208,7 +208,7 @@ class Factory extends ContractFactory<
     },
     destroy: async (
       params: Omit<
-        TestContractParamsWithoutMaps<PredictChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<PredictMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -216,7 +216,7 @@ class Factory extends ContractFactory<
     },
     boostRound: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { amount: bigint; epochToBoost: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -224,7 +224,7 @@ class Factory extends ContractFactory<
     },
     setNewRepeatEvery: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { newRecurrence: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -232,7 +232,7 @@ class Factory extends ContractFactory<
     },
     setNewFees: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { basisPts: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -240,7 +240,7 @@ class Factory extends ContractFactory<
     },
     setNewOperator: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { newOperator: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -248,7 +248,7 @@ class Factory extends ContractFactory<
     },
     setNewClaimedByAnyone: async (
       params: TestContractParamsWithoutMaps<
-        PredictChoiceTypes.Fields,
+        PredictMultipleChoiceTypes.Fields,
         { newClaimedByAnyoneDelay: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -256,7 +256,7 @@ class Factory extends ContractFactory<
     },
     setEndBeforeEnd: async (
       params: Omit<
-        TestContractParamsWithoutMaps<PredictChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<PredictMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -266,22 +266,22 @@ class Factory extends ContractFactory<
 }
 
 // Use this object to test and deploy the contract
-export const PredictChoice = new Factory(
+export const PredictMultipleChoice = new Factory(
   Contract.fromJson(
-    PredictChoiceContractJson,
-    "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+2=2-1=1-1+8a=2-2+51=3-1+2=2+5a4=1-1+74=2-2+92=2-2+a2=2-2+b2=2-2+c2=2-2+d2=2-2+e3=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1720",
-    "ecb96930aa7105c7466435463df9d9186a5459ff9cf7688192cb2c93fd69d9c0"
+    PredictMultipleChoiceContractJson,
+    "=10+6=1-1=2-2+a2=2-2+bd=2-2+c6=2-2+70=2-2+cc=2-3+9=1-2=2+5=1-1=2-2+9c=2-1+b=3-2+d=1-3=2-2+e=1-3=2-2+f4440444144425=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1816",
+    "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677"
   )
 );
 
 // Use this class to interact with the blockchain
-export class PredictChoiceInstance extends ContractInstance {
+export class PredictMultipleChoiceInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<PredictChoiceTypes.State> {
-    return fetchContractState(PredictChoice, this);
+  async fetchState(): Promise<PredictMultipleChoiceTypes.State> {
+    return fetchContractState(PredictMultipleChoice, this);
   }
 
   async getContractEventsCurrentCount(): Promise<number> {
@@ -289,11 +289,11 @@ export class PredictChoiceInstance extends ContractInstance {
   }
 
   subscribeBetEvent(
-    options: EventSubscribeOptions<PredictChoiceTypes.BetEvent>,
+    options: EventSubscribeOptions<PredictMultipleChoiceTypes.BetEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      PredictChoice.contract,
+      PredictMultipleChoice.contract,
       this,
       options,
       "Bet",
@@ -302,11 +302,11 @@ export class PredictChoiceInstance extends ContractInstance {
   }
 
   subscribeRoundEndedEvent(
-    options: EventSubscribeOptions<PredictChoiceTypes.RoundEndedEvent>,
+    options: EventSubscribeOptions<PredictMultipleChoiceTypes.RoundEndedEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      PredictChoice.contract,
+      PredictMultipleChoice.contract,
       this,
       options,
       "RoundEnded",
@@ -315,11 +315,11 @@ export class PredictChoiceInstance extends ContractInstance {
   }
 
   subscribeRoundStartedEvent(
-    options: EventSubscribeOptions<PredictChoiceTypes.RoundStartedEvent>,
+    options: EventSubscribeOptions<PredictMultipleChoiceTypes.RoundStartedEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      PredictChoice.contract,
+      PredictMultipleChoice.contract,
       this,
       options,
       "RoundStarted",
@@ -328,11 +328,11 @@ export class PredictChoiceInstance extends ContractInstance {
   }
 
   subscribeClaimedEvent(
-    options: EventSubscribeOptions<PredictChoiceTypes.ClaimedEvent>,
+    options: EventSubscribeOptions<PredictMultipleChoiceTypes.ClaimedEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      PredictChoice.contract,
+      PredictMultipleChoice.contract,
       this,
       options,
       "Claimed",
@@ -342,15 +342,15 @@ export class PredictChoiceInstance extends ContractInstance {
 
   subscribeAllEvents(
     options: EventSubscribeOptions<
-      | PredictChoiceTypes.BetEvent
-      | PredictChoiceTypes.RoundEndedEvent
-      | PredictChoiceTypes.RoundStartedEvent
-      | PredictChoiceTypes.ClaimedEvent
+      | PredictMultipleChoiceTypes.BetEvent
+      | PredictMultipleChoiceTypes.RoundEndedEvent
+      | PredictMultipleChoiceTypes.RoundStartedEvent
+      | PredictMultipleChoiceTypes.ClaimedEvent
     >,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvents(
-      PredictChoice.contract,
+      PredictMultipleChoice.contract,
       this,
       options,
       fromCount
@@ -359,10 +359,10 @@ export class PredictChoiceInstance extends ContractInstance {
 
   methods = {
     getArrayElem: async (
-      params: PredictChoiceTypes.CallMethodParams<"getArrayElem">
-    ): Promise<PredictChoiceTypes.CallMethodResult<"getArrayElem">> => {
+      params: PredictMultipleChoiceTypes.CallMethodParams<"getArrayElem">
+    ): Promise<PredictMultipleChoiceTypes.CallMethodResult<"getArrayElem">> => {
       return callMethod(
-        PredictChoice,
+        PredictMultipleChoice,
         this,
         "getArrayElem",
         params,
@@ -370,10 +370,10 @@ export class PredictChoiceInstance extends ContractInstance {
       );
     },
     getTitle: async (
-      params?: PredictChoiceTypes.CallMethodParams<"getTitle">
-    ): Promise<PredictChoiceTypes.CallMethodResult<"getTitle">> => {
+      params?: PredictMultipleChoiceTypes.CallMethodParams<"getTitle">
+    ): Promise<PredictMultipleChoiceTypes.CallMethodResult<"getTitle">> => {
       return callMethod(
-        PredictChoice,
+        PredictMultipleChoice,
         this,
         "getTitle",
         params === undefined ? {} : params,
@@ -382,14 +382,14 @@ export class PredictChoiceInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends PredictChoiceTypes.MultiCallParams>(
+  async multicall<Calls extends PredictMultipleChoiceTypes.MultiCallParams>(
     calls: Calls
-  ): Promise<PredictChoiceTypes.MultiCallResults<Calls>> {
+  ): Promise<PredictMultipleChoiceTypes.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      PredictChoice,
+      PredictMultipleChoice,
       this,
       calls,
       getContractByCodeHash
-    )) as PredictChoiceTypes.MultiCallResults<Calls>;
+    )) as PredictMultipleChoiceTypes.MultiCallResults<Calls>;
   }
 }

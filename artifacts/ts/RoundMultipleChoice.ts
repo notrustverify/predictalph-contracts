@@ -26,11 +26,11 @@ import {
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
 } from "@alephium/web3";
-import { default as RoundChoiceContractJson } from "../choice/RoundChoice.ral.json";
+import { default as RoundMultipleChoiceContractJson } from "../multiple-choice/RoundMultipleChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace RoundChoiceTypes {
+export namespace RoundMultipleChoiceTypes {
   export type Fields = {
     prediction: HexString;
     epoch: bigint;
@@ -40,10 +40,20 @@ export namespace RoundChoiceTypes {
     endBeforeEnd: boolean;
     rewardsComputed: boolean;
     totalAmountBoost: bigint;
-    sideWon: boolean;
+    sideWon: bigint;
     totalAmount: bigint;
-    amountTrue: bigint;
-    amountFalse: bigint;
+    amountPunters: [
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint
+    ];
     treasuryAmount: bigint;
     rewardAmount: bigint;
     rewardBaseCalAmount: bigint;
@@ -89,11 +99,11 @@ export namespace RoundChoiceTypes {
 }
 
 class Factory extends ContractFactory<
-  RoundChoiceInstance,
-  RoundChoiceTypes.Fields
+  RoundMultipleChoiceInstance,
+  RoundMultipleChoiceTypes.Fields
 > {
   getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as RoundChoiceTypes.Fields;
+    return this.contract.getInitialFieldsWithDefaultValues() as RoundMultipleChoiceTypes.Fields;
   }
 
   consts = {
@@ -106,14 +116,14 @@ class Factory extends ContractFactory<
     },
   };
 
-  at(address: string): RoundChoiceInstance {
-    return new RoundChoiceInstance(address);
+  at(address: string): RoundMultipleChoiceInstance {
+    return new RoundMultipleChoiceInstance(address);
   }
 
   tests = {
     getEndRoundTime: async (
       params: Omit<
-        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<RoundMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -121,7 +131,7 @@ class Factory extends ContractFactory<
     },
     getRewardAmount: async (
       params: Omit<
-        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<RoundMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -129,7 +139,7 @@ class Factory extends ContractFactory<
     },
     getRewardBaseCalAmount: async (
       params: Omit<
-        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<RoundMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -137,7 +147,7 @@ class Factory extends ContractFactory<
     },
     getRoundEpoch: async (
       params: Omit<
-        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<RoundMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -145,7 +155,7 @@ class Factory extends ContractFactory<
     },
     canEndBeforeEnd: async (
       params: Omit<
-        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<RoundMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<boolean>> => {
@@ -153,23 +163,23 @@ class Factory extends ContractFactory<
     },
     updateAmount: async (
       params: TestContractParamsWithoutMaps<
-        RoundChoiceTypes.Fields,
-        { from: Address; amount: bigint; side: boolean }
+        RoundMultipleChoiceTypes.Fields,
+        { from: Address; amount: bigint; side: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "updateAmount", params);
     },
     calculateRewards: async (
       params: TestContractParamsWithoutMaps<
-        RoundChoiceTypes.Fields,
-        { sideWinning: boolean }
+        RoundMultipleChoiceTypes.Fields,
+        { sideWinning: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "calculateRewards", params);
     },
     boost: async (
       params: TestContractParamsWithoutMaps<
-        RoundChoiceTypes.Fields,
+        RoundMultipleChoiceTypes.Fields,
         { from: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -177,7 +187,7 @@ class Factory extends ContractFactory<
     },
     destroy: async (
       params: Omit<
-        TestContractParamsWithoutMaps<RoundChoiceTypes.Fields, never>,
+        TestContractParamsWithoutMaps<RoundMultipleChoiceTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
@@ -185,8 +195,8 @@ class Factory extends ContractFactory<
     },
     userClaimRewards: async (
       params: TestContractParamsWithoutMaps<
-        RoundChoiceTypes.Fields,
-        { addressPunter: Address; amountBid: bigint; sideBid: boolean }
+        RoundMultipleChoiceTypes.Fields,
+        { addressPunter: Address; amountBid: bigint; sideBid: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "userClaimRewards", params);
@@ -195,30 +205,32 @@ class Factory extends ContractFactory<
 }
 
 // Use this object to test and deploy the contract
-export const RoundChoice = new Factory(
+export const RoundMultipleChoice = new Factory(
   Contract.fromJson(
-    RoundChoiceContractJson,
+    RoundMultipleChoiceContractJson,
     "",
-    "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c"
+    "be3962d657d282ee227e7044c4f4c7db14cda636a4262a3ed7b9975642ab7ac1"
   )
 );
 
 // Use this class to interact with the blockchain
-export class RoundChoiceInstance extends ContractInstance {
+export class RoundMultipleChoiceInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<RoundChoiceTypes.State> {
-    return fetchContractState(RoundChoice, this);
+  async fetchState(): Promise<RoundMultipleChoiceTypes.State> {
+    return fetchContractState(RoundMultipleChoice, this);
   }
 
   methods = {
     getEndRoundTime: async (
-      params?: RoundChoiceTypes.CallMethodParams<"getEndRoundTime">
-    ): Promise<RoundChoiceTypes.CallMethodResult<"getEndRoundTime">> => {
+      params?: RoundMultipleChoiceTypes.CallMethodParams<"getEndRoundTime">
+    ): Promise<
+      RoundMultipleChoiceTypes.CallMethodResult<"getEndRoundTime">
+    > => {
       return callMethod(
-        RoundChoice,
+        RoundMultipleChoice,
         this,
         "getEndRoundTime",
         params === undefined ? {} : params,
@@ -226,10 +238,12 @@ export class RoundChoiceInstance extends ContractInstance {
       );
     },
     getRewardAmount: async (
-      params?: RoundChoiceTypes.CallMethodParams<"getRewardAmount">
-    ): Promise<RoundChoiceTypes.CallMethodResult<"getRewardAmount">> => {
+      params?: RoundMultipleChoiceTypes.CallMethodParams<"getRewardAmount">
+    ): Promise<
+      RoundMultipleChoiceTypes.CallMethodResult<"getRewardAmount">
+    > => {
       return callMethod(
-        RoundChoice,
+        RoundMultipleChoice,
         this,
         "getRewardAmount",
         params === undefined ? {} : params,
@@ -237,10 +251,12 @@ export class RoundChoiceInstance extends ContractInstance {
       );
     },
     getRewardBaseCalAmount: async (
-      params?: RoundChoiceTypes.CallMethodParams<"getRewardBaseCalAmount">
-    ): Promise<RoundChoiceTypes.CallMethodResult<"getRewardBaseCalAmount">> => {
+      params?: RoundMultipleChoiceTypes.CallMethodParams<"getRewardBaseCalAmount">
+    ): Promise<
+      RoundMultipleChoiceTypes.CallMethodResult<"getRewardBaseCalAmount">
+    > => {
       return callMethod(
-        RoundChoice,
+        RoundMultipleChoice,
         this,
         "getRewardBaseCalAmount",
         params === undefined ? {} : params,
@@ -248,10 +264,10 @@ export class RoundChoiceInstance extends ContractInstance {
       );
     },
     getRoundEpoch: async (
-      params?: RoundChoiceTypes.CallMethodParams<"getRoundEpoch">
-    ): Promise<RoundChoiceTypes.CallMethodResult<"getRoundEpoch">> => {
+      params?: RoundMultipleChoiceTypes.CallMethodParams<"getRoundEpoch">
+    ): Promise<RoundMultipleChoiceTypes.CallMethodResult<"getRoundEpoch">> => {
       return callMethod(
-        RoundChoice,
+        RoundMultipleChoice,
         this,
         "getRoundEpoch",
         params === undefined ? {} : params,
@@ -259,10 +275,12 @@ export class RoundChoiceInstance extends ContractInstance {
       );
     },
     canEndBeforeEnd: async (
-      params?: RoundChoiceTypes.CallMethodParams<"canEndBeforeEnd">
-    ): Promise<RoundChoiceTypes.CallMethodResult<"canEndBeforeEnd">> => {
+      params?: RoundMultipleChoiceTypes.CallMethodParams<"canEndBeforeEnd">
+    ): Promise<
+      RoundMultipleChoiceTypes.CallMethodResult<"canEndBeforeEnd">
+    > => {
       return callMethod(
-        RoundChoice,
+        RoundMultipleChoice,
         this,
         "canEndBeforeEnd",
         params === undefined ? {} : params,
@@ -271,14 +289,14 @@ export class RoundChoiceInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends RoundChoiceTypes.MultiCallParams>(
+  async multicall<Calls extends RoundMultipleChoiceTypes.MultiCallParams>(
     calls: Calls
-  ): Promise<RoundChoiceTypes.MultiCallResults<Calls>> {
+  ): Promise<RoundMultipleChoiceTypes.MultiCallResults<Calls>> {
     return (await multicallMethods(
-      RoundChoice,
+      RoundMultipleChoice,
       this,
       calls,
       getContractByCodeHash
-    )) as RoundChoiceTypes.MultiCallResults<Calls>;
+    )) as RoundMultipleChoiceTypes.MultiCallResults<Calls>;
   }
 }

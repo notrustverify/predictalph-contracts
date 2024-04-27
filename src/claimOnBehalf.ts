@@ -121,11 +121,12 @@ const cgClient = new CoinGeckoClient({
 const intPriceDivision = 10_000;
 
 let networkToUse = process.argv.slice(2)[0];
+const contractName = process.argv.slice(2)[1];
 if (networkToUse === undefined) networkToUse = "mainnet";
 //Select our network defined in alephium.config.ts
 
-const addressToClaim = process.argv.slice(2)[1]
-const epochArrayParam = process.argv.slice(2)[2]
+const addressToClaim = process.argv.slice(2)[2]
+const epochArrayParam = process.argv.slice(2)[3]
 if (addressToClaim == undefined) throw new Error("Missing address to claim")
 
 
@@ -144,7 +145,7 @@ web3.setCurrentNodeProvider(nodeProvider);
 
 destroyRound(
   configuration.networks[networkToUse].privateKeys[0],
-  "PredictPrice",
+  contractName,
   addressToClaim,
   epochArrayParam.split(",")
 

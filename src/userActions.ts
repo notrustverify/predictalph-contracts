@@ -59,26 +59,51 @@ async function userBid(
   const predictalphContractId = deployed.contractInstance.contractId;
   const predictalphContractAddress = deployed.contractInstance.address;
 
-  try {
-    const tx = await bid(
-      wallet,
-      predictalphContractId,
-      newIntervalSecond * ONE_ALPH,
-      true,
-      contractType
-    );
+  if(contractType == "predictmultiplechoice"){
+   try {
+      const tx = await bid(
+        wallet,
+        predictalphContractId,
+        newIntervalSecond * ONE_ALPH,
+        2n,
+        contractType
+      );
+  
+      console.log(
+        `bid ${newIntervalSecond} ALPH from ${wallet.address} - ${tx.txId} - ${predictalphContractAddress}`
+      );
+      await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
+      console.log("New bid is set");
+    } catch (error) {
+      console.error(error);
+    }
 
-    console.log(
-      `bid ${newIntervalSecond} ALPH from ${wallet.address} - ${tx.txId} - ${predictalphContractAddress}`
-    );
-    await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
-    console.log("New bid is set");
-  } catch (error) {
-    console.error(error);
+  }else{
+   try {
+      const tx = await bid(
+        wallet,
+        predictalphContractId,
+        newIntervalSecond * ONE_ALPH,
+        true,
+        contractType
+      );
+  
+      console.log(
+        `bid ${newIntervalSecond} ALPH from ${wallet.address} - ${tx.txId} - ${predictalphContractAddress}`
+      );
+      await waitTxConfirmed(nodeProvider, tx.txId, 1, 1000);
+      console.log("New bid is set");
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+
+ 
 }
 
-async function userClaim(privKey: string, contractName: string) {
+async function userClaim(privKey: string, contractName: string,epochdestroy: bigint 
+) {
   const wallet = new PrivateKeyWallet({
     privateKey: privKey,
     keyType: undefined,
@@ -105,11 +130,10 @@ async function userClaim(privKey: string, contractName: string) {
     const tx = await withdraw(
       wallet,
       predictalphContractId,
-      arrayEpochToBytes([13]),
+      arrayEpochToBytes([epochdestroy]),
       wallet.address,
       "predictprice"
     );
-console.log(tx)
     console.log(
       `withdraw from ${wallet.address} - ${tx.txId} - ${predictalphContractAddress}`
     );
@@ -156,6 +180,7 @@ async function boostRound(privKey: string, contractName: string, amount: bigint,
    }
  }
 
+
 const retryFetch = fetchRetry.default(fetch, {
   retries: 10,
   retryDelay: 1000,
@@ -201,7 +226,8 @@ switch (action) {
   case "claim":
     userClaim(
       configuration.networks[networkToUse].privateKeys[0],
-      contractName
+      contractName,
+      BigInt(epoch)
     );
     break;
     case "boost":

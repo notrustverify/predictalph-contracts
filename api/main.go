@@ -98,7 +98,7 @@ func getAllRoundNotClaimed(c *gin.Context) {
 }
 
 func getAllRoundClaimed(c *gin.Context) {
-	userRound, err := getRoundClaimedOrNot(db, c.Param("contractid"), false)
+	userRound, err := getRoundClaimedOrNot(db, c.Param("contractid"), true)
 	if len(userRound) > 0 && err == nil {
 		c.JSON(http.StatusOK, userRound)
 	} else {

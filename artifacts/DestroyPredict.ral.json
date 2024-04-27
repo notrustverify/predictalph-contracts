@@ -1,0 +1,28 @@
+{
+  "version": "v2.11.0",
+  "name": "DestroyPredict",
+  "bytecodeTemplate": "010103000000040c0c{0}010a",
+  "fieldsSig": {
+    "names": [
+      "predict"
+    ],
+    "types": [
+      "PredictChoice"
+    ],
+    "isMutable": [
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

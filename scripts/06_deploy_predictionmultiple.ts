@@ -1,9 +1,9 @@
 import { Deployer, DeployFunction, Network } from '@alephium/cli'
 import { Settings } from '../alephium.config'
-import { PredictChoice } from '../artifacts/ts'
+import { PredictChoice, PredictMultipleChoice } from '../artifacts/ts'
 import { binToHex, ZERO_ADDRESS } from '@alephium/web3'
 
-const deployPredictChoice: DeployFunction<Settings> = async (
+const deployPredictionMultipleChoice: DeployFunction<Settings> = async (
   deployer: Deployer,
   network: Network<Settings>
 ): Promise<void> => {
@@ -11,17 +11,17 @@ const deployPredictChoice: DeployFunction<Settings> = async (
     throw new Error('No settings specified')
   }
 
-  const punterTemplateId = deployer.getDeployContractResult('Punter')
-  const roundTemplateId = deployer.getDeployContractResult('RoundChoice')
+  const punterTemplateId = deployer.getDeployContractResult('PunterChoice')
+  const roundTemplateId = deployer.getDeployContractResult('RoundMultipleChoice')
 
 
   const ONE_WEEK_SEC = 604800
   const ONE_DAY_SEC = 86400
-  const DECEMBER_2024 = 1733011200
+  const MAY = 1717199999
   const settings = network.settings
-  const title = "BTC will hit $100K before end of year 2024"
+  const title = "Knick vs 76ers"
 
-  const predict = await deployer.deployContract(PredictChoice, {
+  const predict = await deployer.deployContract(PredictMultipleChoice, {
     initialFields: {
        punterTemplateId: punterTemplateId.contractInstance.contractId,
        roundTemplateId: roundTemplateId.contractInstance.contractId,
@@ -29,16 +29,16 @@ const deployPredictChoice: DeployFunction<Settings> = async (
        operator: deployer.account.address,
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
-       repeatEvery: BigInt(DECEMBER_2024 * 1000),
-       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC + DECEMBER_2024) * 1000),
+       repeatEvery: BigInt(MAY * 1000),
+       claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC + MAY) * 1000),
        title: binToHex(new TextEncoder().encode(title)),
        playerCounter: 0n,
-       endBeforeEnd: false
+       endBeforeEnd: true
     },
 
-  },"PredictChoiceBTC100K")
+  },"PredictMultipleChoiceTest")
 
-  console.log(`\nDeploying Choice ${title}`)
+  console.log(`Deploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
   console.log(`Punter contract address: ${punterTemplateId.contractInstance.address}`)
   console.log(`Round contract id: ${roundTemplateId.contractInstance.contractId}`)
@@ -48,4 +48,4 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   
 }
 
-export default deployPredictChoice
+export default deployPredictionMultipleChoice

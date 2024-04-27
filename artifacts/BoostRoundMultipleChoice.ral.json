@@ -1,0 +1,34 @@
+{
+  "version": "v2.11.0",
+  "name": "BoostRoundMultipleChoice",
+  "bytecodeTemplate": "0101030001000bb417001600{1}a2{1}{2}0e0c{0}010b",
+  "fieldsSig": {
+    "names": [
+      "predict",
+      "amount",
+      "epochToBoost"
+    ],
+    "types": [
+      "PredictMultipleChoice",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "usePreapprovedAssets": true,
+      "useAssetsInContract": false,
+      "isPublic": true,
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

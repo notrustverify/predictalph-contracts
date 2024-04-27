@@ -28,6 +28,17 @@ import {
   EndChoice,
   RoundChoice,
   BoostRoundChoice,
+  PunterChoice,
+  RoundMultipleChoice,
+  PredictMultipleChoice,
+  PredictMultipleChoiceInstance,
+  BidMultipleChoice,
+  BoostRoundMultipleChoice,
+  WithdrawMultipleChoice,
+  DestroyRoundMultipleChoice,
+  EndMultipleChoice,
+  DestroyPredict,
+  RoundMultipleChoiceTypes,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
@@ -65,27 +76,29 @@ export async function deployPrediction(
 }
 
 export async function deployPredictionChoice(
-   operator: Address,
-   repeatEverySecond: number,
-   epoch: bigint,
-   title: string
- ) {
-   const punterTemplateId = await deployPunterTemplate();
-   const roundTemplateId = await deployRoundChoiceTemplate();
-   return await PredictChoice.deploy(defaultSigner, {
-     initialFields: {
-       punterTemplateId: punterTemplateId.contractInstance.contractId,
-       roundTemplateId: roundTemplateId.contractInstance.contractId,
-       epoch: epoch,
-       operator: operator,
-       feesBasisPts: 100n,
-       repeatEvery: BigInt(repeatEverySecond * 1000),
-       claimedByAnyoneDelay: BigInt(1 * 1000),
-       title: binToHex(new TextEncoder().encode(title)),
-       playerCounter: 0n,
-     },
-   });
- }
+  operator: Address,
+  repeatEverySecond: number,
+  epoch: bigint,
+  title: string,
+  endBeforeEnd: boolean
+) {
+  const punterTemplateId = await deployPunterTemplate();
+  const roundTemplateId = await deployRoundChoiceTemplate();
+  return await PredictChoice.deploy(defaultSigner, {
+    initialFields: {
+      punterTemplateId: punterTemplateId.contractInstance.contractId,
+      roundTemplateId: roundTemplateId.contractInstance.contractId,
+      epoch: epoch,
+      operator: operator,
+      feesBasisPts: 100n,
+      repeatEvery: BigInt(repeatEverySecond * 1000),
+      claimedByAnyoneDelay: BigInt(1 * 1000),
+      title: binToHex(new TextEncoder().encode(title)),
+      playerCounter: 0n,
+      endBeforeEnd: endBeforeEnd,
+    },
+  });
+}
 
 export async function deployPunterTemplate() {
   return await Punter.deploy(defaultSigner, {
@@ -124,31 +137,100 @@ export async function deployRoundTemplate() {
 }
 
 export async function deployRoundChoiceTemplate() {
-   return await RoundChoice.deploy(defaultSigner, {
-     initialFields: {
-        prediction: "00",
-        epoch: 0n,
-        feesBasisPts: 0n,
-        bidEndTimestamp: 0n,
-        operator: ZERO_ADDRESS,
-        rewardsComputed: false,
-        totalAmount: 0n,
-        treasuryAmount: 0n,
-        rewardAmount: 0n,
-        rewardBaseCalAmount: 0n,
-        counterAttendees: 0n,
-        totalAmountBoost: 0n,
-        sideWon: false,
-        amountTrue: 0n,
-        amountFalse: 0n
-     },
-   });
- }
+  return await RoundChoice.deploy(defaultSigner, {
+    initialFields: {
+      prediction: "00",
+      epoch: 0n,
+      feesBasisPts: 0n,
+      bidEndTimestamp: 0n,
+      operator: ZERO_ADDRESS,
+      rewardsComputed: false,
+      totalAmount: 0n,
+      treasuryAmount: 0n,
+      rewardAmount: 0n,
+      rewardBaseCalAmount: 0n,
+      counterAttendees: 0n,
+      totalAmountBoost: 0n,
+      sideWon: false,
+      amountTrue: 0n,
+      amountFalse: 0n,
+      endBeforeEnd: false,
+    },
+  });
+}
+
+export async function deployPunterMultipleChoiceTemplate() {
+  return await PunterChoice.deploy(defaultSigner, {
+    initialFields: {
+      predictionContractId: "00",
+      punterAddress: ZERO_ADDRESS,
+      epoch: 0n,
+      side: 0n,
+      amountBid: 0n,
+      claimedByAnyoneAt: 0n,
+    },
+  });
+}
+
+export async function deployRoundMultipleChoiceTemplate() {
+  return await RoundMultipleChoice.deploy(defaultSigner, {
+    initialFields: {
+      prediction: "00",
+      epoch: 0n,
+      feesBasisPts: 0n,
+      bidEndTimestamp: 0n,
+      operator: ZERO_ADDRESS,
+      rewardsComputed: false,
+      totalAmount: 0n,
+      treasuryAmount: 0n,
+      rewardAmount: 0n,
+      rewardBaseCalAmount: 0n,
+      counterAttendees: 0n,
+      totalAmountBoost: 0n,
+      endBeforeEnd: false,
+      sideWon: 0n,
+      amountPunters: Array.from(Array(10), () => 0n) as RoundMultipleChoiceTypes.Fields["amountPunters"],
+    },
+  });
+}
+
+export async function deployPredictionMultipleChoice(
+  operator: Address,
+  repeatEverySecond: number,
+  epoch: bigint,
+  title: string,
+  endBeforeEnd: boolean
+) {
+  const punterMultipleChoiceTemplateId =
+    await deployPunterMultipleChoiceTemplate();
+  const roundMultipleChoiceTemplateId =
+    await deployRoundMultipleChoiceTemplate();
+
+  return await PredictMultipleChoice.deploy(defaultSigner, {
+    initialFields: {
+      punterTemplateId:
+        punterMultipleChoiceTemplateId.contractInstance.contractId,
+      roundTemplateId:
+        roundMultipleChoiceTemplateId.contractInstance.contractId,
+      epoch: epoch,
+      operator: operator,
+      feesBasisPts: 100n,
+      repeatEvery: BigInt(repeatEverySecond * 1000),
+      claimedByAnyoneDelay: BigInt(1 * 1000),
+      title: binToHex(new TextEncoder().encode(title)),
+      playerCounter: 0n,
+      endBeforeEnd: endBeforeEnd,
+    },
+  });
+}
 
 export async function startRound(
   signer: SignerProvider,
-  predict: PredictPriceInstance | PredictChoiceInstance,
-  price?: bigint
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance,
+  price: bigint
 ) {
   if (predict instanceof PredictPriceInstance) {
     return await Start.execute(signer, {
@@ -160,15 +242,23 @@ export async function startRound(
       initialFields: { predict: predict.contractId },
       attoAlphAmount: ONE_ALPH,
     });
+  } else if (predict instanceof PredictMultipleChoiceInstance) {
+    return await StartChoice.execute(signer, {
+      initialFields: { predict: predict.contractId },
+      attoAlphAmount: ONE_ALPH,
+    });
   }
 }
 
 export async function endRound(
   signer: SignerProvider,
-  predict: PredictPriceInstance | PredictChoiceInstance,
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance,
   price: bigint,
   immediatelyStart: boolean,
-  sideWon?: boolean
+  sideWon: boolean | bigint
 ) {
   if (predict instanceof PredictPriceInstance) {
     return await End.execute(signer, {
@@ -183,7 +273,16 @@ export async function endRound(
     return await EndChoice.execute(signer, {
       initialFields: {
         predict: predict.contractId,
-        sideWon: sideWon,
+        sideWon: sideWon as boolean,
+        immediatelyStart: immediatelyStart,
+      },
+      attoAlphAmount: ONE_ALPH,
+    });
+  } else if (predict instanceof PredictMultipleChoiceInstance) {
+    return await EndMultipleChoice.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        sideWon: sideWon as bigint,
         immediatelyStart: immediatelyStart,
       },
       attoAlphAmount: ONE_ALPH,
@@ -193,16 +292,19 @@ export async function endRound(
 
 export async function bid(
   signer: SignerProvider,
-  predict: PredictPriceInstance | PredictChoiceInstance,
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance,
   amount: bigint,
-  up: boolean
+  up: boolean | bigint
 ) {
   if (predict instanceof PredictPriceInstance) {
     return await BidPrice.execute(signer, {
       initialFields: {
         predict: predict.contractId,
         amount: amount,
-        side: up,
+        side: up as boolean,
       },
       attoAlphAmount: amount + 2n * DUST_AMOUNT,
     });
@@ -211,7 +313,16 @@ export async function bid(
       initialFields: {
         predict: predict.contractId,
         amount: amount,
-        side: up,
+        side: up as boolean,
+      },
+      attoAlphAmount: amount + 2n * DUST_AMOUNT,
+    });
+  } else if (predict instanceof PredictMultipleChoiceInstance) {
+    return await BidMultipleChoice.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        amount: amount,
+        side: up as bigint,
       },
       attoAlphAmount: amount + 2n * DUST_AMOUNT,
     });
@@ -220,7 +331,10 @@ export async function bid(
 
 export async function withdraw(
   signer: SignerProvider,
-  predict: PredictPriceInstance | PredictChoiceInstance,
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance,
   epochParticipation: string,
   addressToClaim: string
 ) {
@@ -240,25 +354,46 @@ export async function withdraw(
         epochParticipation,
         addressToClaim: addressToClaim,
       },
-      attoAlphAmount: 2n*DUST_AMOUNT,
+      attoAlphAmount: 2n * DUST_AMOUNT,
+    });
+  } else if (predict instanceof PredictMultipleChoiceInstance) {
+    return await WithdrawMultipleChoice.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        epochParticipation,
+        addressToClaim: addressToClaim,
+      },
+      attoAlphAmount: 2n * DUST_AMOUNT,
     });
   }
 }
 
 export async function destroyRound(
   signer: SignerProvider,
-  predict: PredictPriceInstance | PredictChoiceInstance,
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance,
   epochArray
 ) {
-   if(predict instanceof PredictPriceInstance){
-  return await DestroyRound.execute(signer, {
-    initialFields: {
-      predict: predict.contractId,
-      arrayEpoch: epochArray,
-    },
-    attoAlphAmount: DUST_AMOUNT,
-  });} else if(predict instanceof PredictChoiceInstance){
-   return await DestroyRound.execute(signer, {
+  if (predict instanceof PredictPriceInstance) {
+    return await DestroyRound.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        arrayEpoch: epochArray,
+      },
+      attoAlphAmount: DUST_AMOUNT,
+    });
+  } else if (predict instanceof PredictChoiceInstance) {
+    return await DestroyRound.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        arrayEpoch: epochArray,
+      },
+      attoAlphAmount: DUST_AMOUNT,
+    });
+  } else if (predict instanceof PredictMultipleChoiceInstance) {
+    return await DestroyRoundMultipleChoice.execute(signer, {
       initialFields: {
         predict: predict.contractId,
         arrayEpoch: epochArray,
@@ -268,23 +403,48 @@ export async function destroyRound(
   }
 }
 
+export async function destroyPredict(
+  signer: SignerProvider,
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance
+) {
+  return await DestroyPredict.execute(signer, {
+    initialFields: { predict: predict.contractId },
+  });
+}
+
 export async function boostRound(
   signer: SignerProvider,
-  predict: PredictPriceInstance | PredictChoiceInstance,
+  predict:
+    | PredictPriceInstance
+    | PredictChoiceInstance
+    | PredictMultipleChoiceInstance,
   epoch: bigint,
   amount: bigint,
   up: boolean
 ) {
-   if(predict instanceof PredictPriceInstance){
-  return await BoostRound.execute(signer, {
-    initialFields: {
-      predict: predict.contractId,
-      amount: amount,
-      epochToBoost: epoch,
-    },
-    attoAlphAmount: amount + DUST_AMOUNT,
-  });} else if (predict instanceof PredictChoiceInstance){
-   return await BoostRoundChoice.execute(signer, {
+  if (predict instanceof PredictPriceInstance) {
+    return await BoostRound.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        amount: amount,
+        epochToBoost: epoch,
+      },
+      attoAlphAmount: amount + DUST_AMOUNT,
+    });
+  } else if (predict instanceof PredictChoiceInstance) {
+    return await BoostRoundChoice.execute(signer, {
+      initialFields: {
+        predict: predict.contractId,
+        amount: amount,
+        epochToBoost: epoch,
+      },
+      attoAlphAmount: amount + DUST_AMOUNT,
+    });
+  } else if (predict instanceof PredictMultipleChoiceInstance) {
+    return await BoostRoundMultipleChoice.execute(signer, {
       initialFields: {
         predict: predict.contractId,
         amount: amount,
