@@ -41,9 +41,9 @@ func main() {
 	}
 
 	db = connect(os.Getenv("DB_PATH"))
-
+	
+	gin.SetMode(mode)
 	router := gin.Default()
-	router.SetMode(mode) 
 	router.Use(cors.New(corsConfig))
 	router.GET("/round/:contractid/:address", getUserRoundsPlayed)
 	router.GET("/allround/:contractid/:address", getAllUserRounds)
