@@ -22,6 +22,10 @@ func main() {
 	err := godotenv.Load(".env")
 	redisHost := os.Getenv("REDIS_HOST")
 
+	// get and set mode from env file for gin
+	mode := os.Getenv("GIN_MODE") 
+ 	SetMode(mode) 
+
 	if redisHost == "" {
 		redisHost = "127.0.0.1"
 	}
