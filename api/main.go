@@ -24,7 +24,6 @@ func main() {
 
 	// get and set mode from env file for gin
 	mode := os.Getenv("GIN_MODE") 
- 	SetMode(mode) 
 
 	if redisHost == "" {
 		redisHost = "127.0.0.1"
@@ -44,6 +43,7 @@ func main() {
 	db = connect(os.Getenv("DB_PATH"))
 
 	router := gin.Default()
+	router.SetMode(mode) 
 	router.Use(cors.New(corsConfig))
 	router.GET("/round/:contractid/:address", getUserRoundsPlayed)
 	router.GET("/allround/:contractid/:address", getAllUserRounds)
