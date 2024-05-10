@@ -103,7 +103,7 @@ func getAllPlayer(db *sql.DB, contractId string, limit int) ([]RoundParticipatio
 }
 
 func getRoundClaimedOrNot(db *sql.DB, contractId string, isClaimedRound bool) ([]RoundParticipationV2, error) {
-	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon sideMultipleChoice, TypeBet RoundParticipations.typebet, SideWonMultipleChoice from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE Claimed = ? AND Games.contractid = ?", isClaimedRound, contractId)
+	rows, err := db.Query("SELECT Address, Claimed, Side, AmountBid, ClaimedByAnyoneTimestamp, Epoch, PriceStart, PriceEnd, SideWon, sideMultipleChoice, RoundParticipations.typebet, SideWonMultipleChoice from RoundParticipations INNER JOIN Games ON games.id = RoundParticipations.gameid INNER JOIN addresses ON addresses.id = RoundParticipations.addressid INNER JOIN rounds ON rounds.id = RoundParticipations.roundId WHERE Claimed = ? AND Games.contractid = ?", isClaimedRound, contractId)
 	if err != nil {
 		fmt.Println(err)
 
