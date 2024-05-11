@@ -10,7 +10,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   if (network.settings === undefined) {
     throw new Error('No settings specified')
   }
-
+/*
   const punterTemplateId = deployer.getDeployContractResult('Punter')
   const roundTemplateId = deployer.getDeployContractResult('RoundChoice')
 
@@ -45,7 +45,7 @@ const deployPredictChoice: DeployFunction<Settings> = async (
   console.log(`Round contract address: ${roundTemplateId.contractInstance.address}`)
   console.log(`Prediction contract id: ${predict.contractInstance.contractId}`)
   console.log(`Prediction contract address: ${predict.contractInstance.address}\n\n`)
-  
+  */
 }
 
 export default deployPredictChoice

@@ -25,6 +25,8 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as RoundChoiceContractJson } from "../choice/RoundChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -92,6 +94,14 @@ class Factory extends ContractFactory<
   RoundChoiceInstance,
   RoundChoiceTypes.Fields
 > {
+  encodeFields(fields: RoundChoiceTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as RoundChoiceTypes.Fields;
   }
@@ -199,7 +209,8 @@ export const RoundChoice = new Factory(
   Contract.fromJson(
     RoundChoiceContractJson,
     "",
-    "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c"
+    "2f89a1a3ca07cf2a2eb15e194efe846e9980d6f90bfa820ad332686bb4794b34",
+    []
   )
 );
 

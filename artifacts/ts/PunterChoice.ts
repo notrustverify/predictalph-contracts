@@ -25,6 +25,8 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as PunterChoiceContractJson } from "../PunterChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -82,6 +84,14 @@ class Factory extends ContractFactory<
   PunterChoiceInstance,
   PunterChoiceTypes.Fields
 > {
+  encodeFields(fields: PunterChoiceTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as PunterChoiceTypes.Fields;
   }
@@ -149,7 +159,8 @@ export const PunterChoice = new Factory(
   Contract.fromJson(
     PunterChoiceContractJson,
     "",
-    "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a"
+    "2cf7cb7b8c9d86e0f22483b2fd1d0ef629e89001895e01a6f453d92fc4f2d15f",
+    []
   )
 );
 

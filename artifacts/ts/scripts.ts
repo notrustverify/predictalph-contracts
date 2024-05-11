@@ -37,112 +37,112 @@ export const BidChoice = new ExecutableScript<{
   predict: HexString;
   amount: bigint;
   side: boolean;
-}>(Script.fromJson(BidChoiceScriptJson, ""));
+}>(Script.fromJson(BidChoiceScriptJson, "", []));
 
 export const BidMultipleChoice = new ExecutableScript<{
   predict: HexString;
   amount: bigint;
   side: bigint;
-}>(Script.fromJson(BidMultipleChoiceScriptJson, ""));
+}>(Script.fromJson(BidMultipleChoiceScriptJson, "", []));
 
 export const BidPrice = new ExecutableScript<{
   predict: HexString;
   amount: bigint;
   side: boolean;
-}>(Script.fromJson(BidPriceScriptJson, ""));
+}>(Script.fromJson(BidPriceScriptJson, "", []));
 
 export const BoostRound = new ExecutableScript<{
   predict: HexString;
   amount: bigint;
   epochToBoost: bigint;
-}>(Script.fromJson(BoostRoundScriptJson, ""));
+}>(Script.fromJson(BoostRoundScriptJson, "", []));
 
 export const BoostRoundChoice = new ExecutableScript<{
   predict: HexString;
   amount: bigint;
   epochToBoost: bigint;
-}>(Script.fromJson(BoostRoundChoiceScriptJson, ""));
+}>(Script.fromJson(BoostRoundChoiceScriptJson, "", []));
 
 export const BoostRoundMultipleChoice = new ExecutableScript<{
   predict: HexString;
   amount: bigint;
   epochToBoost: bigint;
-}>(Script.fromJson(BoostRoundMultipleChoiceScriptJson, ""));
+}>(Script.fromJson(BoostRoundMultipleChoiceScriptJson, "", []));
 
 export const DestroyPredict = new ExecutableScript<{ predict: HexString }>(
-  Script.fromJson(DestroyPredictScriptJson, "")
+  Script.fromJson(DestroyPredictScriptJson, "", [])
 );
 
 export const DestroyRound = new ExecutableScript<{
   predict: HexString;
   arrayEpoch: HexString;
-}>(Script.fromJson(DestroyRoundScriptJson, ""));
+}>(Script.fromJson(DestroyRoundScriptJson, "", []));
 
 export const DestroyRoundChoice = new ExecutableScript<{
   predict: HexString;
   arrayEpoch: HexString;
-}>(Script.fromJson(DestroyRoundChoiceScriptJson, ""));
+}>(Script.fromJson(DestroyRoundChoiceScriptJson, "", []));
 
 export const DestroyRoundMultipleChoice = new ExecutableScript<{
   predict: HexString;
   arrayEpoch: HexString;
-}>(Script.fromJson(DestroyRoundMultipleChoiceScriptJson, ""));
+}>(Script.fromJson(DestroyRoundMultipleChoiceScriptJson, "", []));
 
 export const End = new ExecutableScript<{
   predict: HexString;
   price: bigint;
   immediatelyStart: boolean;
-}>(Script.fromJson(EndScriptJson, ""));
+}>(Script.fromJson(EndScriptJson, "", []));
 
 export const EndChoice = new ExecutableScript<{
   predict: HexString;
   sideWon: boolean;
   immediatelyStart: boolean;
-}>(Script.fromJson(EndChoiceScriptJson, ""));
+}>(Script.fromJson(EndChoiceScriptJson, "", []));
 
 export const EndMultipleChoice = new ExecutableScript<{
   predict: HexString;
   sideWon: bigint;
   immediatelyStart: boolean;
-}>(Script.fromJson(EndMultipleChoiceScriptJson, ""));
+}>(Script.fromJson(EndMultipleChoiceScriptJson, "", []));
 
 export const NewInterval = new ExecutableScript<{
   predict: HexString;
   newRecurrence: bigint;
-}>(Script.fromJson(NewIntervalScriptJson, ""));
+}>(Script.fromJson(NewIntervalScriptJson, "", []));
 
 export const NewIntervalChoice = new ExecutableScript<{
   predict: HexString;
   newRecurrence: bigint;
-}>(Script.fromJson(NewIntervalChoiceScriptJson, ""));
+}>(Script.fromJson(NewIntervalChoiceScriptJson, "", []));
 
 export const Start = new ExecutableScript<{
   predict: HexString;
   price: bigint;
-}>(Script.fromJson(StartScriptJson, ""));
+}>(Script.fromJson(StartScriptJson, "", []));
 
 export const StartChoice = new ExecutableScript<{ predict: HexString }>(
-  Script.fromJson(StartChoiceScriptJson, "")
+  Script.fromJson(StartChoiceScriptJson, "", [])
 );
 
 export const StartMultipleChoice = new ExecutableScript<{ predict: HexString }>(
-  Script.fromJson(StartMultipleChoiceScriptJson, "")
+  Script.fromJson(StartMultipleChoiceScriptJson, "", [])
 );
 
 export const WithdrawChoice = new ExecutableScript<{
   predict: HexString;
   epochParticipation: HexString;
   addressToClaim: Address;
-}>(Script.fromJson(WithdrawChoiceScriptJson, ""));
+}>(Script.fromJson(WithdrawChoiceScriptJson, "", []));
 
 export const WithdrawMultipleChoice = new ExecutableScript<{
   predict: HexString;
   epochParticipation: HexString;
   addressToClaim: Address;
-}>(Script.fromJson(WithdrawMultipleChoiceScriptJson, ""));
+}>(Script.fromJson(WithdrawMultipleChoiceScriptJson, "", []));
 
 export const WithdrawPrice = new ExecutableScript<{
   predict: HexString;
   epochParticipation: HexString;
   addressToClaim: Address;
-}>(Script.fromJson(WithdrawPriceScriptJson, ""));
+}>(Script.fromJson(WithdrawPriceScriptJson, "", []));
