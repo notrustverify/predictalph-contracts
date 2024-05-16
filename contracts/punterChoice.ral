@@ -1,40 +1,8 @@
-Contract PunterChoice(
+struct PunterChoice {
    predictionContractId: ByteVec,
    punterAddress: Address,
    epoch: U256,
    side: U256,
    amountBid: U256,
    claimedByAnyoneAt: U256
-) {
-
-   enum ErrorCodes {
-      InvalidCaller = 200
-   }
-
-
-   pub fn getAddress() -> (Address){
-      return punterAddress
-   }
-
-   pub fn getBid() -> (U256){
-      return side
-   }
-
-   pub fn getAmountBid() -> (U256) {
-      return amountBid
-   }
-
-   pub fn getRoundEpoch() -> (U256){
-      return epoch
-   }
-
-   pub fn getClaimedByAnyone() -> (U256){
-      return claimedByAnyoneAt
-   }
-
-   @using(assetsInContract = true)
-   pub fn destroy(from: Address) -> (){
-      checkCaller!(callerContractId!() == predictionContractId, ErrorCodes.InvalidCaller)
-      destroySelf!(from)
-   }
 }

@@ -25,14 +25,17 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as PredictMultipleChoiceContractJson } from "../multiple-choice/PredictMultipleChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
+import { PunterChoice, AllStructs } from "./types";
+import { RalphMap } from "@alephium/web3";
 
 // Custom types for the contract
 export namespace PredictMultipleChoiceTypes {
   export type Fields = {
-    punterTemplateId: HexString;
     roundTemplateId: HexString;
     title: HexString;
     epoch: bigint;
@@ -99,6 +102,14 @@ class Factory extends ContractFactory<
   PredictMultipleChoiceInstance,
   PredictMultipleChoiceTypes.Fields
 > {
+  encodeFields(fields: PredictMultipleChoiceTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      AllStructs
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as PredictMultipleChoiceTypes.Fields;
   }
@@ -127,139 +138,188 @@ class Factory extends ContractFactory<
 
   tests = {
     getArrayElem: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { array: HexString; index: bigint }
+        { array: HexString; index: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+    ): Promise<
+      TestContractResult<HexString, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "getArrayElem", params);
     },
     getRoundByEpoch: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { epochToGet: bigint }
+        { epochToGet: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+    ): Promise<
+      TestContractResult<HexString, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "getRoundByEpoch", params);
     },
     getRoundByEpochByteVec: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { epochToGet: HexString }
+        { epochToGet: HexString },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+    ): Promise<
+      TestContractResult<HexString, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "getRoundByEpochByteVec", params);
-    },
-    getBetInfoByEpoch: async (
-      params: TestContractParamsWithoutMaps<
-        PredictMultipleChoiceTypes.Fields,
-        { from: Address; epochToGet: HexString }
-      >
-    ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getBetInfoByEpoch", params);
     },
     getTitle: async (
       params: Omit<
-        TestContractParamsWithoutMaps<PredictMultipleChoiceTypes.Fields, never>,
+        TestContractParams<
+          PredictMultipleChoiceTypes.Fields,
+          never,
+          { punters?: Map<HexString, PunterChoice> }
+        >,
         "testArgs"
       >
-    ): Promise<TestContractResultWithoutMaps<HexString>> => {
+    ): Promise<
+      TestContractResult<HexString, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "getTitle", params);
     },
     startRound: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { from: Address }
+        { from: Address },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "startRound", params);
     },
     endRound: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { sideWon: bigint; immediatelyStart: boolean }
+        { sideWon: bigint; immediatelyStart: boolean },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "endRound", params);
     },
     bid: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { amount: bigint; side: bigint }
+        { amount: bigint; side: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "bid", params);
     },
     withdraw: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { from: Address; arrayEpochIn: HexString; addressToClaim: Address }
+        { from: Address; arrayEpochIn: HexString; addressToClaim: Address },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "withdraw", params);
     },
     destroyRound: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { epochArray: HexString }
+        { epochArray: HexString },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "destroyRound", params);
     },
     destroy: async (
       params: Omit<
-        TestContractParamsWithoutMaps<PredictMultipleChoiceTypes.Fields, never>,
+        TestContractParams<
+          PredictMultipleChoiceTypes.Fields,
+          never,
+          { punters?: Map<HexString, PunterChoice> }
+        >,
         "testArgs"
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "destroy", params);
     },
     boostRound: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { amount: bigint; epochToBoost: bigint }
+        { amount: bigint; epochToBoost: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "boostRound", params);
     },
     setNewRepeatEvery: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { newRecurrence: bigint }
+        { newRecurrence: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "setNewRepeatEvery", params);
     },
     setNewFees: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { basisPts: bigint }
+        { basisPts: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "setNewFees", params);
     },
     setNewOperator: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { newOperator: Address }
+        { newOperator: Address },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "setNewOperator", params);
     },
     setNewClaimedByAnyone: async (
-      params: TestContractParamsWithoutMaps<
+      params: TestContractParams<
         PredictMultipleChoiceTypes.Fields,
-        { newClaimedByAnyoneDelay: bigint }
+        { newClaimedByAnyoneDelay: bigint },
+        { punters?: Map<HexString, PunterChoice> }
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "setNewClaimedByAnyone", params);
     },
     setEndBeforeEnd: async (
       params: Omit<
-        TestContractParamsWithoutMaps<PredictMultipleChoiceTypes.Fields, never>,
+        TestContractParams<
+          PredictMultipleChoiceTypes.Fields,
+          never,
+          { punters?: Map<HexString, PunterChoice> }
+        >,
         "testArgs"
       >
-    ): Promise<TestContractResultWithoutMaps<null>> => {
+    ): Promise<
+      TestContractResult<null, { punters?: Map<HexString, PunterChoice> }>
+    > => {
       return testMethod(this, "setEndBeforeEnd", params);
     },
   };
@@ -269,8 +329,9 @@ class Factory extends ContractFactory<
 export const PredictMultipleChoice = new Factory(
   Contract.fromJson(
     PredictMultipleChoiceContractJson,
-    "=10+6=1-1=2-2+a2=2-2+bd=2-2+c6=2-2+70=2-2+cc=2-3+9=1-2=2+5=1-1=2-2+9c=2-1+b=3-2+d=1-3=2-2+e=1-3=2-2+f4440444144425=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1816",
-    "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677"
+    "=10-2+68=2-2+a7=2-2+b5=1-1=3+4=1-2+c5=2+c=1-1=2-1+e=1+4=2-1=2-2+45=2-2+47=3-1+9=3-1+a=3-1+b=3-1+d=3-1+e=92-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=22+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=598-2+70=342+7a7e0214696e73657274206174206d617020706174683a2000=119-1+3=60-2+80=127-1+a=280+7a7e021472656d6f7665206174206d617020706174683a2000=61-1+9=498",
+    "df898d3c6e8f79170961d908e8f2b36e2baefcb0a8b28bf3a986ba47372f65d7",
+    AllStructs
   )
 );
 
@@ -279,6 +340,14 @@ export class PredictMultipleChoiceInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
+
+  maps = {
+    punters: new RalphMap<HexString, PunterChoice>(
+      PredictMultipleChoice.contract,
+      this,
+      "punters"
+    ),
+  };
 
   async fetchState(): Promise<PredictMultipleChoiceTypes.State> {
     return fetchContractState(PredictMultipleChoice, this);

@@ -25,9 +25,12 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as RoundMultipleChoiceContractJson } from "../multiple-choice/RoundMultipleChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
+import { PunterChoice, AllStructs } from "./types";
 
 // Custom types for the contract
 export namespace RoundMultipleChoiceTypes {
@@ -102,6 +105,14 @@ class Factory extends ContractFactory<
   RoundMultipleChoiceInstance,
   RoundMultipleChoiceTypes.Fields
 > {
+  encodeFields(fields: RoundMultipleChoiceTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      AllStructs
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as RoundMultipleChoiceTypes.Fields;
   }
@@ -209,7 +220,8 @@ export const RoundMultipleChoice = new Factory(
   Contract.fromJson(
     RoundMultipleChoiceContractJson,
     "",
-    "be3962d657d282ee227e7044c4f4c7db14cda636a4262a3ed7b9975642ab7ac1"
+    "b713bb8b685de184db4d72e0bfb2884042351f3d708ffec91b95a03d5b37bb64",
+    AllStructs
   )
 );
 

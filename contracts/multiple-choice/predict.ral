@@ -1,5 +1,4 @@
 Contract PredictMultipleChoice(
-   punterTemplateId: ByteVec,
    roundTemplateId: ByteVec,
    title: ByteVec,
    mut epoch: U256,
@@ -10,6 +9,8 @@ Contract PredictMultipleChoice(
    mut playerCounter: U256,
    mut endBeforeEnd: Bool // can end round before real end
 ) extends DynamicArrayForInt() {
+
+   mapping[ByteVec, PunterChoice] punters
 
    event Bet(contractId: ByteVec, from: Address, epoch: U256, amount: U256, side: U256, claimedByAnyoneTimestamp: U256)
    event RoundEnded(contractId: ByteVec, epoch: U256, sideWon: U256)
@@ -50,13 +51,6 @@ Contract PredictMultipleChoice(
       assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
 
       return RoundMultipleChoice(roundContractId)
-   }
-
-   fn getBetInfoByEpoch(from: Address, epochToGet: ByteVec) -> PunterChoice {
-      let bidderContractId = subContractId!(SubContractTypes.PunterChoice ++ toByteVec!(from) ++ epochToGet)
-      assert!(contractExists!(bidderContractId), ErrorCodes.PunterChoiceNotExists)
-    
-      return PunterChoice(bidderContractId)
    }
 
    pub fn getTitle() -> (ByteVec){
@@ -134,15 +128,15 @@ Contract PredictMultipleChoice(
       let timestampNow = blockTimeStamp!()
       assert!(timestampNow < endRoundMultipleChoiceTimestamp, ErrorCodes.BidTimestampReached)
       assert!(isAssetAddress!(caller), ErrorCodes.InvalidPunterChoiceAddress)
-      assert!(amount >= 1 alph, ErrorCodes.NotEnoughAlph)
+      assert!(amount >= 0.1 alph, ErrorCodes.NotEnoughAlph)
 
       // use address for th path to be able to find it back 
-      let bidderContractId = SubContractTypes.PunterChoice ++ toByteVec!(caller) ++ u256To4Byte!(epoch)
+      let bidderKey = SubContractTypes.PunterChoice ++ toByteVec!(caller) ++ u256To4Byte!(epoch)
 
       // user never played, create contract
-      assert!(!contractExists!(subContractId!(bidderContractId)), ErrorCodes.AlreadyPlayed)
+      assert!(!punters.contains!(bidderKey), ErrorCodes.AlreadyPlayed)
 
-      let bidAmount = amount - 1 alph
+      let bidAmount = amount - 0.1 alph
 
       let mut claimedByAnyoneTimestamp = 0
       if(claimedByAnyoneDelay >= timestampNow){
@@ -152,8 +146,8 @@ Contract PredictMultipleChoice(
       }
 
       let selfContractId = selfContractId!()
-      let (encodedImmFields, encodedMutFields) = PunterChoice.encodeFields!(selfContractId, caller, epoch, side, bidAmount, claimedByAnyoneTimestamp)
-      let _ = copyCreateSubContract!{caller -> ALPH: 1 alph}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
+      let newBet = PunterChoice{predictionContractId: selfContractId, punterAddress: caller, epoch: epoch, side: side, amountBid: bidAmount, claimedByAnyoneAt: claimedByAnyoneTimestamp}
+      punters.insert!(caller, bidderKey, newBet)
       round.updateAmount{caller -> ALPH: bidAmount}(caller, bidAmount, side)
         
       playerCounter = playerCounter + 1
@@ -172,29 +166,29 @@ Contract PredictMultipleChoice(
       for (let mut index = 0; index < size!(arrayEpochIn)/4; index = index + 1) {
          let epochNumber = getArrayElem(arrayEpochIn, index)
          let roundContractId = subContractId!(SubContractTypes.RoundMultipleChoice ++ epochNumber)
-         let betInfoContractId = subContractId!(SubContractTypes.PunterChoice ++ toByteVec!(addressToClaim) ++ epochNumber)
+         let betInfoContractKey = SubContractTypes.PunterChoice ++ toByteVec!(addressToClaim) ++ epochNumber
          assert!(contractExists!(roundContractId), ErrorCodes.RoundNotExists)
-         assert!(contractExists!(betInfoContractId), ErrorCodes.PunterChoiceNotExists)
+         assert!(punters.contains!(betInfoContractKey), ErrorCodes.PunterChoiceNotExists)
 
-         if (contractExists!(roundContractId) && contractExists!(betInfoContractId)){
-            let betInfoCaller = getBetInfoByEpoch(addressToClaim, epochNumber)
+         if (contractExists!(roundContractId) && contractExists!(betInfoContractKey)){
+            let betInfoCaller = punters[betInfoContractKey]
             
-            let addressPunterChoice = betInfoCaller.getAddress()
-            let canBeClaimedAt = betInfoCaller.getClaimedByAnyone()
+            let addressPunterChoice = betInfoCaller.punterAddress
+            let canBeClaimedAt = betInfoCaller.claimedByAnyoneAt
             
             if(addressToClaim != from){
                assert!(timestampNow > canBeClaimedAt, ErrorCodes.CannotBeClaimedYet)
             }
 
-            let amountPunterChoice = betInfoCaller.getAmountBid()
-            let upBid = betInfoCaller.getBid()
+            let amountPunterChoice = betInfoCaller.amountBid
+            let upBid = betInfoCaller.side
 
             let round = getRoundByEpochByteVec(epochNumber)
 
             // cannot claim if the round didnt end 
 
             round.userClaimRewards(addressToClaim, amountPunterChoice, upBid)
-            betInfoCaller.destroy(from)
+            punters.remove!(from, betInfoContractKey)
 
             playerCounter = playerCounter - 1 
             // emit who call and with and which punter it concerned

@@ -1,6 +1,6 @@
 import { Deployer, DeployFunction } from '@alephium/cli'
 import { Settings } from '../alephium.config'
-import { Punter, PunterChoice, Round, RoundChoice, RoundMultipleChoice, RoundMultipleChoiceInstance, RoundMultipleChoiceTypes } from '../artifacts/ts'
+import { Punter, Round, RoundChoice, RoundMultipleChoice, RoundMultipleChoiceInstance, RoundMultipleChoiceTypes } from '../artifacts/ts'
 import { ZERO_ADDRESS } from '@alephium/web3'
 
 const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Promise<void> => {
@@ -15,16 +15,6 @@ const deployTemplate: DeployFunction<Settings> = async (deployer: Deployer): Pro
     }
   })
 
-  await deployer.deployContract(PunterChoice, {
-   initialFields: {
-       predictionContractId: '00',
-       punterAddress: ZERO_ADDRESS,
-       epoch: 0n,
-       side: 0n,
-       amountBid: 0n,
-       claimedByAnyoneAt: 0n
-   }
- })
 
   await deployer.deployContract(Round, {
     initialFields: {

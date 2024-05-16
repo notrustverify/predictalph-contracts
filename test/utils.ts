@@ -28,7 +28,6 @@ import {
   EndChoice,
   RoundChoice,
   BoostRoundChoice,
-  PunterChoice,
   RoundMultipleChoice,
   PredictMultipleChoice,
   PredictMultipleChoiceInstance,
@@ -159,18 +158,6 @@ export async function deployRoundChoiceTemplate() {
   });
 }
 
-export async function deployPunterMultipleChoiceTemplate() {
-  return await PunterChoice.deploy(defaultSigner, {
-    initialFields: {
-      predictionContractId: "00",
-      punterAddress: ZERO_ADDRESS,
-      epoch: 0n,
-      side: 0n,
-      amountBid: 0n,
-      claimedByAnyoneAt: 0n,
-    },
-  });
-}
 
 export async function deployRoundMultipleChoiceTemplate() {
   return await RoundMultipleChoice.deploy(defaultSigner, {
@@ -201,15 +188,12 @@ export async function deployPredictionMultipleChoice(
   title: string,
   endBeforeEnd: boolean
 ) {
-  const punterMultipleChoiceTemplateId =
-    await deployPunterMultipleChoiceTemplate();
+
   const roundMultipleChoiceTemplateId =
     await deployRoundMultipleChoiceTemplate();
 
   return await PredictMultipleChoice.deploy(defaultSigner, {
     initialFields: {
-      punterTemplateId:
-        punterMultipleChoiceTemplateId.contractInstance.contractId,
       roundTemplateId:
         roundMultipleChoiceTemplateId.contractInstance.contractId,
       epoch: epoch,
