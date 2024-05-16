@@ -1,0 +1,29 @@
+[
+  {
+    "name": "PunterChoice",
+    "fieldNames": [
+      "predictionContractId",
+      "punterAddress",
+      "epoch",
+      "side",
+      "amountBid",
+      "claimedByAnyoneAt"
+    ],
+    "fieldTypes": [
+      "ByteVec",
+      "Address",
+      "U256",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  }
+]
