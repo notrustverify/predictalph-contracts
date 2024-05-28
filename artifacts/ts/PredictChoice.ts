@@ -25,6 +25,8 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as PredictChoiceContractJson } from "../choice/PredictChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -99,6 +101,14 @@ class Factory extends ContractFactory<
   PredictChoiceInstance,
   PredictChoiceTypes.Fields
 > {
+  encodeFields(fields: PredictChoiceTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as PredictChoiceTypes.Fields;
   }
@@ -270,7 +280,8 @@ export const PredictChoice = new Factory(
   Contract.fromJson(
     PredictChoiceContractJson,
     "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+2=2-1=1-1+8a=2-2+51=3-1+2=2+5a4=1-1+74=2-2+92=2-2+a2=2-2+b2=2-2+c2=2-2+d2=2-2+e3=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1720",
-    "ecb96930aa7105c7466435463df9d9186a5459ff9cf7688192cb2c93fd69d9c0"
+    "ecb96930aa7105c7466435463df9d9186a5459ff9cf7688192cb2c93fd69d9c0",
+    []
   )
 );
 

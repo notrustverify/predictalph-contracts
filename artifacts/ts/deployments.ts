@@ -44,6 +44,7 @@ export type Deployments = {
     PredictChoice_PredictChoiceBTC100K?: DeployContractExecutionResult<PredictChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceTest?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceUEFASemi?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
+    PredictMultipleChoice_PredictMultipleChoiceRealBorussia?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceNBAKnick76ers?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictChoiceNGUTOP?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceNGUTOP?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
@@ -179,6 +180,21 @@ function toDeployments(json: any): Deployments {
             contractInstance: PredictMultipleChoice.at(
               json.contracts[
                 "PredictMultipleChoice:PredictMultipleChoiceUEFASemi"
+              ].contractInstance.address
+            ),
+          },
+    PredictMultipleChoice_PredictMultipleChoiceRealBorussia:
+      json.contracts[
+        "PredictMultipleChoice:PredictMultipleChoiceRealBorussia"
+      ] === undefined
+        ? undefined
+        : {
+            ...json.contracts[
+              "PredictMultipleChoice:PredictMultipleChoiceRealBorussia"
+            ],
+            contractInstance: PredictMultipleChoice.at(
+              json.contracts[
+                "PredictMultipleChoice:PredictMultipleChoiceRealBorussia"
               ].contractInstance.address
             ),
           },

@@ -25,6 +25,8 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  addStdIdToFields,
+  encodeContractFields,
 } from "@alephium/web3";
 import { default as PredictMultipleChoiceContractJson } from "../multiple-choice/PredictMultipleChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
@@ -99,6 +101,14 @@ class Factory extends ContractFactory<
   PredictMultipleChoiceInstance,
   PredictMultipleChoiceTypes.Fields
 > {
+  encodeFields(fields: PredictMultipleChoiceTypes.Fields) {
+    return encodeContractFields(
+      addStdIdToFields(this.contract, fields),
+      this.contract.fieldsSig,
+      []
+    );
+  }
+
   getInitialFieldsWithDefaultValues() {
     return this.contract.getInitialFieldsWithDefaultValues() as PredictMultipleChoiceTypes.Fields;
   }
@@ -270,7 +280,8 @@ export const PredictMultipleChoice = new Factory(
   Contract.fromJson(
     PredictMultipleChoiceContractJson,
     "=10+6=1-1=2-2+a2=2-2+bd=2-2+c6=2-2+70=2-2+cc=2-3+9=1-2=2+5=1-1=2-2+9c=2-1+b=3-2+d=1-3=2-2+e=1-3=2-2+f4440444144425=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1816",
-    "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677"
+    "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677",
+    []
   )
 );
 

@@ -19,7 +19,7 @@ const deployPredictionMultipleChoice: DeployFunction<Settings> = async (
   const ONE_DAY_SEC = 86400
   const MAY = 1717199999
   const settings = network.settings
-  const title = "Who will come to the finals of the UEFA Champions leauge?"
+  const title = "Real Madrid vs. Borussia Dortmund"
 
   const predict = await deployer.deployContract(PredictMultipleChoice, {
     initialFields: {
@@ -29,14 +29,14 @@ const deployPredictionMultipleChoice: DeployFunction<Settings> = async (
        operator: deployer.account.address,
        feesBasisPts: 100n,
        //repeatEvery: BigInt(1800*1000),
-       repeatEvery: BigInt(1715194800 * 1000),
+       repeatEvery: BigInt(1717268400 * 1000),
        claimedByAnyoneDelay: BigInt((ONE_WEEK_SEC + 1715194800) * 1000),
        title: binToHex(new TextEncoder().encode(title)),
        playerCounter: 0n,
        endBeforeEnd: true
     },
 
-  },"PredictMultipleChoiceUEFASemi")
+  },"PredictMultipleChoiceRealBorussia")
 
   console.log(`Deploying Choice ${title}`)
   console.log(`Punter contract id: ${punterTemplateId.contractInstance.contractId}`)
