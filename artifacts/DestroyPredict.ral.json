@@ -1,5 +1,5 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.0.1",
   "name": "DestroyPredict",
   "bytecodeTemplate": "010103000000040c0c{0}010a",
   "fieldsSig": {
@@ -16,9 +16,6 @@
   "functions": [
     {
       "name": "main",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],

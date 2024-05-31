@@ -1,8 +1,8 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.0.1",
   "name": "Punter",
-  "bytecode": "060609121b4024402d403e010000000102ce0102010000000102ce0302010000000102ce0402010000000102ce0202010000000102ce0502010201010007b3ce00411340c87b1600b0",
-  "codeHash": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
+  "bytecode": "06060e1c402a40384046405c010000000103d3acb775bece0102010000000103d365f80b6dce0302010000000103d3f36a26a7ce0402010000000103d3c600af1bce0202010000000103d36508ec98ce0502010201010008d320f98f62b3ce00411340c87b1600b0",
+  "codeHash": "1c9457dbca2db0e2989b5bbf58f4ae5a90fb2bf71d2fc0270ff96374e4811436",
   "fieldsSig": {
     "names": [
       "predictionContractId",
@@ -33,9 +33,6 @@
   "functions": [
     {
       "name": "getAddress",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -45,9 +42,6 @@
     },
     {
       "name": "getBid",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -57,9 +51,6 @@
     },
     {
       "name": "getAmountBid",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -69,9 +60,6 @@
     },
     {
       "name": "getRoundEpoch",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -81,9 +69,6 @@
     },
     {
       "name": "getClaimedByAnyone",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -93,9 +78,6 @@
     },
     {
       "name": "destroy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "from"
       ],

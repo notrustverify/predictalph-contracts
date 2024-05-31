@@ -1,8 +1,8 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.0.1",
   "name": "RoundChoice",
-  "bytecode": "100a09121b4024402d406840b140d140ea4128010000000102ce0302010000000102a00602010000000102a00802010000000102ce0102010000000102ce050201010303001fb3ce00411340647ba000191340677ba00316012aa10316024c05a00416012aa1044a04a00516012aa105a0090d2aa10916001601a901000101004025b3ce00411340647bce054b05ce0356321340687ba000191340677b16004c03a004a1084a02a005a108a003ce022c1367102da106a003a0062ba1071600a10203a10001010202000fa000191340677ba00116012aa101a00316012aa10316001601a901020000000cb3ce00411340647ba0090c321340657bce04b001020304004021b3ce00411340647ba0001340697ba0070c334c11a00216021c4c0d1601a0072ca0082d170316001603a8a00316032ba103a0090d2ba109",
-  "codeHash": "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c",
+  "bytecode": "100a0e1c402a40384046408740d540fa4118415b010000000103d32b301872ce0302010000000103d343c19cdda00602010000000103d3f034d088a00802010000000103d3c600af1bce0102010000000103d303042c51ce050201010303004020d3027728a5b3ce00411340647ba000191340677ba00316012aa10316024c05a00416012aa1044a04a00516012aa105a0090d2aa10916001601a901000101004026d38bedc8e4b3ce00411340647bce054b05ce0356321340687ba000191340677b16004c03a004a1084a02a005a108a003ce022c1367102da106a003a0062ba1071600a10203a100010102020010d32300b4bda000191340677ba00116012aa101a00316012aa10316001601a901020000000dd38e18691cb3ce00411340647ba0090c321340657bce04b001020304004022d30b7a506bb3ce00411340647ba0001340697ba0070c334c11a00216021c4c0d1601a0072ca0082d170316001603a8a00316032ba103a0090d2ba109",
+  "codeHash": "2f89a1a3ca07cf2a2eb15e194efe846e9980d6f90bfa820ad332686bb4794b34",
   "fieldsSig": {
     "names": [
       "prediction",
@@ -63,9 +63,6 @@
   "functions": [
     {
       "name": "getEndRoundTime",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -75,9 +72,6 @@
     },
     {
       "name": "getRewardAmount",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -87,9 +81,6 @@
     },
     {
       "name": "getRewardBaseCalAmount",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -99,9 +90,6 @@
     },
     {
       "name": "getRoundEpoch",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -111,9 +99,6 @@
     },
     {
       "name": "canEndBeforeEnd",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -123,9 +108,6 @@
     },
     {
       "name": "updateAmount",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "from",
         "amount",
@@ -145,9 +127,6 @@
     },
     {
       "name": "calculateRewards",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [
         "sideWinning"
       ],
@@ -161,9 +140,6 @@
     },
     {
       "name": "boost",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "from",
         "amount"
@@ -180,9 +156,6 @@
     },
     {
       "name": "destroy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -190,9 +163,6 @@
     },
     {
       "name": "userClaimRewards",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "addressPunter",
         "amountBid",

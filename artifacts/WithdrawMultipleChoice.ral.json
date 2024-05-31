@@ -1,5 +1,5 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.0.1",
   "name": "WithdrawMultipleChoice",
   "bytecodeTemplate": "01010300010009b417001600{1}{2}0f0c{0}0108",
   "fieldsSig": {
@@ -22,9 +22,6 @@
   "functions": [
     {
       "name": "main",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],

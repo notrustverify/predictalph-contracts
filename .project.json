@@ -1,5 +1,5 @@
 {
-  "fullNodeVersion": "v2.12.0",
+  "fullNodeVersion": "v3.0.1",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
@@ -124,57 +124,57 @@
     "PredictChoice": {
       "sourceFile": "choice/predict.ral",
       "sourceCodeHash": "9f8f151eac000ca30cb8aef41a7e4f134d745e3d78d9c98024ed527af207894b",
-      "bytecodeDebugPatch": "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+2=2-1=1-1+8a=2-2+51=3-1+2=2+5a4=1-1+74=2-2+92=2-2+a2=2-2+b2=2-2+c2=2-2+d2=2-2+e3=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1720",
-      "codeHashDebug": "ecb96930aa7105c7466435463df9d9186a5459ff9cf7688192cb2c93fd69d9c0",
+      "bytecodeDebugPatch": "=10-2+5f=2+9=1-1=2-2+b0=2-2+be=2-2+3d=2-5+9=3-2+6a=2-3=1-1=3-1+7d4=1+9c=2-2+bf=2-1=2-3=2-2+e9=2+f=1-1+44134429=91-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1850",
+      "codeHashDebug": "d71a7195a0742653388474e2fd3fd933feb81be152442a070cecf1ed0204c2be",
       "warnings": []
     },
     "PredictMultipleChoice": {
       "sourceFile": "multiple-choice/predict.ral",
       "sourceCodeHash": "8950bb18cba55c073866a4c0d5278c108e0cfafee7ed29f2bb66d62a5e569ccc",
-      "bytecodeDebugPatch": "=10+6=1-1=2-2+a2=2-2+bd=2-2+c6=2-2+70=2-2+cc=2-3+9=1-2=2+5=1-1=2-2+9c=2-1+b=3-2+d=1-3=2-2+e=1-3=2-2+f4440444144425=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1816",
-      "codeHashDebug": "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677",
+      "bytecodeDebugPatch": "=10-6+68=2+a=2-1=1-1+c=2-2+0d04=1+7f=2-2+e0=2-2+ac=2+7=1-1=2-2+bf=2-1+de44=1+1=1-3=1-3+16=1-3=1-2=1+b4=3-1=2-2+55446b=91-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1946",
+      "codeHashDebug": "b1a7cf498bba3b6b0a95601d8107ed41472e56e4897729e8bed7083e1337e11a",
       "warnings": []
     },
     "PredictPrice": {
       "sourceFile": "price/predict.ral",
       "sourceCodeHash": "866b6b307a4306be1465bd07c1ea815d976a92bd29553ac6de4c23410f83d559",
-      "bytecodeDebugPatch": "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+6=2+2=1-1=3-1+d=2+3=1-1=3-1+3=3-1+5=3-1+6=3-1+7=3-1+8=3-1+9=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1600",
-      "codeHashDebug": "35cff66724106a4953bc380897ceb4742e7ece4a52cf282df9e3f8be0cba6e7e",
+      "bytecodeDebugPatch": "=10-2+59=2-1+8=3-1+a=3-1+b=2-2+12=3-1+7=3-1+3=3-1+f=3-1+4=3-1+6=3-1+8=3-1+9=3-1+b=3-1+c=3-1+d=92-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1720",
+      "codeHashDebug": "5451688e8f61e8a2d83d75d9c29b41a9cd254d71e90b5901d79f838af6572f8b",
       "warnings": []
     },
     "Punter": {
       "sourceFile": "punter.ral",
       "sourceCodeHash": "903a9c7009e1fc66628dba4640440e8cbc6dcb3b62fdecc1db331c8ae08ee404",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
+      "codeHashDebug": "1c9457dbca2db0e2989b5bbf58f4ae5a90fb2bf71d2fc0270ff96374e4811436",
       "warnings": []
     },
     "PunterChoice": {
       "sourceFile": "punterChoice.ral",
       "sourceCodeHash": "d51b047e24d84e916cc870369b8a6f625ca6589cc22178c4580ad9555264412d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
+      "codeHashDebug": "2cf7cb7b8c9d86e0f22483b2fd1d0ef629e89001895e01a6f453d92fc4f2d15f",
       "warnings": []
     },
     "Round": {
       "sourceFile": "price/round.ral",
       "sourceCodeHash": "116330ad4b9e59448a4fa0204bcd4ed0347cefb3be70ed88576f718e6cf5377d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "4a43dd8c1ec8b2bb5e5e2234577ed61f088f55168fb510d2921569860b2c8fd1",
+      "codeHashDebug": "c73ef8fb3fee2509dd99a34a77755f8b429fc77b206e8bdae16a83689d6f72c7",
       "warnings": []
     },
     "RoundChoice": {
       "sourceFile": "choice/round.ral",
       "sourceCodeHash": "509d3c9e019376975e633356de45ae2cb402a738b08c25808f8a92c3e49a36e7",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c",
+      "codeHashDebug": "2f89a1a3ca07cf2a2eb15e194efe846e9980d6f90bfa820ad332686bb4794b34",
       "warnings": []
     },
     "RoundMultipleChoice": {
       "sourceFile": "multiple-choice/round.ral",
       "sourceCodeHash": "a5d795447be7ac029b78920eb55d9700f4b568a1f91dddae3f5b9a059353f3be",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "be3962d657d282ee227e7044c4f4c7db14cda636a4262a3ed7b9975642ab7ac1",
+      "codeHashDebug": "b713bb8b685de184db4d72e0bfb2884042351f3d708ffec91b95a03d5b37bb64",
       "warnings": []
     },
     "Start": {
