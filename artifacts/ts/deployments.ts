@@ -45,6 +45,7 @@ export type Deployments = {
     PredictMultipleChoice_PredictMultipleChoiceTest?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceUEFASemi?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceRealBorussia?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
+    PredictMultipleChoice_PredictMultipleChoiceNBADallasBoston?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceNBAKnick76ers?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictChoiceNGUTOP?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
     PredictMultipleChoice_PredictMultipleChoiceNGUTOP?: DeployContractExecutionResult<PredictMultipleChoiceInstance>;
@@ -195,6 +196,21 @@ function toDeployments(json: any): Deployments {
             contractInstance: PredictMultipleChoice.at(
               json.contracts[
                 "PredictMultipleChoice:PredictMultipleChoiceRealBorussia"
+              ].contractInstance.address
+            ),
+          },
+    PredictMultipleChoice_PredictMultipleChoiceNBADallasBoston:
+      json.contracts[
+        "PredictMultipleChoice:PredictMultipleChoiceNBADallasBoston"
+      ] === undefined
+        ? undefined
+        : {
+            ...json.contracts[
+              "PredictMultipleChoice:PredictMultipleChoiceNBADallasBoston"
+            ],
+            contractInstance: PredictMultipleChoice.at(
+              json.contracts[
+                "PredictMultipleChoice:PredictMultipleChoiceNBADallasBoston"
               ].contractInstance.address
             ),
           },

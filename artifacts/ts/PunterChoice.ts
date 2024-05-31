@@ -159,7 +159,7 @@ export const PunterChoice = new Factory(
   Contract.fromJson(
     PunterChoiceContractJson,
     "",
-    "2cf7cb7b8c9d86e0f22483b2fd1d0ef629e89001895e01a6f453d92fc4f2d15f",
+    "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
     []
   )
 );

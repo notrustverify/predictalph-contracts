@@ -209,7 +209,7 @@ export const RoundChoice = new Factory(
   Contract.fromJson(
     RoundChoiceContractJson,
     "",
-    "2f89a1a3ca07cf2a2eb15e194efe846e9980d6f90bfa820ad332686bb4794b34",
+    "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c",
     []
   )
 );
